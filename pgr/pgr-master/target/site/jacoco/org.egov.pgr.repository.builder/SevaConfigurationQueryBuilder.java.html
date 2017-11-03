@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SevaConfigurationQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">SevaConfigurationQueryBuilder.java</span></div><h1>SevaConfigurationQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.web.contract.SevaConfigurationGetRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L53">public class SevaConfigurationQueryBuilder {</span>
+
+<span class="nc" id="L55">	private static final Logger logger = LoggerFactory.getLogger(SevaConfigurationQueryBuilder.class);</span>
+
+	@Autowired
+	private ApplicationProperties applicationProperties;
+
+	private static final String BASE_QUERY = &quot;SELECT ck.keyName as key, cv.value as value&quot; + &quot; FROM egseva_config ck&quot;
+			+ &quot; JOIN egseva_configvalues cv ON ck.id = cv.keyId AND ck.tenantId = cv.tenantId&quot;;
+
+	@SuppressWarnings(&quot;rawtypes&quot;)
+	public String getQuery(SevaConfigurationGetRequest sevaConfigurationGetRequest, List preparedStatementValues) {
+<span class="nc" id="L65">		StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+
+<span class="nc" id="L67">		addWhereClause(selectQuery, preparedStatementValues, sevaConfigurationGetRequest);</span>
+<span class="nc" id="L68">		addOrderByClause(selectQuery, sevaConfigurationGetRequest);</span>
+<span class="nc" id="L69">		addPagingClause(selectQuery, preparedStatementValues, sevaConfigurationGetRequest);</span>
+
+<span class="nc" id="L71">		logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L72">		return selectQuery.toString();</span>
+	}
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addWhereClause(StringBuilder selectQuery, List preparedStatementValues,
+			SevaConfigurationGetRequest sevaConfigurationGetRequest) {
+
+<span class="nc bnc" id="L79" title="All 4 branches missed.">		if (sevaConfigurationGetRequest.getId() == null &amp;&amp; sevaConfigurationGetRequest.getEffectiveFrom() == null</span>
+<span class="nc bnc" id="L80" title="All 4 branches missed.">				&amp;&amp; sevaConfigurationGetRequest.getKeyName() == null &amp;&amp; sevaConfigurationGetRequest.getTenantId() == null)</span>
+<span class="nc" id="L81">			return;</span>
+
+<span class="nc" id="L83">		selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L84">		boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L86" title="All 2 branches missed.">		if (sevaConfigurationGetRequest.getTenantId() != null) {</span>
+<span class="nc" id="L87">			isAppendAndClause = true;</span>
+<span class="nc" id="L88">			selectQuery.append(&quot; ck.tenantId = ?&quot;);</span>
+<span class="nc" id="L89">			preparedStatementValues.add(sevaConfigurationGetRequest.getTenantId());</span>
+		}
+
+<span class="nc bnc" id="L92" title="All 2 branches missed.">		if (sevaConfigurationGetRequest.getId() != null) {</span>
+<span class="nc" id="L93">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L94">			selectQuery.append(&quot; ck.id IN &quot; + getIdQuery(sevaConfigurationGetRequest.getId()));</span>
+		}
+
+<span class="nc bnc" id="L97" title="All 2 branches missed.">		if (sevaConfigurationGetRequest.getKeyName() != null) {</span>
+<span class="nc" id="L98">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L99">			selectQuery.append(&quot; ck.keyName = ?&quot;);</span>
+<span class="nc" id="L100">			preparedStatementValues.add(sevaConfigurationGetRequest.getKeyName());</span>
+		}
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">		if (sevaConfigurationGetRequest.getEffectiveFrom() != null) {</span>
+<span class="nc" id="L104">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L105">			selectQuery.append(&quot; cv.effectiveFrom = ?&quot;);</span>
+<span class="nc" id="L106">			preparedStatementValues.add(sevaConfigurationGetRequest.getEffectiveFrom());</span>
+		}
+<span class="nc" id="L108">	}</span>
+
+	private void addOrderByClause(StringBuilder selectQuery, SevaConfigurationGetRequest sevaConfigurationGetRequest) {
+<span class="nc bnc" id="L111" title="All 2 branches missed.">		String sortBy = (sevaConfigurationGetRequest.getSortBy() == null ? &quot;keyName&quot;</span>
+<span class="nc" id="L112">				: sevaConfigurationGetRequest.getSortBy());</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">		String sortOrder = (sevaConfigurationGetRequest.getSortOrder() == null ? &quot;ASC&quot;</span>
+<span class="nc" id="L114">				: sevaConfigurationGetRequest.getSortOrder());</span>
+<span class="nc" id="L115">		selectQuery.append(&quot; ORDER BY &quot; + sortBy + &quot; &quot; + sortOrder);</span>
+<span class="nc" id="L116">	}</span>
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addPagingClause(StringBuilder selectQuery, List preparedStatementValues,
+			SevaConfigurationGetRequest hrConfigurationGetRequest) {
+		// handle limit(also called pageSize) here
+<span class="nc" id="L122">		selectQuery.append(&quot; LIMIT ?&quot;);</span>
+<span class="nc" id="L123">		long pageSize = Integer.parseInt(applicationProperties.sevaSearchPageSizeDefault());</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">		if (hrConfigurationGetRequest.getPageSize() != null)</span>
+<span class="nc" id="L125">			pageSize = hrConfigurationGetRequest.getPageSize();</span>
+<span class="nc" id="L126">		preparedStatementValues.add(pageSize); // Set limit to pageSize</span>
+
+		// handle offset here
+<span class="nc" id="L129">		selectQuery.append(&quot; OFFSET ?&quot;);</span>
+<span class="nc" id="L130">		int pageNumber = 0; // Default pageNo is zero meaning first page</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">		if (hrConfigurationGetRequest.getPageNumber() != null)</span>
+<span class="nc" id="L132">			pageNumber = hrConfigurationGetRequest.getPageNumber() - 1;</span>
+<span class="nc" id="L133">		preparedStatementValues.add(pageNumber * pageSize); // Set offset to</span>
+															// pageNo * pageSize
+<span class="nc" id="L135">	}</span>
+
+	/**
+	 * This method is always called at the beginning of the method so that and
+	 * is prepended before the field's predicate is handled.
+	 * 
+	 * @param appendAndClauseFlag
+	 * @param queryString
+	 * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+	 */
+	private boolean addAndClauseIfRequired(boolean appendAndClauseFlag, StringBuilder queryString) {
+<span class="nc bnc" id="L146" title="All 2 branches missed.">		if (appendAndClauseFlag)</span>
+<span class="nc" id="L147">			queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L149">		return true;</span>
+	}
+
+	private static String getIdQuery(List&lt;Long&gt; idList) {
+<span class="nc" id="L153">		StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">		if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L155">			query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">			for (int i = 1; i &lt; idList.size(); i++) {</span>
+<span class="nc" id="L157">				query.append(&quot;, &quot; + idList.get(i));</span>
+			}
+		}
+<span class="nc" id="L160">		return query.append(&quot;)&quot;).toString();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

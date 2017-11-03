@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OTPConfigService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.service</a> &gt; <span class="el_source">OTPConfigService.java</span></div><h1>OTPConfigService.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.egov.pgr.domain.model.OTPConfig;
+import org.egov.pgr.producers.PGRProducer;
+import org.egov.pgr.repository.OTPConfigRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Service
+<span class="fc" id="L57">public class OTPConfigService {</span>
+	
+<span class="fc" id="L59">	public static final Logger logger = LoggerFactory.getLogger(OTPConfigService.class);</span>
+	
+	@Autowired
+	private PGRProducer pgrProducer;
+	
+	@Autowired
+	private OTPConfigRepository otpConfigRepository;
+	
+	public OTPConfig createOTPConfig(final String topic, final String key,
+			final OTPConfig otpConfig) {
+<span class="nc" id="L69">		final ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L70">		String otpConfigValue = null;</span>
+		try {
+<span class="nc" id="L72">			logger.info(&quot;OTP Config::&quot; + otpConfig);</span>
+<span class="nc" id="L73">			otpConfigValue = mapper.writeValueAsString(otpConfig);</span>
+<span class="nc" id="L74">			logger.info(&quot;Value to the Queue : OTP Config Value::&quot; + otpConfigValue);</span>
+<span class="nc" id="L75">		} catch (final JsonProcessingException e) {</span>
+<span class="nc" id="L76">			logger.error(&quot;Exception Encountered : &quot; + e);</span>
+<span class="nc" id="L77">		}</span>
+		try {
+<span class="nc" id="L79">			pgrProducer.sendMessage(topic, key, otpConfigValue);</span>
+<span class="nc" id="L80">		} catch (final Exception e) {</span>
+<span class="nc" id="L81">			logger.error(&quot;Exception while posting to kafka Queue : &quot; + e);</span>
+<span class="nc" id="L82">			return otpConfig;</span>
+<span class="nc" id="L83">		}</span>
+<span class="nc" id="L84">		logger.info(&quot;Producer successfully posted the request to Queue&quot;);</span>
+<span class="nc" id="L85">		return otpConfig;</span>
+	}
+	
+	public OTPConfig updateOTPConfig(final String topic, final String key,
+			final OTPConfig otpConfig) {
+<span class="nc" id="L90">		final ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L91">		String otpConfigValue = null;</span>
+		try {
+<span class="nc" id="L93">			logger.info(&quot;OTP Config::&quot; + otpConfig);</span>
+<span class="nc" id="L94">			otpConfigValue = mapper.writeValueAsString(otpConfig);</span>
+<span class="nc" id="L95">			logger.info(&quot;Value to the Queue : OTP Config Value::&quot; + otpConfigValue);</span>
+<span class="nc" id="L96">		} catch (final JsonProcessingException e) {</span>
+<span class="nc" id="L97">			logger.error(&quot;Exception Encountered : &quot; + e);</span>
+<span class="nc" id="L98">		}</span>
+		try {
+<span class="nc" id="L100">			pgrProducer.sendMessage(topic, key, otpConfigValue);</span>
+<span class="nc" id="L101">		} catch (final Exception e) {</span>
+<span class="nc" id="L102">			logger.error(&quot;Exception while posting to kafka Queue : &quot; + e);</span>
+<span class="nc" id="L103">			return otpConfig;</span>
+<span class="nc" id="L104">		}</span>
+<span class="nc" id="L105">		logger.info(&quot;Producer successfully posted the request to Queue&quot;);</span>
+<span class="nc" id="L106">		return otpConfig;</span>
+	}
+	
+	public OTPConfig create(OTPConfig otpConfig) {
+<span class="fc" id="L110">		logger.info(&quot;Persisting OTP Config Data&quot;);</span>
+<span class="fc" id="L111">		return otpConfigRepository.persistOTPConfig(otpConfig);</span>
+	}
+	
+	public boolean update(OTPConfig otpConfig) {
+<span class="fc" id="L115">		logger.info(&quot;Updating OTP Config Data&quot;);</span>
+<span class="fc" id="L116">		return otpConfigRepository.updateOTPConfig(otpConfig);</span>
+	}
+	
+	public List&lt;org.egov.pgr.web.contract.OTPConfig&gt; getAllOtpConfig(List&lt;String&gt; tenantList) {
+<span class="fc" id="L120">		List&lt;OTPConfig&gt; configList = otpConfigRepository.getAllOtpConfig(tenantList);</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">		for(int i=0;i&lt;configList.size();i++){</span>
+<span class="fc" id="L122">			tenantList.remove(configList.get(i).getTenantId());</span>
+		}
+<span class="fc bfc" id="L124" title="All 2 branches covered.">		for (int i = 0; i &lt; tenantList.size(); i++) {</span>
+<span class="fc" id="L125">			OTPConfig config = new OTPConfig();</span>
+<span class="fc" id="L126">			config.setTenantId(tenantList.get(i));</span>
+<span class="fc" id="L127">			config.setOtpConfigEnabled(false);</span>
+<span class="fc" id="L128">			configList.add(config);</span>
+		}
+<span class="fc" id="L130">		return modelToContract(configList);</span>
+
+	}
+	
+	private List&lt;org.egov.pgr.web.contract.OTPConfig&gt; modelToContract(List&lt;OTPConfig&gt; configList){
+<span class="fc" id="L135">		List&lt;org.egov.pgr.web.contract.OTPConfig&gt; contractConfigList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">		for(int i=0; i&lt;configList.size(); i++) {</span>
+<span class="fc" id="L137">			org.egov.pgr.web.contract.OTPConfig con = new org.egov.pgr.web.contract.OTPConfig();</span>
+<span class="fc" id="L138">			con.setTenantId(configList.get(i).getTenantId());</span>
+<span class="fc" id="L139">			con.setOtpEnabledForAnonymousComplaint(configList.get(i).isOtpConfigEnabled());</span>
+<span class="fc" id="L140">			contractConfigList.add(con);</span>
+		}
+<span class="fc" id="L142">		return contractConfigList;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

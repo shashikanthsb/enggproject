@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TenantIdMandatoryExceptionAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.adapters.error</a> &gt; <span class="el_source">TenantIdMandatoryExceptionAdapter.java</span></div><h1>TenantIdMandatoryExceptionAdapter.java</h1><pre class="source lang-java linenums">package org.egov.pgr.web.adapters.error;
+
+
+import org.egov.common.contract.response.Error;
+import org.egov.common.contract.response.ErrorField;
+import org.egov.common.contract.response.ErrorResponse;
+import org.springframework.http.HttpStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="nc" id="L12">public class TenantIdMandatoryExceptionAdapter implements ErrorAdapter&lt;Void&gt; {</span>
+
+    private static final String MESSAGE = &quot;Tenant id is mandatory&quot;;
+    private static final String CODE = &quot;PGR.TENANT_ID_MANDATORY&quot;;
+    private static final String FIELD_NAME = &quot;serviceTypeConfiguration.tenantId&quot;;
+
+    @Override
+    public ErrorResponse adapt(Void model) {
+<span class="nc" id="L20">        final Error error = getError();</span>
+<span class="nc" id="L21">        return new ErrorResponse(null, error);</span>
+    }
+
+    private Error getError() {
+<span class="nc" id="L25">        List&lt;ErrorField&gt; errorFields = getErrorFields();</span>
+<span class="nc" id="L26">        return Error.builder()</span>
+<span class="nc" id="L27">                .code(HttpStatus.BAD_REQUEST.value())</span>
+<span class="nc" id="L28">                .message(MESSAGE)</span>
+<span class="nc" id="L29">                .fields(errorFields)</span>
+<span class="nc" id="L30">                .build();</span>
+    }
+
+    private List&lt;ErrorField&gt; getErrorFields() {
+<span class="nc" id="L34">        List&lt;ErrorField&gt; errorFields = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L35">        final ErrorField errorField = ErrorField.builder()</span>
+<span class="nc" id="L36">                .code(CODE)</span>
+<span class="nc" id="L37">                .message(MESSAGE)</span>
+<span class="nc" id="L38">                .field(FIELD_NAME)</span>
+<span class="nc" id="L39">                .build();</span>
+<span class="nc" id="L40">        errorFields.add(errorField);</span>
+<span class="nc" id="L41">        return errorFields;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

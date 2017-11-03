@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EscalationHierarchyRespository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">EscalationHierarchyRespository.java</span></div><h1>EscalationHierarchyRespository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository;
+
+import java.sql.Date;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.egov.pgr.domain.model.AuditDetails;
+import org.egov.pgr.domain.model.EscalationHierarchy;
+import org.egov.pgr.repository.builder.EscalationHierarchyQueryBuilder;
+import org.egov.pgr.repository.rowmapper.EscalationHierarchyRowMapper;
+import org.egov.pgr.web.contract.EscalationHierarchyGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+<span class="nc" id="L60">public class EscalationHierarchyRespository {</span>
+	
+<span class="fc" id="L62">	public static final Logger LOGGER = LoggerFactory.getLogger(EscalationHierarchyRespository.class);</span>
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private EscalationHierarchyQueryBuilder escalationHierarchyQueryBuilder;
+
+	@Autowired
+	private EscalationHierarchyRowMapper escalationHierarchyRowMapper;
+
+	public List&lt;EscalationHierarchy&gt; persistEscalationHierarchy(final List&lt;EscalationHierarchy&gt; escalationHierarchyList, final AuditDetails auditDetails ) {
+<span class="nc" id="L74">		LOGGER.info(&quot;EscalationHierarchy::&quot; + escalationHierarchyList);</span>
+		
+<span class="nc" id="L76">		final String escalationHierarchyInsert = escalationHierarchyQueryBuilder.insertEscalationHierarchy();</span>
+		try {
+<span class="nc" id="L78">			jdbcTemplate.batchUpdate(escalationHierarchyInsert ,</span>
+<span class="nc" id="L79">					new BatchPreparedStatementSetter() {</span>
+						@Override
+						public void setValues(java.sql.PreparedStatement statement, int i) throws SQLException {
+<span class="nc" id="L82">							EscalationHierarchy eachEscHierarchy = escalationHierarchyList.get(i);</span>
+<span class="nc" id="L83">							statement.setString(1, eachEscHierarchy.getTenantId());</span>
+<span class="nc" id="L84">							statement.setLong(2, eachEscHierarchy.getFromPosition());</span>
+<span class="nc" id="L85">							statement.setLong(3, eachEscHierarchy.getToPosition());</span>
+<span class="nc" id="L86">							statement.setString(4, eachEscHierarchy.getServiceCode());</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">							statement.setLong(5, (null == eachEscHierarchy.getDepartment())? 0L : eachEscHierarchy.getDepartment());</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">							statement.setLong(6, (null == eachEscHierarchy.getDesignation())? 0L : eachEscHierarchy.getDesignation());</span>
+<span class="nc" id="L89">							statement.setLong(7, auditDetails.getCreatedBy());</span>
+<span class="nc" id="L90">							statement.setDate(8, new Date(new java.util.Date().getTime()));</span>
+<span class="nc" id="L91">						}</span>
+
+						@Override
+						public int getBatchSize() {
+<span class="nc" id="L95">							return escalationHierarchyList.size();</span>
+						}
+					});
+<span class="nc" id="L98">		} catch (Exception ex) {</span>
+<span class="nc" id="L99">			LOGGER.error(&quot;Encountered an Exception :&quot; + ex.getMessage());</span>
+<span class="nc" id="L100">		}</span>
+<span class="nc" id="L101">		return escalationHierarchyList;</span>
+	}
+	
+	public void deleteEscalationHierarchy(final List&lt;EscalationHierarchy&gt; escalationHierarchyList) {
+<span class="nc" id="L105">		LOGGER.info(&quot;EscalationHierarchy::&quot; + escalationHierarchyList);</span>
+<span class="nc" id="L106">		String deleteQuery = escalationHierarchyQueryBuilder.deleteEscalationHierarchy(escalationHierarchyList);</span>
+<span class="nc" id="L107">		jdbcTemplate.update(deleteQuery);</span>
+<span class="nc" id="L108">	}</span>
+	
+	public List&lt;EscalationHierarchy&gt; getAllEscalationHierarchy(EscalationHierarchyGetReq escHierarchyGetRequest) {
+<span class="nc" id="L111">		LOGGER.info(&quot;EscalationHierarchy::&quot; + escHierarchyGetRequest);</span>
+<span class="nc" id="L112">		final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L113">		String getQuery = escalationHierarchyQueryBuilder.getQuery(escHierarchyGetRequest, preparedStatementValues);</span>
+<span class="nc" id="L114">		LOGGER.info(&quot;Query for Get All Escalation Hierarchy ::&quot; + getQuery);</span>
+<span class="nc" id="L115">		final List&lt;EscalationHierarchy&gt; escalationHierarchies = jdbcTemplate.query(getQuery,</span>
+<span class="nc" id="L116">				preparedStatementValues.toArray(), escalationHierarchyRowMapper);</span>
+<span class="nc" id="L117">		return escalationHierarchies;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

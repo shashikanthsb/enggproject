@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValueDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.dto</a> &gt; <span class="el_source">ValueDefinition.java</span></div><h1>ValueDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.dto;
+
+import lombok.*;
+
+import java.util.Date;
+
+<span class="nc" id="L7">@Builder</span>
+@Getter
+<span class="nc" id="L9">@AllArgsConstructor</span>
+<span class="nc" id="L10">@NoArgsConstructor</span>
+<span class="nc" id="L11">@Setter</span>
+public class ValueDefinition {
+
+    private static final char YES = 'Y';
+
+<span class="nc" id="L16">    private String key;</span>
+<span class="nc" id="L17">    private String attributeCode;</span>
+<span class="nc" id="L18">    private String tenantId;</span>
+<span class="nc" id="L19">    private String serviceCode;</span>
+<span class="nc" id="L20">    private String name;</span>
+<span class="nc" id="L21">    private char active;</span>
+<span class="nc" id="L22">    private char required;</span>
+<span class="nc" id="L23">    private Long createdBy;</span>
+<span class="nc" id="L24">    private Date createdDate;</span>
+<span class="nc" id="L25">    private Long lastModifiedBy;</span>
+<span class="nc" id="L26">    private Date lastModifiedDate;</span>
+
+    private boolean isActive() {
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        return YES == active;</span>
+    }
+
+    private boolean isRequired() {
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        return YES == required;</span>
+    }
+
+    public org.egov.pgr.domain.model.ValueDefinition toDomain(){
+
+
+<span class="nc" id="L39">        return new org.egov.pgr.domain.model.ValueDefinition(name, key, isActive(),isRequired(),serviceCode,tenantId,attributeCode);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

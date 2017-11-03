@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.contract</a> &gt; <span class="el_source">ServiceType.java</span></div><h1>ServiceType.java</h1><pre class="source lang-java linenums">package org.egov.pgr.web.contract;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Getter
+<span class="nc" id="L11">@Builder</span>
+<span class="nc" id="L12">@AllArgsConstructor</span>
+<span class="nc" id="L13">@NoArgsConstructor</span>
+public class ServiceType {
+
+<span class="nc" id="L16">    private Long id;</span>
+<span class="nc" id="L17">    private String serviceName;</span>
+<span class="nc" id="L18">    private String serviceCode;</span>
+<span class="nc" id="L19">    private String description;</span>
+<span class="nc" id="L20">    private boolean metadata;</span>
+<span class="nc" id="L21">    private Integer department;</span>
+<span class="nc" id="L22">    private String type;</span>
+<span class="nc" id="L23">    private List&lt;String&gt; keywords;</span>
+<span class="nc" id="L24">    private Integer category;</span>
+<span class="nc" id="L25">    private List&lt;String&gt; config;</span>
+<span class="nc" id="L26">    private Integer slaHours;</span>
+<span class="nc" id="L27">    private String tenantId;</span>
+<span class="nc" id="L28">    private Boolean days;</span>
+<span class="nc" id="L29">    private Boolean active;</span>
+<span class="nc" id="L30">    private boolean hasFinancialImpact;</span>
+
+<span class="nc" id="L32">    public ServiceType(org.egov.pgr.domain.model.ServiceType serviceType) {</span>
+<span class="nc" id="L33">        this.id = serviceType.getId();</span>
+<span class="nc" id="L34">        this.serviceName = serviceType.getServiceName();</span>
+<span class="nc" id="L35">        this.active = serviceType.getActive();</span>
+<span class="nc" id="L36">        this.category = serviceType.getCategory();</span>
+<span class="nc" id="L37">        this.days = serviceType.getIsDay();</span>
+<span class="nc" id="L38">        this.department = serviceType.getDepartment();</span>
+<span class="nc" id="L39">        this.description = serviceType.getDescription();</span>
+<span class="nc" id="L40">        this.hasFinancialImpact = serviceType.isHasFinancialImpact();</span>
+<span class="nc" id="L41">        this.metadata = serviceType.isMetadata();</span>
+<span class="nc" id="L42">        this.serviceCode = serviceType.getServiceCode();</span>
+<span class="nc" id="L43">        this.tenantId = serviceType.getTenantId();</span>
+<span class="nc" id="L44">        this.keywords = serviceType.getKeywords();</span>
+<span class="nc" id="L45">        this.type = serviceType.getType();</span>
+<span class="nc" id="L46">        this.slaHours = serviceType.getSlaHours();</span>
+<span class="nc" id="L47">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

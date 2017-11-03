@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrievanceTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">GrievanceTypeController.java</span></div><h1>GrievanceTypeController.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.web.controller;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.GrievanceType;
+import org.egov.pgr.service.GrievanceTypeService;
+import org.egov.pgr.util.PgrMasterConstants;
+import org.egov.pgr.web.contract.RequestInfoWrapper;
+import org.egov.pgr.web.contract.ServiceGetRequest;
+import org.egov.pgr.web.contract.ServiceRequest;
+import org.egov.pgr.web.contract.ServiceResponse;
+import org.egov.pgr.web.contract.factory.ResponseInfoFactory;
+import org.egov.pgr.web.errorhandlers.Error;
+import org.egov.pgr.web.errorhandlers.ErrorHandler;
+import org.egov.pgr.web.errorhandlers.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/service&quot;)
+<span class="nc" id="L74">public class GrievanceTypeController {</span>
+
+<span class="nc" id="L76">    private static final Logger logger = LoggerFactory.getLogger(GrievanceTypeController.class);</span>
+    public static final String CODE = &quot;code&quot;;
+    public static final String FIELD = &quot;field&quot;;
+    public static final String MESSAGE = &quot;message&quot;;
+
+    @Autowired
+    private GrievanceTypeService grievanceTypeService;
+
+    @Autowired
+    private ErrorHandler errHandler;
+
+    @Autowired
+    private ResponseInfoFactory responseInfoFactory;
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+<span class="nc" id="L93">    HashMap&lt;String, String&gt; grievanceTypeException = new HashMap&lt;&gt;();</span>
+
+    @PostMapping(value = &quot;/v1/_create&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; create(@RequestBody @Valid final ServiceRequest serviceTypeRequest,
+                                    final BindingResult errors) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L100">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L101">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L103">        logger.info(&quot;Service Create : Request::&quot; + serviceTypeRequest);</span>
+
+<span class="nc" id="L105">        validateServiceRequest(serviceTypeRequest, &quot;create&quot;);</span>
+
+<span class="nc" id="L107">        final GrievanceType grievanceType = grievanceTypeService.createServiceType(applicationProperties.getCreateGrievanceTypeTopicName(), applicationProperties.getCreateGrievanceTypeTopicKey(), serviceTypeRequest);</span>
+<span class="nc" id="L108">        final List&lt;GrievanceType&gt; grievanceTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L109">        grievanceTypes.add(grievanceType);</span>
+<span class="nc" id="L110">        return getSuccessResponse(grievanceTypes, serviceTypeRequest.getRequestInfo());</span>
+
+    }
+
+    @PostMapping(value = &quot;/v1/_update&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; update(@RequestBody @Valid final ServiceRequest serviceTypeRequest,
+                                    final BindingResult errors) {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L119">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L120">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L122">        logger.info(&quot;Service Update : Request::&quot; + serviceTypeRequest);</span>
+<span class="nc bnc" id="L123" title="All 4 branches missed.">        if (serviceTypeRequest.getService().getServiceCode() == null || serviceTypeRequest.getService().getServiceCode().equals(&quot;&quot;)) {</span>
+<span class="nc" id="L124">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L125">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L127">        validateUpdateServiceRequest(serviceTypeRequest, &quot;update&quot;);</span>
+
+<span class="nc" id="L129">        final GrievanceType service = grievanceTypeService.updateServices(applicationProperties.getUpdateGrievanceTypeTopicName(), applicationProperties.getUpdateGrievanceTypeTopicKey(), serviceTypeRequest);</span>
+<span class="nc" id="L130">        final List&lt;GrievanceType&gt; services = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L131">        services.add(service);</span>
+<span class="nc" id="L132">        return getSuccessResponse(services, serviceTypeRequest.getRequestInfo());</span>
+    }
+
+    @PostMapping(&quot;/v1/_search&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; search(@ModelAttribute @Valid final ServiceGetRequest serviceTypeGetRequest,
+                                    final BindingResult modelAttributeBindingResult, @RequestBody @Valid final RequestInfoWrapper requestInfoWrapper,
+                                    final BindingResult requestBodyBindingResult) {
+<span class="nc" id="L140">        final RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();</span>
+
+        // validate input params
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if (modelAttributeBindingResult.hasErrors())</span>
+<span class="nc" id="L144">            return errHandler.getErrorResponseEntityForMissingParameters(modelAttributeBindingResult, requestInfo);</span>
+
+        // validate input params
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (requestBodyBindingResult.hasErrors())</span>
+<span class="nc" id="L148">            return errHandler.getErrorResponseEntityForMissingRequestInfo(requestBodyBindingResult, requestInfo);</span>
+
+        // Call service
+<span class="nc" id="L151">        List&lt;GrievanceType&gt; grievanceTypeList = null;</span>
+        try {
+<span class="nc" id="L153">            grievanceTypeList = grievanceTypeService.getServiceTypes(serviceTypeGetRequest);</span>
+<span class="nc" id="L154">        } catch (final Exception exception) {</span>
+<span class="nc" id="L155">            logger.error(&quot;Error while processing request &quot; + serviceTypeGetRequest, exception);</span>
+<span class="nc" id="L156">            return errHandler.getResponseEntityForUnexpectedErrors(requestInfo);</span>
+<span class="nc" id="L157">        }</span>
+
+<span class="nc" id="L159">        return getSuccessResponse(grievanceTypeList, requestInfo);</span>
+
+    }
+
+    private void validateServiceRequest(final ServiceRequest serviceTypeRequest, String mode) {
+<span class="nc" id="L164">        addGrievanceCodeNameValidator(serviceTypeRequest, mode);</span>
+<span class="nc" id="L165">        addGrievanceNameValidationErrors(serviceTypeRequest);</span>
+<span class="nc" id="L166">        addGrievanceNameValidator(serviceTypeRequest, mode);</span>
+<span class="nc" id="L167">        addTenantIdValidationErrors(serviceTypeRequest);</span>
+<span class="nc" id="L168">        checkMetadataExists(serviceTypeRequest);</span>
+<span class="nc" id="L169">        checkCategorySLAValues(serviceTypeRequest);</span>
+<span class="nc" id="L170">        checkServiceCodeExists(serviceTypeRequest);</span>
+<span class="nc" id="L171">        checkDescriptionLength(serviceTypeRequest);</span>
+<span class="nc" id="L172">    }</span>
+
+    private void validateUpdateServiceRequest(final ServiceRequest serviceTypeRequest, String mode) {
+<span class="nc" id="L175">        addGrievanceNameValidationErrors(serviceTypeRequest);</span>
+<span class="nc" id="L176">        addGrievanceNameValidator(serviceTypeRequest, mode);</span>
+<span class="nc" id="L177">        addTenantIdValidationErrors(serviceTypeRequest);</span>
+<span class="nc" id="L178">        checkMetadataExists(serviceTypeRequest);</span>
+<span class="nc" id="L179">        checkCategorySLAValues(serviceTypeRequest);</span>
+<span class="nc" id="L180">        checkDescriptionLength(serviceTypeRequest);</span>
+<span class="nc" id="L181">    }</span>
+
+    private void addGrievanceNameValidationErrors(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L184">        final GrievanceType service = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L185" title="All 4 branches missed.">        if (service.getServiceName() == null || service.getServiceName().isEmpty()) {</span>
+<span class="nc" id="L186">            grievanceTypeException.put(CODE, PgrMasterConstants.GRIEVANCETYPE_NAME_MANDATORY_CODE);</span>
+<span class="nc" id="L187">            grievanceTypeException.put(FIELD, PgrMasterConstants.GRIEVANCETYPE_NAME_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L188">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.GRIEVANCETYPE_NAME_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L189">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L191">    }</span>
+
+    private void addGrievanceNameValidator(final ServiceRequest serviceTypeRequest, final String mode) {
+<span class="nc bnc" id="L194" title="All 2 branches missed.">        if (grievanceTypeService.checkComplaintNameIfExists(serviceTypeRequest.getService().getServiceName(),</span>
+<span class="nc" id="L195">                serviceTypeRequest.getService().getTenantId(), serviceTypeRequest.getService().getServiceCode(), mode)) {</span>
+<span class="nc" id="L196">            grievanceTypeException.put(CODE, PgrMasterConstants.GRIEVANCETYPE_NAME_UNIQUE_CODE);</span>
+<span class="nc" id="L197">            grievanceTypeException.put(FIELD, PgrMasterConstants.GRIEVANCETYPE_NAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L198">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.GRIEVANCETYPE_NAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L199">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L201">    }</span>
+
+    private void addGrievanceCodeNameValidator(final ServiceRequest serviceTypeRequest, final String mode) {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if (grievanceTypeService.checkComplaintCodeNameIfExists(serviceTypeRequest.getService().getServiceName(),</span>
+<span class="nc" id="L205">                serviceTypeRequest.getService().getTenantId(), serviceTypeRequest.getService().getServiceCode(), mode)) {</span>
+<span class="nc" id="L206">            grievanceTypeException.put(CODE, PgrMasterConstants.CODENAME_UNIQUE_CODE);</span>
+<span class="nc" id="L207">            grievanceTypeException.put(FIELD, PgrMasterConstants.CODENAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L208">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.CODENAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L209">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L211">    }</span>
+
+    private void addTenantIdValidationErrors(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L214">        final GrievanceType grievanceType = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L215" title="All 4 branches missed.">        if (grievanceType.getTenantId() == null || grievanceType.getTenantId().isEmpty()) {</span>
+<span class="nc" id="L216">            grievanceTypeException.put(CODE, PgrMasterConstants.TENANTID_MANDATORY_CODE);</span>
+<span class="nc" id="L217">            grievanceTypeException.put(FIELD, PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L218">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L219">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L221">    }</span>
+
+
+
+    private void checkMetadataExists(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L226">        final GrievanceType grievanceType = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (grievanceType.isMetadata()) {</span>
+<span class="nc bnc" id="L228" title="All 4 branches missed.">            if (null == grievanceType.getAttributes() || grievanceType.getAttributes().size() &lt;= 0) {</span>
+<span class="nc" id="L229">                grievanceTypeException.put(CODE, PgrMasterConstants.ATTRIBUTE_DETAILS_MANDATORY_CODE);</span>
+<span class="nc" id="L230">                grievanceTypeException.put(FIELD, PgrMasterConstants.ATTRIBUTE_DETAILS_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L231">                grievanceTypeException.put(MESSAGE, PgrMasterConstants.ATTRIBUTE_DETAILS_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L232">                throw new PGRMasterException(grievanceTypeException);</span>
+            }
+        }
+<span class="nc" id="L235">    }</span>
+
+    private void checkCategorySLAValues(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L238">        final GrievanceType grievanceType = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (null == grievanceType.getCategory()) {</span>
+<span class="nc" id="L240">            grievanceTypeException.put(CODE, PgrMasterConstants.CATEGORY_ID_MANDATORY_CODE);</span>
+<span class="nc" id="L241">            grievanceTypeException.put(FIELD, PgrMasterConstants.CATEGORY_ID_MANDATORY_FIELD_NAME);</span>
+<span class="nc" id="L242">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.CATEGORY_ID_MANDATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L243">            throw new PGRMasterException(grievanceTypeException);</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        } else if (null == grievanceType.getSlaHours()) {</span>
+<span class="nc" id="L245">            grievanceTypeException.put(CODE, PgrMasterConstants.SLA_HOURS_MANDATORY_CODE);</span>
+<span class="nc" id="L246">            grievanceTypeException.put(FIELD, PgrMasterConstants.SLA_HOURS_MANDATORY_FIELD_NAME);</span>
+<span class="nc" id="L247">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.SLA_HOURS_MANDATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L248">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L250">        return;</span>
+    }
+
+    private void checkServiceCodeExists(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L254">        final GrievanceType grievanceType = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (grievanceTypeService.checkServiceCodeIfExists(grievanceType.getServiceCode(), grievanceType.getTenantId())) {</span>
+<span class="nc" id="L256">            grievanceTypeException.put(CODE, PgrMasterConstants.SERVICETYPE_TENANTID_NAME_UNIQUE_CODE);</span>
+<span class="nc" id="L257">            grievanceTypeException.put(FIELD, PgrMasterConstants.SERVICETYPE_TENANTID_NAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L258">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.SERVICETYPE_TENANTID_NAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L259">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L261">    }</span>
+
+    private void checkDescriptionLength(final ServiceRequest serviceTypeRequest) {
+<span class="nc" id="L264">        final GrievanceType grievanceType = serviceTypeRequest.getService();</span>
+<span class="nc bnc" id="L265" title="All 8 branches missed.">        if (grievanceType.getDescription() != null &amp;&amp; !grievanceType.getDescription().isEmpty() &amp;&amp; !(grievanceType.getDescription().length() &gt; 0 &amp;&amp; grievanceType.getDescription().length() &lt;= 250)) {</span>
+<span class="nc" id="L266">            grievanceTypeException.put(CODE, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_CODE);</span>
+<span class="nc" id="L267">            grievanceTypeException.put(FIELD, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_FIELD_NAME);</span>
+<span class="nc" id="L268">            grievanceTypeException.put(MESSAGE, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_ERROR_MESSAGE);</span>
+<span class="nc" id="L269">            throw new PGRMasterException(grievanceTypeException);</span>
+        }
+<span class="nc" id="L271">    }</span>
+
+    private ErrorResponse populateErrors(final BindingResult errors) {
+<span class="nc" id="L274">        final ErrorResponse errRes = new ErrorResponse();</span>
+
+<span class="nc" id="L276">        final Error error = new Error();</span>
+<span class="nc" id="L277">        error.setCode(1);</span>
+<span class="nc" id="L278">        error.setDescription(&quot;Error while binding request&quot;);</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        if (errors.hasFieldErrors())</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            for (final FieldError fieldError : errors.getFieldErrors())</span>
+<span class="nc" id="L281">                error.getFields().put(fieldError.getField(), fieldError.getRejectedValue());</span>
+<span class="nc" id="L282">        errRes.setError(error);</span>
+<span class="nc" id="L283">        return errRes;</span>
+    }
+
+    private ResponseEntity&lt;?&gt; getSuccessResponse(final List&lt;GrievanceType&gt; grievanceTypeList, final RequestInfo requestInfo) {
+<span class="nc" id="L287">        final ServiceResponse serviceTypeResponse = new ServiceResponse();</span>
+<span class="nc" id="L288">        serviceTypeResponse.setServices(grievanceTypeList);</span>
+<span class="nc" id="L289">        final ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true);</span>
+<span class="nc" id="L290">        responseInfo.setStatus(HttpStatus.OK.toString());</span>
+<span class="nc" id="L291">        serviceTypeResponse.setResponseInfo(responseInfo);</span>
+<span class="nc" id="L292">        return new ResponseEntity&lt;&gt;(serviceTypeResponse, HttpStatus.OK);</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

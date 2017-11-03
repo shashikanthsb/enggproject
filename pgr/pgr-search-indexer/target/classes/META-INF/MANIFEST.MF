@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: pgr-search-indexer
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: shashikanth
+Implementation-Vendor-Id: org.egov
+Build-Jdk: 1.8.0_112
+Implementation-URL: http://projects.spring.io/spring-boot/pgr-search-i
+ ndexer/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

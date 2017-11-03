@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EscalationHierarchyController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">EscalationHierarchyController.java</span></div><h1>EscalationHierarchyController.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.web.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ErrorField;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.model.EscalationHierarchy;
+import org.egov.pgr.service.EscalationHierarchyService;
+import org.egov.pgr.util.PgrMasterConstants;
+import org.egov.pgr.web.contract.EscalationHierarchyGetReq;
+import org.egov.pgr.web.contract.EscalationHierarchyReq;
+import org.egov.pgr.web.contract.EscalationHierarchyRes;
+import org.egov.pgr.web.contract.RequestInfoWrapper;
+import org.egov.pgr.web.contract.factory.ResponseInfoFactory;
+import org.egov.pgr.web.errorhandlers.Error;
+import org.egov.pgr.web.errorhandlers.ErrorHandler;
+import org.egov.pgr.web.errorhandlers.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(&quot;/escalation-hierarchy&quot;)
+<span class="nc" id="L79">public class EscalationHierarchyController {</span>
+
+<span class="nc" id="L81">	private static final Logger logger = LoggerFactory.getLogger(EscalationHierarchyController.class);</span>
+
+<span class="nc" id="L83">	private static final String[] taskAction = { &quot;create&quot;, &quot;update&quot; };</span>
+
+	@Autowired
+	private ResponseInfoFactory responseInfoFactory;
+
+	@Autowired
+	private EscalationHierarchyService escalationHierarchyService;
+
+	@Autowired
+	private ApplicationProperties applicationProperties;
+
+	@Autowired
+	private ErrorHandler errHandler;
+
+	@PostMapping(value = &quot;/v1/_create&quot;)
+	@ResponseBody
+	public ResponseEntity&lt;?&gt; create(@RequestBody @Valid final EscalationHierarchyReq escalationHierarchyRequest,
+			final BindingResult errors) {
+<span class="nc bnc" id="L101" title="All 2 branches missed.">		if (errors.hasErrors()) {</span>
+<span class="nc" id="L102">			final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L103">			return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="nc" id="L105">		logger.info(&quot;EscalationHierarchy Create : Request ::&quot; + escalationHierarchyRequest);</span>
+
+<span class="nc" id="L107">		final List&lt;ErrorResponse&gt; errorResponses = validateServiceGroupRequest(escalationHierarchyRequest,</span>
+				taskAction[0]);
+<span class="nc bnc" id="L109" title="All 2 branches missed.">		if (!errorResponses.isEmpty())</span>
+<span class="nc" id="L110">			return new ResponseEntity&lt;&gt;(errorResponses, HttpStatus.BAD_REQUEST);</span>
+
+<span class="nc" id="L112">		final List&lt;EscalationHierarchy&gt; escalationHierarchies = escalationHierarchyService.createEscalationHierarchy(</span>
+<span class="nc" id="L113">				applicationProperties.getCreateEscalationHierarchyTopicName(),</span>
+<span class="nc" id="L114">				applicationProperties.getCreateEscalationHierarchyTopicKey(), escalationHierarchyRequest);</span>
+
+<span class="nc" id="L116">		return getSuccessResponse(escalationHierarchies, escalationHierarchyRequest.getRequestInfo());</span>
+
+	}
+
+	@PostMapping(value = &quot;/v1/_update&quot;)
+	@ResponseBody
+	public ResponseEntity&lt;?&gt; update(@RequestBody @Valid final EscalationHierarchyReq escalationHierarchyRequest,
+			final BindingResult errors) {
+<span class="nc bnc" id="L124" title="All 2 branches missed.">		if (errors.hasErrors()) {</span>
+<span class="nc" id="L125">			final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L126">			return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="nc" id="L128">		logger.info(&quot;EscalationHierarchy Update: Request::&quot; + escalationHierarchyRequest);</span>
+
+<span class="nc" id="L130">		final List&lt;ErrorResponse&gt; errorResponses = validateServiceGroupRequest(escalationHierarchyRequest,</span>
+				taskAction[1]);
+<span class="nc bnc" id="L132" title="All 2 branches missed.">		if (!errorResponses.isEmpty())</span>
+<span class="nc" id="L133">			return new ResponseEntity&lt;&gt;(errorResponses, HttpStatus.BAD_REQUEST);</span>
+
+<span class="nc" id="L135">		final List&lt;EscalationHierarchy&gt; escalationHierarchies  = escalationHierarchyService.updateEscalationHierarchy(</span>
+<span class="nc" id="L136">				applicationProperties.getUpdateEscalationHierarchyTopicName(),</span>
+<span class="nc" id="L137">				applicationProperties.getUpdateEscalationHierarchyTopicKey(), escalationHierarchyRequest);</span>
+
+<span class="nc" id="L139">		return getSuccessResponse(escalationHierarchies, escalationHierarchyRequest.getRequestInfo());</span>
+
+	}
+	
+	@PostMapping(&quot;/v1/_search&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; search(@ModelAttribute @Valid final EscalationHierarchyGetReq escHierarchyGetRequest,
+            final BindingResult modelAttributeBindingResult, @RequestBody @Valid final RequestInfoWrapper requestInfoWrapper,
+            final BindingResult requestBodyBindingResult) {
+<span class="nc" id="L148">        final RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();</span>
+
+        // validate input params
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (modelAttributeBindingResult.hasErrors())</span>
+<span class="nc" id="L152">            return errHandler.getErrorResponseEntityForMissingParameters(modelAttributeBindingResult, requestInfo);</span>
+
+        // validate input params
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (requestBodyBindingResult.hasErrors())</span>
+<span class="nc" id="L156">            return errHandler.getErrorResponseEntityForMissingRequestInfo(requestBodyBindingResult, requestInfo);</span>
+
+        // Call service
+<span class="nc" id="L159">        List&lt;EscalationHierarchy&gt; escHierarchyList = null;</span>
+        try {
+<span class="nc" id="L161">        	escHierarchyList = escalationHierarchyService.getAllEscalationHierarchy(escHierarchyGetRequest);</span>
+<span class="nc" id="L162">        } catch (final Exception exception) {</span>
+<span class="nc" id="L163">            logger.error(&quot;EscalationHierarchy Search : Error while processing request : &quot; + escHierarchyGetRequest, exception);</span>
+<span class="nc" id="L164">            return errHandler.getResponseEntityForUnexpectedErrors(requestInfo);</span>
+<span class="nc" id="L165">        }</span>
+
+<span class="nc" id="L167">        return getSuccessResponse(escHierarchyList, requestInfo);</span>
+
+    }
+
+	private List&lt;ErrorResponse&gt; validateServiceGroupRequest(final EscalationHierarchyReq escalationHierarchyRequest,
+			String action) {
+<span class="nc" id="L173">		final List&lt;ErrorResponse&gt; errorResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L174">		final ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="nc" id="L175">		final Error error = getError(escalationHierarchyRequest, action);</span>
+<span class="nc" id="L176">		errorResponse.setError(error);</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">		if (!errorResponse.getErrorFields().isEmpty())</span>
+<span class="nc" id="L178">			errorResponses.add(errorResponse);</span>
+<span class="nc" id="L179">		return errorResponses;</span>
+	}
+
+	private Error getError(final EscalationHierarchyReq escalationHierarchyRequest, String action) {
+<span class="nc" id="L183">		final List&lt;ErrorField&gt; errorFields = getErrorFields(escalationHierarchyRequest, action);</span>
+<span class="nc" id="L184">		return Error.builder().code(HttpStatus.BAD_REQUEST.value())</span>
+<span class="nc" id="L185">				.message(PgrMasterConstants.INVALID_ESCALATIONHIERARCHY_REQUEST_MESSAGE).errorFields(errorFields)</span>
+<span class="nc" id="L186">				.build();</span>
+	}
+
+	private List&lt;ErrorField&gt; getErrorFields(final EscalationHierarchyReq escalationHierarchyRequest, String action) {
+<span class="nc" id="L190">		final List&lt;ErrorField&gt; errorFields = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L191">		fromtopositioncheck(escalationHierarchyRequest, errorFields);</span>
+<span class="nc" id="L192">		addTeanantIdValidationErrors(escalationHierarchyRequest, errorFields);</span>
+<span class="nc" id="L193">		serviceCodeCheck(escalationHierarchyRequest, errorFields);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">		if (action.equals(taskAction[0])) {</span>
+<span class="nc" id="L195">			checkCombinationExists(escalationHierarchyRequest, errorFields);</span>
+		}
+<span class="nc" id="L197">		return errorFields;</span>
+	}
+
+	private ErrorResponse populateErrors(final BindingResult errors) {
+<span class="nc" id="L201">		final ErrorResponse errRes = new ErrorResponse();</span>
+
+<span class="nc" id="L203">		final Error error = new Error();</span>
+<span class="nc" id="L204">		error.setCode(1);</span>
+<span class="nc" id="L205">		error.setDescription(&quot;Error while binding request&quot;);</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">		if (errors.hasFieldErrors())</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">			for (final FieldError fieldError : errors.getFieldErrors())</span>
+<span class="nc" id="L208">				error.getFields().put(fieldError.getField(), fieldError.getRejectedValue());</span>
+<span class="nc" id="L209">		errRes.setError(error);</span>
+<span class="nc" id="L210">		return errRes;</span>
+	}
+
+	private void fromtopositioncheck(final EscalationHierarchyReq escalationHierarchyRequest,
+			final List&lt;ErrorField&gt; errorFields) {
+<span class="nc bnc" id="L215" title="All 2 branches missed.">		for (int i = 0; i &lt; escalationHierarchyRequest.getEscalationHierarchy().size(); i++) {</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">			if (null == escalationHierarchyRequest.getEscalationHierarchy().get(i).getFromPosition()</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">					|| escalationHierarchyRequest.getEscalationHierarchy().get(i).getFromPosition() &lt;= 0L) {</span>
+<span class="nc" id="L218">				final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.FROMPOSITION_MANDATORY_CODE)</span>
+<span class="nc" id="L219">						.message(PgrMasterConstants.FROMPOSITION_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L220">						.field(PgrMasterConstants.FROMPOSITION_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L221">				errorFields.add(errorField);</span>
+			}
+<span class="nc bnc" id="L223" title="All 2 branches missed.">			if (null == escalationHierarchyRequest.getEscalationHierarchy().get(i).getToPosition()</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">					|| escalationHierarchyRequest.getEscalationHierarchy().get(i).getToPosition() &lt;= 0L) {</span>
+<span class="nc" id="L225">				final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.TOPOSITION_MANDATORY_CODE)</span>
+<span class="nc" id="L226">						.message(PgrMasterConstants.TOPOSITION_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L227">						.field(PgrMasterConstants.TOPOSITION_MANDATORY_CODE).build();</span>
+<span class="nc" id="L228">				errorFields.add(errorField);</span>
+			}
+<span class="nc" id="L230">			if (escalationHierarchyRequest.getEscalationHierarchy().get(i)</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">					.getFromPosition() == escalationHierarchyRequest.getEscalationHierarchy().get(i).getToPosition()) {</span>
+<span class="nc" id="L232">				final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.FROMTOPOSITION_UNIQUE_CODE)</span>
+<span class="nc" id="L233">						.message(PgrMasterConstants.FROMTOPOSITION_UNIQUE_ERROR_MESSAGE)</span>
+<span class="nc" id="L234">						.field(PgrMasterConstants.FROMTOPOSITION_UNIQUE_FIELD_NAME).build();</span>
+<span class="nc" id="L235">				errorFields.add(errorField);</span>
+			}
+		}
+<span class="nc" id="L238">	}</span>
+
+	private void serviceCodeCheck(final EscalationHierarchyReq escalationHierarchyRequest,
+			final List&lt;ErrorField&gt; errorFields) {
+<span class="nc bnc" id="L242" title="All 2 branches missed.">		for(int i=0 ;i&lt;escalationHierarchyRequest.getEscalationHierarchy().size(); i++) {</span>
+<span class="nc bnc" id="L243" title="All 4 branches missed.">		if (escalationHierarchyRequest.getEscalationHierarchy().get(i).getServiceCode() == null || escalationHierarchyRequest.getEscalationHierarchy().get(i).getServiceCode().isEmpty()) {</span>
+<span class="nc" id="L244">			final ErrorField errorField = ErrorField.builder()</span>
+<span class="nc" id="L245">					.code(PgrMasterConstants.GRIEVANCETYPE_CODE_MANDATORY_CODE)</span>
+<span class="nc" id="L246">					.message(PgrMasterConstants.GRIEVANCETYPE_CODE_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L247">					.field(PgrMasterConstants.GRIEVANCETYPE_CODE_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L248">			errorFields.add(errorField);</span>
+		}
+		}
+<span class="nc" id="L251">	}</span>
+
+	private void addTeanantIdValidationErrors(final EscalationHierarchyReq escalationHierarchyRequest,
+			final List&lt;ErrorField&gt; errorFields) {
+<span class="nc bnc" id="L255" title="All 2 branches missed.">		for(int i=0 ;i&lt;escalationHierarchyRequest.getEscalationHierarchy().size(); i++) {</span>
+<span class="nc bnc" id="L256" title="All 4 branches missed.">		if (escalationHierarchyRequest.getEscalationHierarchy().get(i).getTenantId() == null || escalationHierarchyRequest.getEscalationHierarchy().get(i).getTenantId().isEmpty()) {</span>
+<span class="nc" id="L257">			final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.TENANTID_MANDATORY_CODE)</span>
+<span class="nc" id="L258">					.message(PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L259">					.field(PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L260">			errorFields.add(errorField);</span>
+<span class="nc" id="L261">		} else</span>
+<span class="nc" id="L262">			return;</span>
+		}
+<span class="nc" id="L264">	}</span>
+	
+	private void checkCombinationExists(final EscalationHierarchyReq escalationHierarchyRequest,
+			final List&lt;ErrorField&gt; errorFields) {
+<span class="nc bnc" id="L268" title="All 2 branches missed.">		for(int i=0 ;i&lt;escalationHierarchyRequest.getEscalationHierarchy().size(); i++) {</span>
+<span class="nc bnc" id="L269" title="All 4 branches missed.">		if (escalationHierarchyRequest.getEscalationHierarchy().get(i).getTenantId() == null || escalationHierarchyRequest.getEscalationHierarchy().get(i).getTenantId().isEmpty()) {</span>
+<span class="nc" id="L270">			final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.TENANTID_MANDATORY_CODE)</span>
+<span class="nc" id="L271">					.message(PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L272">					.field(PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L273">			errorFields.add(errorField);</span>
+<span class="nc" id="L274">		} else</span>
+<span class="nc" id="L275">			return;</span>
+		}
+<span class="nc" id="L277">	}</span>
+	
+	private ResponseEntity&lt;?&gt; getSuccessResponse(final List&lt;EscalationHierarchy&gt; escalationHierarchyList,
+			final RequestInfo requestInfo) {
+<span class="nc" id="L281">		final EscalationHierarchyRes escalationHierarchyRes = new EscalationHierarchyRes();</span>
+<span class="nc" id="L282">		final ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true);</span>
+<span class="nc" id="L283">		responseInfo.setStatus(HttpStatus.OK.toString());</span>
+<span class="nc" id="L284">		escalationHierarchyRes.setResponseInfo(responseInfo);</span>
+<span class="nc" id="L285">		escalationHierarchyRes.setEscalationHierarchies(escalationHierarchyList);</span>
+<span class="nc" id="L286">		return new ResponseEntity&lt;&gt;(escalationHierarchyRes, HttpStatus.OK);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

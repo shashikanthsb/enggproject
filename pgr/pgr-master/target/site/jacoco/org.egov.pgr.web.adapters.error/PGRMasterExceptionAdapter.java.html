@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PGRMasterExceptionAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.adapters.error</a> &gt; <span class="el_source">PGRMasterExceptionAdapter.java</span></div><h1>PGRMasterExceptionAdapter.java</h1><pre class="source lang-java linenums">package org.egov.pgr.web.adapters.error;
+
+import org.egov.common.contract.response.Error;
+import org.egov.common.contract.response.ErrorField;
+import org.egov.common.contract.response.ErrorResponse;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+<span class="nc" id="L11">public class PGRMasterExceptionAdapter implements ErrorAdapter&lt;HashMap&lt;String, String&gt;&gt; {</span>
+
+
+    private static final int HTTP_CLIENT_ERROR_CODE = 400;
+    private static final String ERROR_CODE = &quot;%s&quot;;
+    private static final String ERROR_FIELD = &quot;%s&quot;;
+    private static final String ERROR_MESSAGE = &quot;%s&quot;;
+
+    @Override
+    public ErrorResponse adapt(HashMap&lt;String, String&gt; hashMap) {
+<span class="nc" id="L21">        final Error error = getError(hashMap);</span>
+<span class="nc" id="L22">        return new ErrorResponse(null, error);</span>
+    }
+
+    private Error getError(HashMap&lt;String, String&gt; hashMap) {
+<span class="nc" id="L26">        final List&lt;ErrorField&gt; fields = Collections.singletonList(getErrorField(hashMap));</span>
+
+<span class="nc" id="L28">        return Error.builder()</span>
+<span class="nc" id="L29">                .code(HTTP_CLIENT_ERROR_CODE)</span>
+<span class="nc" id="L30">                .fields(fields)</span>
+<span class="nc" id="L31">                .build();</span>
+    }
+
+    private ErrorField getErrorField(HashMap&lt;String, String&gt; hashMap) {
+<span class="nc" id="L35">        return ErrorField.builder()</span>
+<span class="nc" id="L36">                .code(String.format(ERROR_CODE,hashMap.get(&quot;code&quot;)))</span>
+<span class="nc" id="L37">                .field(String.format(ERROR_FIELD, hashMap.get(&quot;field&quot;)))</span>
+<span class="nc" id="L38">                .message(String.format(ERROR_MESSAGE, hashMap.get(&quot;message&quot;)))</span>
+<span class="nc" id="L39">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

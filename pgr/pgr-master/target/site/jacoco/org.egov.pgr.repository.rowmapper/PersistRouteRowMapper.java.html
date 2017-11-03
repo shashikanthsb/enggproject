@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PersistRouteRowMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.rowmapper</a> &gt; <span class="el_source">PersistRouteRowMapper.java</span></div><h1>PersistRouteRowMapper.java</h1><pre class="source lang-java linenums">package org.egov.pgr.repository.rowmapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.egov.pgr.domain.model.PersistRouter;
+import org.egov.pgr.domain.model.PersistRouterReq;
+import org.egov.pgr.domain.model.ReceivingCenterType;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+
+
+
+@Component
+<span class="nc" id="L15">public class PersistRouteRowMapper implements RowMapper&lt;PersistRouter&gt; {</span>
+	@Override
+	public PersistRouter mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+<span class="nc" id="L18">		final PersistRouter persistRouter = new PersistRouter();</span>
+<span class="nc" id="L19">		persistRouter.setId(rs.getLong(&quot;id&quot;));</span>
+<span class="nc" id="L20">		persistRouter.setBoundary(rs.getInt(&quot;bndryid&quot;));</span>
+<span class="nc" id="L21">		persistRouter.setService(rs.getLong(&quot;complainttypeid&quot;));</span>
+<span class="nc" id="L22">		persistRouter.setPosition(rs.getInt(&quot;position&quot;));</span>
+<span class="nc" id="L23">		persistRouter.setTenantId(rs.getString(&quot;tenantid&quot;));</span>
+		
+
+<span class="nc" id="L26">		return persistRouter;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

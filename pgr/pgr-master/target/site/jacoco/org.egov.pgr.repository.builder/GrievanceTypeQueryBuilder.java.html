@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrievanceTypeQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">GrievanceTypeQueryBuilder.java</span></div><h1>GrievanceTypeQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.web.contract.ServiceGetRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import static org.springframework.util.StringUtils.isEmpty;
+
+@Component
+<span class="nc" id="L52">public class GrievanceTypeQueryBuilder {</span>
+
+<span class="fc" id="L54">    private static final Logger logger = LoggerFactory.getLogger(GrievanceTypeQueryBuilder.class);</span>
+
+    private static final String BASE_QUERY = &quot;select comp.id, comp.tenantid, comp.code, comp.name, comp.description, comp.category, comp.slahours, &quot;
+    			+ &quot; comp.hasfinancialimpact, comp.isactive, comp.isday, adef.code attributecode, &quot;
+    			+ &quot; adef.datatype, adef.description attrdescription, adef.datatypedescription, adef.variable, adef.required, adef.groupcode, vdef.key, vdef.name keyname &quot;
+    			+ &quot; from egpgr_complainttype comp LEFT JOIN service_definition sdef ON comp.code = sdef.code LEFT JOIN attribute_definition adef ON sdef.code = adef.servicecode &quot;
+    			+ &quot; LEFT JOIN value_definition vdef ON adef.code = vdef.attributecode AND adef.servicecode = vdef.servicecode &quot;;
+
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public String getQuery(final ServiceGetRequest serviceGetRequest, final List preparedStatementValues) {
+<span class="nc" id="L64">        final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L65">        addWhereClause(selectQuery, preparedStatementValues, serviceGetRequest);</span>
+        // addOrderByClause(selectQuery, serviceGetRequest);
+        // addPagingClause(selectQuery, preparedStatementValues, serviceGetRequest);
+<span class="nc" id="L68">        logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L69">        logger.info(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L70">        return selectQuery.toString();</span>
+    }
+
+    @SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+    private void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+            final ServiceGetRequest serviceGetRequest) {
+
+<span class="nc bnc" id="L77" title="All 6 branches missed.">        if (serviceGetRequest.getId() == null &amp;&amp; serviceGetRequest.getName() == null &amp;&amp; serviceGetRequest.getCode() == null</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                &amp;&amp; serviceGetRequest.getTenantId() == null)</span>
+<span class="nc" id="L79">            return;</span>
+
+<span class="nc" id="L81">        selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L82">        boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (null != serviceGetRequest.getTenantId()) {</span>
+<span class="nc" id="L85">            isAppendAndClause = true;</span>
+<span class="nc" id="L86">            selectQuery.append(&quot; comp.tenantId = ?&quot;);</span>
+<span class="nc" id="L87">            preparedStatementValues.add(serviceGetRequest.getTenantId());</span>
+        }
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (null != serviceGetRequest.getCategoryId()) {</span>
+<span class="nc" id="L91">        	isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L92">            selectQuery.append(&quot; comp.category = ?&quot;);</span>
+<span class="nc" id="L93">            preparedStatementValues.add(serviceGetRequest.getCategoryId());</span>
+        }
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (serviceGetRequest.getId() != null) {</span>
+<span class="nc" id="L97">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L98">            selectQuery.append(&quot; comp.id IN &quot; + getIdQuery(serviceGetRequest.getId()));</span>
+        }
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (serviceGetRequest.getName() != null) {</span>
+<span class="nc" id="L102">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L103">            selectQuery.append(&quot; comp.name = ?&quot;);</span>
+<span class="nc" id="L104">            preparedStatementValues.add(serviceGetRequest.getName());</span>
+        }
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (serviceGetRequest.getCode() != null) {</span>
+<span class="nc" id="L108">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L109">            selectQuery.append(&quot; comp.code = ?&quot;);</span>
+<span class="nc" id="L110">            preparedStatementValues.add(serviceGetRequest.getCode());</span>
+        }
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (serviceGetRequest.getKeywords() !=null){</span>
+<span class="nc" id="L114">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L115">            selectQuery.append(&quot; comp.code in (select servicecode from servicetype_keyword where keyword = ? )&quot;);</span>
+<span class="nc" id="L116">            preparedStatementValues.add(serviceGetRequest.getKeywords());</span>
+        }
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (!isEmpty(serviceGetRequest.getActive()))</span>
+        {
+<span class="nc" id="L121">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L122">            selectQuery.append(&quot; comp.isactive = ?&quot;);</span>
+<span class="nc" id="L123">            preparedStatementValues.add(serviceGetRequest.getActive());</span>
+        }
+<span class="nc" id="L125">    }</span>
+
+
+
+    private void addOrderByClause(final StringBuilder selectQuery, final ServiceGetRequest categoryGetRequest) {
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        final String sortBy = categoryGetRequest.getSortBy() == null ? &quot;category.code&quot;</span>
+<span class="nc" id="L131">                : &quot;category.&quot; + categoryGetRequest.getSortBy();</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        final String sortOrder = categoryGetRequest.getSortOrder() == null ? &quot;DESC&quot; : categoryGetRequest.getSortOrder();</span>
+<span class="nc" id="L133">        selectQuery.append(&quot; ORDER BY &quot; + sortBy + &quot; &quot; + sortOrder);</span>
+<span class="nc" id="L134">    }</span>
+
+    @SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+    private void addPagingClause(final StringBuilder selectQuery, final List preparedStatementValues,
+            final ServiceGetRequest categoryGetRequest) {
+        // handle limit(also called pageSize) here
+<span class="nc" id="L140">        selectQuery.append(&quot; LIMIT ?&quot;);</span>
+<span class="nc" id="L141">        long pageSize = 1L;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (categoryGetRequest.getPageSize() != null)</span>
+<span class="nc" id="L143">            pageSize = categoryGetRequest.getPageSize();</span>
+<span class="nc" id="L144">        preparedStatementValues.add(pageSize); // Set limit to pageSize</span>
+
+        // handle offset here
+<span class="nc" id="L147">        selectQuery.append(&quot; OFFSET ?&quot;);</span>
+<span class="nc" id="L148">        int pageNumber = 0; // Default pageNo is zero meaning first page</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (categoryGetRequest.getPageNumber() != null)</span>
+<span class="nc" id="L150">            pageNumber = categoryGetRequest.getPageNumber() - 1;</span>
+<span class="nc" id="L151">        preparedStatementValues.add(pageNumber * pageSize); // Set offset to</span>
+        // pageNo * pageSize
+<span class="nc" id="L153">    }</span>
+
+    /**
+     * This method is always called at the beginning of the method so that and is prepended before the field's predicate is
+     * handled.
+     *
+     * @param appendAndClauseFlag
+     * @param queryString
+     * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+     */
+    private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        if (appendAndClauseFlag)</span>
+<span class="nc" id="L165">            queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L167">        return true;</span>
+    }
+
+    private static String getIdQuery(final List&lt;Long&gt; idList) {
+<span class="nc" id="L171">        final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L173">            query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            for (int i = 1; i &lt; idList.size(); i++)</span>
+<span class="nc" id="L175">                query.append(&quot;, &quot; + idList.get(i));</span>
+        }
+<span class="nc" id="L177">        return query.append(&quot;)&quot;).toString();</span>
+    }
+
+    public String insertComplaintTypeQuery(){
+<span class="nc" id="L181">    	return &quot;INSERT into egpgr_complainttype (id, name, code, description, isactive, slahours, tenantid, type, createdby, createddate, category, isday) &quot;</span>
+    			+ &quot;values (NEXTVAL('seq_egpgr_complainttype'),?,?,?,?,?,?,?,?,?,?,?)&quot;;
+
+    }
+
+    public static String fetchServiceKeywords() {
+<span class="nc" id="L187">    	return &quot;SELECT keyword FROM servicetype_keyword WHERE servicecode = ? AND tenantid = ? &quot;;</span>
+    }
+    public String insertServiceTypeQuery() {
+<span class="nc" id="L190">        return &quot;INSERT INTO service_definition (code,tenantid,createdby,createddate) values &quot;</span>
+                + &quot;(?,?,?,?)&quot;;
+    }
+
+
+    public static String insertServiceTypeQueryAttribValues() {
+<span class="nc" id="L196">        return &quot;INSERT INTO attribute_definition (code, variable, datatype, description, datatypedescription, servicecode,  required, groupcode, &quot;</span>
+        		+ &quot;tenantid, createdby, createddate) values &quot;
+                + &quot;(?,?,?,?,?,?,?,?,?,?,?)&quot;;
+    }
+
+    public static String insertServiceKeyworkMappingQuery() {
+<span class="nc" id="L202">    	return &quot;INSERT INTO servicetype_keyword (id, servicecode, keyword, tenantid, createdby, createddate) &quot;</span>
+    			+ &quot; VALUES (NEXTVAL('seq_servicetype_keyword'),?,?,?,?,?) &quot;;
+    }
+
+    public static String insertValueDefinitionQuery(){
+<span class="nc" id="L207">    	return &quot;INSERT INTO value_definition (servicecode, attributecode, key, name, tenantid, createddate, createdby) &quot;</span>
+    			+ &quot;values (?,?,?,?,?,?,?) &quot;;
+    }
+
+    public static String updateServiceTypeQuery() {
+<span class="nc" id="L212">        return &quot;UPDATE egpgr_complainttype SET name = ?, description = ?, category = ?, slaHours = ?,&quot;</span>
+                + &quot;isactive = ?, hasfinancialimpact = ?, isday = ?, lastmodifiedby = ?, lastmodifieddate = ? where code = ? and tenantid = ? &quot;;
+    }
+
+    public static String removeAttributeQuery() {
+<span class="nc" id="L217">    	return &quot;DELETE from attribute_definition WHERE servicecode = ? AND tenantid = ?  &quot; ;</span>
+    }
+
+    public static String removeValueQuery() {
+<span class="nc" id="L221">    	return &quot;DELETE from value_definition WHERE servicecode = ? AND tenantid = ?  &quot; ;</span>
+    }
+
+    public static String removeServiceKeywordMapping() {
+<span class="nc" id="L225">    	return &quot;DELETE from servicetype_keyword WHERE servicecode = ? AND tenantid = ? &quot;;</span>
+    }
+
+    public static String selectServiceNameAndCodeQuery() {
+<span class="nc" id="L229">        return &quot; select code FROM egpgr_complainttype where name = ? OR (tenantId = ? and code = ?)&quot;;</span>
+    }
+
+    public static String checkServiceCodeIfExists() {
+<span class="nc" id="L233">    	return &quot; SELECT code FROM service_definition WHERE trim(code) = ? and tenantid = ? &quot;;</span>
+    }
+
+    public static String checkComplaintCodeIfExists() {
+<span class="nc" id="L237">    	return &quot; SELECT code FROM egpgr_complainttype WHERE trim(code) = ? and tenantid = ? &quot;;</span>
+    }
+
+    public static String checkServiceNameIfExists() {
+<span class="nc" id="L241">    	return &quot; SELECT name,code from egpgr_complainttype WHERE trim(upper(name)) = ? and tenantid = ? &quot;;</span>
+    }
+
+    public static String checkServiceCodeNameIfExists() {
+<span class="nc" id="L245">        return &quot; SELECT name,code from egpgr_complainttype WHERE trim(upper(name)) = ? and trim(upper(code)) = ? and tenantid = ? &quot;;</span>
+    }
+    public static String selectServiceNameAndCodeNotInQuery() {
+<span class="nc" id="L248">        return &quot; select code from egpgr_grievancetype where name = ? and tenantId = ? and code != ? &quot;;</span>
+    }
+
+    public static String getAllServiceTypes(){
+<span class="nc" id="L252">    	return &quot;select comp.tenantid, comp.code, comp.name, comp.description, adef.code attributecode, &quot;</span>
+    			+ &quot; adef.datatype, adef.description, adef.datatypedescription, adef.variable, adef.required, vdef.key, vdef.name keyname &quot;
+    			+ &quot; from egpgr_complainttype comp LEFT JOIN service_definition sdef ON comp.code = sdef.code LEFT JOIN attribute_definition adef ON sdef.code = adef.servicecode &quot;
+    			+ &quot; LEFT JOIN value_definition vdef ON adef.code = vdef.attributecode AND adef.servicecode = vdef.servicecode WHERE comp.tenantid = 'blrrural'&quot; ;
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

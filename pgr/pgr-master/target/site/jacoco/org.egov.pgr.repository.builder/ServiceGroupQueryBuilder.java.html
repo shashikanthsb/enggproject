@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceGroupQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">ServiceGroupQueryBuilder.java</span></div><h1>ServiceGroupQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.web.contract.ServiceGroupGetRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L50">public class ServiceGroupQueryBuilder {</span>
+
+<span class="fc" id="L52">	private static final Logger logger = LoggerFactory.getLogger(ServiceGroupQueryBuilder.class);</span>
+
+	private static final String BASE_QUERY = &quot;SELECT id, code, name, description,active, tenantId, keyword &quot;
+			+ &quot; FROM egpgr_complainttype_category &quot;;
+
+	@SuppressWarnings(&quot;rawtypes&quot;)
+	public  String getQuery(final ServiceGroupGetRequest serviceGroupGetRequest, final List preparedStatementValues) {
+<span class="nc" id="L59">		final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L60">		addWhereClause(selectQuery, preparedStatementValues, serviceGroupGetRequest);</span>
+<span class="nc" id="L61">		logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L62">		return selectQuery.toString();</span>
+	}
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private  void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+			final ServiceGroupGetRequest serviceGroupGetRequest) {
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">		if (serviceGroupGetRequest.getTenantId() == null)</span>
+<span class="nc" id="L70">			return;</span>
+
+<span class="nc" id="L72">		selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L73">		boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">		if (serviceGroupGetRequest.getTenantId() != null) {</span>
+<span class="nc" id="L76">			isAppendAndClause = true;</span>
+<span class="nc" id="L77">			selectQuery.append(&quot; tenantId = ?&quot;);</span>
+<span class="nc" id="L78">			preparedStatementValues.add(serviceGroupGetRequest.getTenantId());</span>
+		}
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">		if (serviceGroupGetRequest.getId() != null) {</span>
+<span class="nc" id="L82">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L83">			selectQuery.append(&quot; id IN &quot; + getIdQuery(serviceGroupGetRequest.getId()));</span>
+		}
+
+<span class="nc bnc" id="L86" title="All 2 branches missed.">		if (serviceGroupGetRequest.getKeyword() != null){</span>
+<span class="nc" id="L87">			isAppendAndClause = true;</span>
+<span class="nc" id="L88">			selectQuery.append(getComplaintCategoryByKeyword());</span>
+<span class="nc" id="L89">			preparedStatementValues.add(serviceGroupGetRequest.getKeyword());</span>
+
+		}
+/*
+		if (serviceGroupRequest.getName() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);
+			selectQuery.append(&quot; name = ?&quot;);
+			preparedStatementValues.add(serviceGroupRequest.getName());
+		}*/
+
+<span class="nc" id="L99">	}</span>
+	
+	/**
+	 * This method is always called at the beginning of the method so that and
+	 * is prepended before the field's predicate is handled.
+	 *
+	 * @param appendAndClauseFlag
+	 * @param queryString
+	 * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+	 */
+	private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">		if (appendAndClauseFlag)</span>
+<span class="nc" id="L111">			queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L113">		return true;</span>
+	}
+
+	private static String getIdQuery(final List&lt;Long&gt; idList) {
+<span class="nc" id="L117">		final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">		if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L119">			query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">			for (int i = 1; i &lt; idList.size(); i++)</span>
+<span class="nc" id="L121">				query.append(&quot;, &quot; + idList.get(i));</span>
+		}
+<span class="nc" id="L123">		return query.append(&quot;)&quot;).toString();</span>
+	}
+
+	public String insertServiceGroupQuery() {
+<span class="nc" id="L127">		return &quot;INSERT INTO egpgr_complainttype_category(id, code, name,description,active,createdby,lastmodifiedby,createddate,lastmodifieddate,tenantid,keyword) values &quot;</span>
+				+ &quot;(NEXTVAL('seq_egpgr_complainttype_category'),?,?,?,?,?,?,?,?,?,?)&quot;;
+	}
+	
+	public String updateServiceGroupQuery() {
+<span class="nc" id="L132">		return &quot;UPDATE egpgr_complainttype_category SET name = ?, description = ?,active = ?, createdby = ?, lastmodifiedby = ?, &quot;</span>
+				+ &quot;createddate = ?, lastmodifieddate = ?, tenantid = ?, keyword = ? where code = ?&quot;;
+	}
+	
+	public static String checkIfAvailable() { 
+<span class="nc" id="L137">		return &quot;SELECT count(*) FROM egpgr_complainttype_category WHERE (code = ? AND tenantid = ? ) OR (name = ? AND tenantid = ?) &quot;;</span>
+	}
+	
+	public static String checkIfNameTenantIdAvailable() { 
+<span class="nc" id="L141">		return &quot;SELECT count(*) FROM egpgr_complainttype_category WHERE trim(upper(name)) = ? AND tenantid = ? &quot; ;</span>
+	}
+
+	public static String checkIfNameTenantIdAvailableUpdate() { 
+<span class="nc" id="L145">		return &quot;SELECT count(*) FROM egpgr_complainttype_category WHERE trim(upper(name)) = ? AND tenantid = ? AND id NOT IN (?) &quot; ;</span>
+	}
+
+	private static String getComplaintCategoryByKeyword(){
+<span class="nc" id="L149">		return &quot; and keyword = ? &quot; ;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceTypeKeywordRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.repository</a> &gt; <span class="el_source">ServiceTypeKeywordRepository.java</span></div><h1>ServiceTypeKeywordRepository.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.repository;
+
+import org.egov.pgr.persistence.dto.ServiceTypeKeyword;
+import org.egov.pgr.persistence.querybuilder.ServiceTypeKeywordQueryBuilder;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+
+@Repository
+public class ServiceTypeKeywordRepository {
+
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    private ServiceTypeKeywordQueryBuilder serviceTypeKeywordQueryBuilder;
+
+    public ServiceTypeKeywordRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+<span class="nc" id="L18">                                        ServiceTypeKeywordQueryBuilder serviceTypeKeywordQueryBuilder) {</span>
+<span class="nc" id="L19">        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;</span>
+<span class="nc" id="L20">        this.serviceTypeKeywordQueryBuilder = serviceTypeKeywordQueryBuilder;</span>
+<span class="nc" id="L21">    }</span>
+
+    public void save(ServiceTypeKeyword serviceTypeKeyword){
+<span class="nc" id="L24">        namedParameterJdbcTemplate.update(serviceTypeKeywordQueryBuilder.getInsertQuery(),</span>
+<span class="nc" id="L25">                getMap(serviceTypeKeyword));</span>
+<span class="nc" id="L26">    }</span>
+
+    public void update(ServiceTypeKeyword serviceTypeKeyword){
+<span class="nc" id="L29">        namedParameterJdbcTemplate.update(serviceTypeKeywordQueryBuilder.getUpdateQuery(),</span>
+<span class="nc" id="L30">                getMap(serviceTypeKeyword));</span>
+<span class="nc" id="L31">    }</span>
+
+
+    private HashMap getMap(ServiceTypeKeyword serviceTypeKeyword){
+<span class="nc" id="L35">        HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L37">        parametersMap.put(&quot;servicecode&quot;, serviceTypeKeyword.getServicecode());</span>
+<span class="nc" id="L38">        parametersMap.put(&quot;tenantid&quot;, serviceTypeKeyword.getTenantId());</span>
+<span class="nc" id="L39">        parametersMap.put(&quot;keyword&quot;, serviceTypeKeyword.getKeyword());</span>
+<span class="nc" id="L40">        parametersMap.put(&quot;createddate&quot;, serviceTypeKeyword.getCreatedDate());</span>
+<span class="nc" id="L41">        parametersMap.put(&quot;createdby&quot;, serviceTypeKeyword.getCreatedBy());</span>
+<span class="nc" id="L42">        parametersMap.put(&quot;lastmodifiedby&quot;, serviceTypeKeyword.getLastModifiedBy());</span>
+<span class="nc" id="L43">        parametersMap.put(&quot;lastmodifieddate&quot;, serviceTypeKeyword.getLastModifiedDate());</span>
+
+<span class="nc" id="L45">        return parametersMap;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

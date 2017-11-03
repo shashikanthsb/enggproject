@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PGRConsumer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.consumers</a> &gt; <span class="el_source">PGRConsumer.java</span></div><h1>PGRConsumer.java</h1><pre class="source lang-java linenums">
+/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.consumers;
+
+import java.io.IOException;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.annotation.InterfaceStability;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.model.*;
+import org.egov.pgr.domain.model.OTPConfig;
+import org.egov.pgr.domain.service.ServiceDefinitionService;
+import org.egov.pgr.domain.service.ServiceTypeService;
+import org.egov.pgr.persistence.repository.ServiceTypeConfigurationRepository;
+import org.egov.pgr.service.EscalationHierarchyService;
+import org.egov.pgr.service.EscalationTimeTypeService;
+/*import org.egov.pgr.web.contract.RouterReq;*/
+import org.egov.pgr.service.GrievanceTypeService;
+import org.egov.pgr.service.OTPConfigService;
+import org.egov.pgr.service.ReceivingCenterTypeService;
+import org.egov.pgr.service.ReceivingModeTypeService;
+import org.egov.pgr.service.RouterService;
+/*import org.egov.pgr.service.RouterService;*/
+import org.egov.pgr.service.ServiceGroupService;
+import org.egov.pgr.web.contract.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+@Service
+<span class="nc" id="L75">public class PGRConsumer {</span>
+
+<span class="nc" id="L77">	public static final Logger LOGGER = LoggerFactory.getLogger(PGRConsumer.class);</span>
+
+
+    @Autowired
+    private ServiceGroupService serviceGroupService;
+    
+    @Autowired
+    private RouterService routerService;
+    
+    @Autowired
+	private ReceivingCenterTypeService receivingCenterTypeService;
+
+	@Autowired
+	private ReceivingModeTypeService receivingModeTypeService;
+	
+	@Autowired
+	private GrievanceTypeService grievanceTypeService;
+	
+	@Autowired
+	private EscalationTimeTypeService escalationTimeTypeService;
+
+	@Autowired
+	private ApplicationProperties applicationProperties;
+	
+	@Autowired 
+	private OTPConfigService otpConfigService;
+	
+	@Autowired 
+	private EscalationHierarchyService escalationHierarchyService; 
+
+	@Autowired
+	private ServiceTypeConfigurationRepository serviceTypeConfigurationRepository;
+
+	@Autowired
+	private ServiceTypeService serviceTypeService;
+
+	@Autowired
+	private ServiceDefinitionService serviceDefinitionService;
+	
+   	@KafkaListener(containerFactory = &quot;kafkaListenerContainerFactory&quot;, topics = {
+			&quot;${kafka.topics.servicegroup.create.name}&quot;, &quot;${kafka.topics.receivingcenter.create.name}&quot;,
+			&quot;${kafka.topics.receivingmode.create.name}&quot;, &quot;${kafka.topics.receivingcenter.update.name}&quot;,
+			&quot;${kafka.topics.receivingmode.update.name}&quot;, &quot;${kafka.topics.servicetype.create.name}&quot;, 
+			&quot;${kafka.topics.servicegroup.update.name}&quot;, &quot;${kafka.topics.servicetype.update.name}&quot;,&quot;${kafka.topics.router.create.name}&quot;,
+			&quot;${kafka.topics.servicegroup.update.name}&quot;, &quot;${kafka.topics.escalationtimetype.create.name}&quot;, 
+			&quot;${kafka.topics.escalationtimetype.update.name}&quot;, &quot;${kafka.topics.otpconfig.update.name}&quot;, &quot;${kafka.topics.otpconfig.create.name}&quot;,
+			&quot;${kafka.topics.escalationhierarchy.update.name}&quot;, &quot;${kafka.topics.escalationhierarchy.create.name}&quot;, &quot;${kafka.topics.servicetypeconfiguration.create.name}&quot;,
+			&quot;${kafka.topics.servicetypeconfiguration.update.name}&quot;,&quot;${kafka.topics.servicetypes.create.name}&quot;,
+			&quot;${kafka.topics.servicetypes.create.key}&quot;, &quot;${kafka.topics.servicedefinition.create.name}&quot;,
+			&quot;${kafka.topics.servicedefinition.create.key}&quot;, &quot;${kafka.topics.servicetypes.update.name}&quot;,
+			&quot;${kafka.topics.servicetypes.update.key}&quot;, &quot;${kafka.topics.servicedefinition.update.name}&quot;,
+			&quot;${kafka.topics.servicedefinition.update.key}&quot;})
+
+	public void listen(final ConsumerRecord&lt;String, String&gt; record) {
+<span class="nc" id="L131">		LOGGER.info(&quot;RECORD: &quot; + record.toString());</span>
+<span class="nc" id="L132">		LOGGER.info(&quot;key:&quot; + record.key() + &quot;:&quot; + &quot;value:&quot; + record.value() + &quot;thread:&quot; + Thread.currentThread());</span>
+<span class="nc" id="L133">		final ObjectMapper objectMapper = new ObjectMapper();</span>
+
+<span class="nc" id="L135">		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);</span>
+		try {
+<span class="nc bnc" id="L137" title="All 2 branches missed.">			if (record.topic().equals(applicationProperties.getCreateServiceGroupTopicName())) {</span>
+<span class="nc" id="L138">				LOGGER.info(&quot;Consuming create ServiceGroup request&quot;);</span>
+<span class="nc" id="L139">				serviceGroupService.create(objectMapper.readValue(record.value(), ServiceGroupRequest.class));</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateReceivingCenterTopicName())) {</span>
+<span class="nc" id="L141">				LOGGER.info(&quot;Consuming create ReceivingCenterType request&quot;);</span>
+<span class="nc" id="L142">				receivingCenterTypeService.create(objectMapper.readValue(record.value(), ReceivingCenterTypeReq.class));</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateReceivingCenterTopicName())) {</span>
+<span class="nc" id="L144">				LOGGER.info(&quot;Consuming update ReceivingCenterType request&quot;);</span>
+<span class="nc" id="L145">				receivingCenterTypeService.update(objectMapper.readValue(record.value(), ReceivingCenterTypeReq.class));</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateReceivingModeTopicName())) {</span>
+<span class="nc" id="L147">				LOGGER.info(&quot;Consuming create ReceivingModeType request&quot;);</span>
+<span class="nc" id="L148">				receivingModeTypeService.create(objectMapper.readValue(record.value(), ReceivingModeTypeReq.class));</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateReceivingModeTopicName())) {</span>
+<span class="nc" id="L150">				LOGGER.info(&quot;Consuming update ReceivingModeType request&quot;);</span>
+<span class="nc" id="L151">				receivingModeTypeService.update(objectMapper.readValue(record.value(), ReceivingModeTypeReq.class));</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateGrievanceTypeTopicName())) {</span>
+<span class="nc" id="L153">				LOGGER.info(&quot;Consuming create GrievanceType request&quot;);</span>
+<span class="nc" id="L154">				grievanceTypeService.create(objectMapper.readValue(record.value(), ServiceRequest.class));</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateServiceGroupTopicName())) {</span>
+<span class="nc" id="L156">				LOGGER.info(&quot;Consuming update ServiceGroup request&quot;);</span>
+<span class="nc" id="L157">				serviceGroupService.update(objectMapper.readValue(record.value(), ServiceGroupRequest.class));</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateGrievanceTypeTopicName())) {</span>
+<span class="nc" id="L159">				LOGGER.info(&quot;Consuming update GrievanceType request&quot;);</span>
+<span class="nc" id="L160">				grievanceTypeService.update(objectMapper.readValue(record.value(), ServiceRequest.class));</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateServiceGroupTopicName())) {</span>
+<span class="nc" id="L162">				LOGGER.info(&quot;Consuming create Category request&quot;);</span>
+<span class="nc" id="L163">				serviceGroupService.create(objectMapper.readValue(record.value(), ServiceGroupRequest.class));</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateRouterTopicName())) {</span>
+<span class="nc" id="L165">				LOGGER.info(&quot;Consuming create Router request&quot;);</span>
+<span class="nc" id="L166">				routerService.create(objectMapper.readValue(record.value(), RouterTypeReq.class));</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateEscalationTimeTypeName())) {</span>
+<span class="nc" id="L168">				LOGGER.info(&quot;Consuming create Escalation time type request&quot;);</span>
+<span class="nc" id="L169">				escalationTimeTypeService.create(objectMapper.readValue(record.value(), EscalationTimeTypeReq.class));</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateEscalationTimeTypeName())) {</span>
+<span class="nc" id="L171">				LOGGER.info(&quot;Consuming update Escalation time type request&quot;);</span>
+<span class="nc" id="L172">				escalationTimeTypeService.update(objectMapper.readValue(record.value(), EscalationTimeTypeReq.class));</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateOtpConfigTopicName())) {</span>
+<span class="nc" id="L174">				LOGGER.info(&quot;Consuming create OTP Config request&quot;);</span>
+<span class="nc" id="L175">				otpConfigService.create(objectMapper.readValue(record.value(),  OTPConfig.class));</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateOtpConfigTopicName())) {</span>
+<span class="nc" id="L177">				LOGGER.info(&quot;Consuming update OTP Config request&quot;);</span>
+<span class="nc" id="L178">				otpConfigService.update(objectMapper.readValue(record.value(),  OTPConfig.class)); </span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getCreateEscalationHierarchyTopicName())) {</span>
+<span class="nc" id="L180">				LOGGER.info(&quot;Consuming Create Escalation Hierarchy Request&quot;);</span>
+<span class="nc" id="L181">				escalationHierarchyService.create(objectMapper.readValue(record.value(), EscalationHierarchyReq.class));</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">			} else if (record.topic().equals(applicationProperties.getUpdateEscalationHierarchyTopicName())) {</span>
+<span class="nc" id="L183">				LOGGER.info(&quot;Consuming Update Escalation Hierarchy Request&quot;);</span>
+<span class="nc" id="L184">				escalationHierarchyService.update(objectMapper.readValue(record.value(), EscalationHierarchyReq.class));</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">			}else if (record.topic().equals(applicationProperties.servicetypeconfigurationCreateTopic())) {</span>
+<span class="nc" id="L186">				serviceTypeConfigurationRepository.save(objectMapper.readValue(record.value(), org.egov.pgr.persistence.dto.ServiceTypeConfiguration.class));</span>
+			}
+<span class="nc bnc" id="L188" title="All 2 branches missed.">			else if (record.topic().equals(applicationProperties.servicetypeconfigurationUpdateTopic())) {</span>
+<span class="nc" id="L189">				serviceTypeConfigurationRepository.update(objectMapper.readValue(record.value(), org.egov.pgr.persistence.dto.ServiceTypeConfiguration.class));</span>
+			}
+<span class="nc bnc" id="L191" title="All 2 branches missed.">			else if(record.topic().equals(applicationProperties.getCreateServiceTypeTopicName())) {</span>
+<span class="nc" id="L192">				serviceTypeService.persistServiceType(objectMapper.readValue(record.value(), ServiceTypeRequest.class).toDomain());</span>
+			}
+<span class="nc bnc" id="L194" title="All 2 branches missed.">			else if(record.topic().equals(applicationProperties.getUpdateServiceTypeTopicName())){</span>
+<span class="nc" id="L195">				serviceTypeService.persistForUpdate(objectMapper.readValue(record.value(), ServiceTypeRequest.class).toDomain());</span>
+			}
+<span class="nc bnc" id="L197" title="All 2 branches missed.">			else if(record.topic().equals(applicationProperties.getCreateServiceDefinitionName())){</span>
+<span class="nc" id="L198">				serviceDefinitionService.persist(objectMapper.readValue(record.value(), ServiceDefinitionRequest.class).toDomain());</span>
+			}
+<span class="nc bnc" id="L200" title="All 2 branches missed.">			else if(record.topic().equals(applicationProperties.getUpdateServiceDefinitionName())){</span>
+<span class="nc" id="L201">				serviceDefinitionService.persistForUpdate(objectMapper.readValue(record.value(), ServiceDefinitionRequest.class).toDomain());</span>
+			}
+<span class="nc" id="L203">		} catch (final IOException e) {</span>
+<span class="nc" id="L204">			e.printStackTrace();</span>
+<span class="nc" id="L205">		}</span>
+<span class="nc" id="L206">	}</span>
+   	}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

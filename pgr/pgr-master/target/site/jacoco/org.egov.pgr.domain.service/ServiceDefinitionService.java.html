@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDefinitionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service</a> &gt; <span class="el_source">ServiceDefinitionService.java</span></div><h1>ServiceDefinitionService.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.egov.pgr.domain.model.ServiceDefinition;
+import org.egov.pgr.domain.model.ServiceDefinitionSearchCriteria;
+import org.egov.pgr.domain.service.validator.AttributedefinitionValidator.AttributeDefinitionCreateValidator;
+import org.egov.pgr.domain.service.validator.serviceDefinitionCreateValidator.ServiceDefinitionCreateValidator;
+import org.egov.pgr.domain.service.validator.valueDeficnitionValidator.ValueDefinitionCreateValidator;
+import org.egov.pgr.domain.service.validator.valuedefinitionUniqueValidator.ValueDefinitionUniqueValuesValidator;
+import org.egov.pgr.domain.service.validatorAttributedefinitionUniqueValidator.AttributeDefinitionUniqueValuesValidator;
+import org.egov.pgr.persistence.dto.AttributeDefinition;
+import org.egov.pgr.persistence.dto.ValueDefinition;
+import org.egov.pgr.persistence.repository.AttributeDefinitionRepository;
+import org.egov.pgr.persistence.repository.ServiceDefinitionMessageQueueRepository;
+import org.egov.pgr.persistence.repository.ServiceDefinitionRepository;
+import org.egov.pgr.persistence.repository.ValueDefinitionRepository;
+import org.egov.pgr.web.contract.ServiceDefinitionRequest;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ServiceDefinitionService {
+
+	public static final String UPDATE = &quot;UPDATE&quot;;
+	private List&lt;ServiceDefinitionCreateValidator&gt; createValidators;
+	private List&lt;AttributeDefinitionCreateValidator&gt; attributeValidate;
+	private List&lt;ValueDefinitionCreateValidator&gt; valueDefinitionValidate;
+	private List&lt;AttributeDefinitionUniqueValuesValidator&gt; attribUniqValidate;
+	private List&lt;ValueDefinitionUniqueValuesValidator&gt; valueDefinValidate;
+
+
+	private static final String CREATE = &quot;CREATE&quot;;
+	private ServiceDefinitionMessageQueueRepository serviceDefinitionMessageQueueRepository;
+	private ServiceDefinitionRepository serviceDefinitionRepository;
+	private AttributeDefinitionRepository attributeDefinitionRepository;
+	private ValueDefinitionRepository valueDefinitionRepository;
+	
+
+	public ServiceDefinitionService(ServiceDefinitionMessageQueueRepository serviceDefinitionMessageQueueRepository,
+			ServiceDefinitionRepository serviceDefinitionRepository,
+			AttributeDefinitionRepository attributeDefinitionRepository,
+			ValueDefinitionRepository valueDefinitionRepository,
+			List&lt;ServiceDefinitionCreateValidator&gt; createValidators,
+			List&lt;AttributeDefinitionCreateValidator&gt; attributeValidate,
+			List&lt;ValueDefinitionCreateValidator&gt; valueDefinitionValidate,
+			List&lt;AttributeDefinitionUniqueValuesValidator&gt; attribUniqValidate,
+<span class="nc" id="L48">			List&lt;ValueDefinitionUniqueValuesValidator&gt; valueDefinValidate) {</span>
+
+<span class="nc" id="L50">		this.serviceDefinitionMessageQueueRepository = serviceDefinitionMessageQueueRepository;</span>
+<span class="nc" id="L51">		this.serviceDefinitionRepository = serviceDefinitionRepository;</span>
+<span class="nc" id="L52">		this.attributeDefinitionRepository = attributeDefinitionRepository;</span>
+<span class="nc" id="L53">		this.valueDefinitionRepository = valueDefinitionRepository;</span>
+<span class="nc" id="L54">		this.createValidators = createValidators;</span>
+<span class="nc" id="L55">		this.attributeValidate = attributeValidate;</span>
+<span class="nc" id="L56">		this.valueDefinitionValidate = valueDefinitionValidate; </span>
+<span class="nc" id="L57">		this.attribUniqValidate = attribUniqValidate;</span>
+<span class="nc" id="L58">		this.valueDefinitionRepository = valueDefinitionRepository;</span>
+<span class="nc" id="L59">		this.valueDefinValidate = valueDefinValidate;</span>
+
+<span class="nc" id="L61">	}</span>
+	
+	public void create(ServiceDefinition serviceDefinition, ServiceDefinitionRequest request) {
+<span class="nc" id="L64">		validateForCreate(serviceDefinition);</span>
+<span class="nc" id="L65">		serviceDefinitionMessageQueueRepository.save(request, CREATE);</span>
+<span class="nc" id="L66">	}</span>
+
+	public void update(ServiceDefinition serviceDefinition, ServiceDefinitionRequest request){
+<span class="nc" id="L69">		serviceDefinitionMessageQueueRepository.save(request, UPDATE);</span>
+<span class="nc" id="L70">	}</span>
+
+	public void persist(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L73">		serviceDefinitionRepository.save(serviceDefinition.toDto());</span>
+<span class="nc" id="L74">		persistServiceTypeAttributes(serviceDefinition);</span>
+<span class="nc" id="L75">	}</span>
+
+	public void persistForUpdate(ServiceDefinition serviceDefinition){
+<span class="nc" id="L78">        serviceDefinitionRepository.update(serviceDefinition.toDto());</span>
+
+<span class="nc" id="L80">	}</span>
+
+	public List&lt;ServiceDefinition&gt; search(ServiceDefinitionSearchCriteria serviceDefinitionSearchCriteria) {
+
+<span class="nc" id="L84">		List&lt;ServiceDefinition&gt; serviceDefinitionList = serviceDefinitionRepository</span>
+<span class="nc" id="L85">				.search(serviceDefinitionSearchCriteria);</span>
+<span class="nc" id="L86">		setAttributes(serviceDefinitionList);</span>
+
+<span class="nc" id="L88">		return serviceDefinitionList;</span>
+	}
+
+	private void validateForCreate(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L92">		createMandatoryFieldValidate(serviceDefinition);</span>
+<span class="nc" id="L93">		attributeMandatoryFieldValidation(serviceDefinition);</span>
+<span class="nc" id="L94">		valueDefinMandatoryFieldValidation(serviceDefinition);</span>
+<span class="nc" id="L95">		matchAttributeAndServiceCode(serviceDefinition);</span>
+<span class="nc" id="L96">		ServiceDefinitionFieldLengthValidate(serviceDefinition);</span>
+<span class="nc" id="L97">		valueDefLengthValidation(serviceDefinition);</span>
+<span class="nc" id="L98">		valueDefinDataTypeValidation(serviceDefinition);</span>
+<span class="nc" id="L99">		attributeLengthValidation(serviceDefinition);</span>
+
+
+<span class="nc" id="L102">		createUniqueConstraintValidation(serviceDefinition);</span>
+<span class="nc" id="L103">		attribUniqueConstraintValidation(serviceDefinition);</span>
+<span class="nc" id="L104">		valueDefinUniqueConstraintValidation(serviceDefinition);</span>
+
+<span class="nc" id="L106">	}</span>
+
+	private void persistServiceTypeAttributes(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L109">		List&lt;AttributeDefinition&gt; attributeDefinitionList = serviceDefinition.getAttributes().stream()</span>
+<span class="nc" id="L110">				.map(attributeDefinition -&gt; attributeDefinition.toDto(serviceDefinition)).collect(Collectors.toList());</span>
+
+<span class="nc" id="L112">		attributeDefinitionList.forEach(this::persistAttribute);</span>
+<span class="nc" id="L113">	}</span>
+
+	private void persistAttribute(AttributeDefinition attributeDefinition) {
+<span class="nc" id="L116">		attributeDefinitionRepository.save(attributeDefinition);</span>
+
+<span class="nc" id="L118">		attributeDefinition.getValueDefinitions().forEach(this::persistValueDefinition);</span>
+<span class="nc" id="L119">	}</span>
+
+	private void persistValueDefinition(ValueDefinition valueDefinition) {
+<span class="nc" id="L122">		valueDefinitionRepository.save(valueDefinition);</span>
+<span class="nc" id="L123">	}</span>
+
+	private void createMandatoryFieldValidate(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L126">		createValidators.stream().filter(validator -&gt; validator.canValidate(serviceDefinition))</span>
+<span class="nc" id="L127">				.forEach(v -&gt; v.checkMandatoryField(serviceDefinition));</span>
+<span class="nc" id="L128">	}</span>
+	
+	private void ServiceDefinitionFieldLengthValidate(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L131">		createValidators.stream().filter(validator -&gt; validator.canValidate(serviceDefinition))</span>
+<span class="nc" id="L132">				.forEach(v -&gt; v.checkLength(serviceDefinition));</span>
+<span class="nc" id="L133">	}</span>
+
+	private void createUniqueConstraintValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L136">		createValidators.stream().filter(validator -&gt; validator.canValidate(serviceDefinition))</span>
+<span class="nc" id="L137">				.forEach(v -&gt; v.checkConstraints(serviceDefinition));</span>
+<span class="nc" id="L138">	}</span>
+	
+	private void attributeLengthValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L141">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+		{
+<span class="nc" id="L143">			attributeValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L144">			validator.canValidate(attributeDefinition))</span>
+<span class="nc" id="L145">			.forEach(v -&gt; v.validatingLength(attributeDefinition));</span>
+<span class="nc" id="L146">		});</span>
+		
+<span class="nc" id="L148">	}</span>
+	
+	
+	private void attributeMandatoryFieldValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L152">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+		{
+<span class="nc" id="L154">			attributeValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L155">			validator.canValidate(attributeDefinition))</span>
+<span class="nc" id="L156">			.forEach(v -&gt; v.checkMandatoryField(attributeDefinition));</span>
+<span class="nc" id="L157">		});</span>
+		
+<span class="nc" id="L159">	}</span>
+	
+	private void valueDefLengthValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L162">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+		{
+<span class="nc" id="L164">			attributeDefinition.getValueDefinitions().stream().forEach(valueDefinition -&gt;</span>
+			{
+<span class="nc" id="L166">			valueDefinitionValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L167">			validator.canValidate(valueDefinition))</span>
+<span class="nc" id="L168">			.forEach(v -&gt; v.validateLength(valueDefinition));</span>
+<span class="nc" id="L169">		});</span>
+<span class="nc" id="L170">		});</span>
+		
+<span class="nc" id="L172">	}</span>
+	
+	private void valueDefinMandatoryFieldValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L175">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+		{
+<span class="nc" id="L177">			attributeDefinition.getValueDefinitions().stream().forEach(valueDefinition -&gt;</span>
+			{
+<span class="nc" id="L179">			valueDefinitionValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L180">			validator.canValidate(valueDefinition))</span>
+<span class="nc" id="L181">			.forEach(v -&gt; v.checkMandatoryField(valueDefinition));</span>
+<span class="nc" id="L182">		});</span>
+<span class="nc" id="L183">		});</span>
+		
+<span class="nc" id="L185">	}</span>
+	
+	private void valueDefinUniqueConstraintValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L188">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+	{			
+<span class="nc" id="L190">		attributeDefinition.getValueDefinitions().stream().forEach(valueDefinition -&gt;</span>
+		{
+<span class="nc" id="L192">				valueDefinValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L193">			validator.canValidate(valueDefinition))</span>
+<span class="nc" id="L194">				.forEach(v -&gt; v.validateUniqueConstratint(valueDefinition,serviceDefinition.getCode(),attributeDefinition.getCode(),serviceDefinition.getTenantId()));</span>
+<span class="nc" id="L195">			});</span>
+<span class="nc" id="L196">			});</span>
+<span class="nc" id="L197">	}</span>
+	
+	private void valueDefinDataTypeValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L200">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+	{			
+		
+<span class="nc" id="L203">		attributeValidate.stream().filter(validator -&gt; </span>
+<span class="nc" id="L204">			validator.canValidate(attributeDefinition))</span>
+<span class="nc" id="L205">				.forEach(v -&gt; v.validateDataType(attributeDefinition));</span>
+		
+<span class="nc" id="L207">			});</span>
+<span class="nc" id="L208">	}</span>
+	
+		
+	private void attribUniqueConstraintValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L212">		serviceDefinition.getAttributes().stream().forEach(attributeDefinition -&gt; </span>
+		{			
+		
+<span class="nc" id="L215">			attribUniqValidate.stream().filter(validator -&gt; validator.canValidate(attributeDefinition))</span>
+<span class="nc" id="L216">				.forEach(v -&gt; v.validateUniqueConstratint(attributeDefinition));</span>
+<span class="nc" id="L217">	});</span>
+<span class="nc" id="L218">	}</span>
+	
+	
+	private void matchAttributeAndServiceCode(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L222">		createValidators.stream().filter(validator -&gt; validator.canValidate(serviceDefinition))</span>
+<span class="nc" id="L223">				.forEach(v -&gt; v.matchServiceandAttributeCodes(serviceDefinition));</span>
+<span class="nc" id="L224">	} </span>
+	
+	private void setAttributes(List&lt;ServiceDefinition&gt; serviceDefinitions) {
+<span class="nc" id="L227">		serviceDefinitions.forEach(serviceDefinition -&gt; serviceDefinition.setAttributes(attributeDefinitionRepository</span>
+<span class="nc" id="L228">				.searchByCodeAndTenant(serviceDefinition.getCode(), serviceDefinition.getTenantId())));</span>
+<span class="nc" id="L229">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

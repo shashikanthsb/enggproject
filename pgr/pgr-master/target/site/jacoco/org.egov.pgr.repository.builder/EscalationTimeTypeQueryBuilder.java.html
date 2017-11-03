@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EscalationTimeTypeQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">EscalationTimeTypeQueryBuilder.java</span></div><h1>EscalationTimeTypeQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.web.contract.EscalationTimeTypeGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L50">public class EscalationTimeTypeQueryBuilder {</span>
+	
+<span class="fc" id="L52">	private static final Logger logger = LoggerFactory.getLogger(EscalationTimeTypeQueryBuilder.class);</span>
+	
+	private static final String BASE_QUERY = &quot;SELECT escalation.id,escalation.complaint_type_id,escalation.designation_id,escalation.no_of_hrs,escalation.tenantId from egpgr_escalation escalation&quot;;
+	
+	public String insertEscalationTimeType(){
+<span class="nc" id="L57">		return &quot;INSERT INTO egpgr_escalation(complaint_type_id, no_of_hrs, designation_id, tenantid, createdby&quot;</span>
+				+ &quot;, lastmodifiedby, createddate, lastmodifieddate) VALUES(?,?,?,?,?,?,?,?)&quot;;
+	}
+	
+	public String updateEscalationTimeType(){
+<span class="nc" id="L62">		return &quot;UPDATE egpgr_escalation set complaint_type_id = ?, no_of_hrs = ?, designation_id = ?, tenantid = ?, &quot;</span>
+				+ &quot;createdby = ?, lastmodifiedby = ?, createddate = ?, lastmodifieddate = ? where id = ?&quot;;
+	}
+	
+	@SuppressWarnings(&quot;rawtypes&quot;)
+	public String getQuery(final EscalationTimeTypeGetReq centerTypeRequest, final List preparedStatementValues) {
+<span class="nc" id="L68">		final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L69">		addWhereClause(selectQuery, preparedStatementValues, centerTypeRequest);</span>
+<span class="nc" id="L70">		addOrderByClause(selectQuery, centerTypeRequest);</span>
+<span class="nc" id="L71">		addPagingClause(selectQuery, preparedStatementValues, centerTypeRequest);</span>
+<span class="nc" id="L72">		logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L73">		return selectQuery.toString();</span>
+	}
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+			final EscalationTimeTypeGetReq escalationRequest) {
+
+<span class="nc bnc" id="L80" title="All 6 branches missed.">		if (escalationRequest.getId() == null &amp;&amp; escalationRequest.getGrievanceType() == 0 &amp;&amp; escalationRequest.getDesignation() == 0</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">				 &amp;&amp; escalationRequest.getTenantId() == null)</span>
+<span class="nc" id="L82">			return;</span>
+
+<span class="nc" id="L84">		selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L85">		boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">		if (escalationRequest.getTenantId() != null) {</span>
+<span class="nc" id="L88">			isAppendAndClause = true;</span>
+<span class="nc" id="L89">			selectQuery.append(&quot; escalation.tenantId = ?&quot;);</span>
+<span class="nc" id="L90">			preparedStatementValues.add(escalationRequest.getTenantId());</span>
+		}
+
+<span class="nc bnc" id="L93" title="All 2 branches missed.">		if (escalationRequest.getId() != null) {</span>
+<span class="nc" id="L94">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L95">			selectQuery.append(&quot; escalation.id IN &quot; + getIdQuery(escalationRequest.getId()));</span>
+		}
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">		if (escalationRequest.getGrievanceType() != 0) {</span>
+<span class="nc" id="L99">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L100">			selectQuery.append(&quot; escalation.complaint_type_id = ?&quot;);</span>
+<span class="nc" id="L101">			preparedStatementValues.add(escalationRequest.getGrievanceType());</span>
+		}
+		
+<span class="nc bnc" id="L104" title="All 2 branches missed.">		if (escalationRequest.getDesignation() != 0) {</span>
+<span class="nc" id="L105">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L106">			selectQuery.append(&quot; escalation.designation_id = ?&quot;);</span>
+<span class="nc" id="L107">			preparedStatementValues.add(escalationRequest.getDesignation());</span>
+		}
+		
+		
+
+		/*
+		 * if (centerTypeRequest.getCode() != null) { isAppendAndClause =
+		 * addAndClauseIfRequired(isAppendAndClause, selectQuery);
+		 * selectQuery.append(&quot; centerType.code = ?&quot;);
+		 * preparedStatementValues.add(centerTypeRequest.getCode()); }
+		 */
+		/*if (escalationRequest.getActive() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);
+			selectQuery.append(&quot; centerType.active = ?&quot;);
+			preparedStatementValues.add(escalationRequest.getActive());
+		}*/
+
+<span class="nc" id="L124">	}</span>
+
+	
+	
+	/**
+	 * This method is always called at the beginning of the method so that and
+	 * is prepended before the field's predicate is handled.
+	 *
+	 * @param appendAndClauseFlag
+	 * @param queryString
+	 * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+	 */
+	private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		if (appendAndClauseFlag)</span>
+<span class="nc" id="L138">			queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L140">		return true;</span>
+	}
+
+	private static String getIdQuery(final List&lt;Long&gt; idList) {
+<span class="nc" id="L144">		final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">		if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L146">			query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">			for (int i = 1; i &lt; idList.size(); i++)</span>
+<span class="nc" id="L148">				query.append(&quot;, &quot; + idList.get(i));</span>
+		}
+<span class="nc" id="L150">		return query.append(&quot;)&quot;).toString();</span>
+	}
+
+	private void addOrderByClause(final StringBuilder selectQuery,
+			final EscalationTimeTypeGetReq escalationGetRequest) {
+<span class="nc bnc" id="L155" title="All 2 branches missed.">		final String sortBy = escalationGetRequest.getSortBy() == null ? &quot;escalation.id&quot;</span>
+<span class="nc" id="L156">				: &quot;escalation.&quot; + escalationGetRequest.getSortBy();</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">		final String sortOrder = escalationGetRequest.getSortOrder() == null ? &quot;DESC&quot;</span>
+<span class="nc" id="L158">				: escalationGetRequest.getSortOrder();</span>
+<span class="nc" id="L159">		selectQuery.append(&quot; ORDER BY &quot; + sortBy + &quot; &quot; + sortOrder);</span>
+<span class="nc" id="L160">	}</span>
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addPagingClause(final StringBuilder selectQuery, final List preparedStatementValues,
+			final EscalationTimeTypeGetReq escalationGetRequest) {
+		// handle limit(also called pageSize) here
+<span class="nc" id="L166">		selectQuery.append(&quot; LIMIT ?&quot;);</span>
+<span class="nc" id="L167">		long pageSize = Integer.parseInt(&quot;100&quot;);</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">		if (escalationGetRequest.getPageSize() != null)</span>
+<span class="nc" id="L169">			pageSize = escalationGetRequest.getPageSize();</span>
+<span class="nc" id="L170">		preparedStatementValues.add(pageSize); // Set limit to pageSize</span>
+
+		// handle offset here
+<span class="nc" id="L173">		selectQuery.append(&quot; OFFSET ?&quot;);</span>
+<span class="nc" id="L174">		int pageNumber = 0; // Default pageNo is zero meaning first page</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">		if (escalationGetRequest.getPageNumber() != null)</span>
+<span class="nc" id="L176">			pageNumber = escalationGetRequest.getPageNumber() - 1;</span>
+<span class="nc" id="L177">		preparedStatementValues.add(pageNumber * pageSize); // Set offset to</span>
+		// pageNo * pageSize
+<span class="nc" id="L179">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValueDefinitionRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.repository</a> &gt; <span class="el_source">ValueDefinitionRepository.java</span></div><h1>ValueDefinitionRepository.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.repository;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.egov.pgr.persistence.dto.ValueDefinition;
+import org.egov.pgr.persistence.querybuilder.ValueDefinitionQueryBuilder;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class ValueDefinitionRepository {
+
+    private ValueDefinitionQueryBuilder valueDefinitionQueryBuilder;
+
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public ValueDefinitionRepository(ValueDefinitionQueryBuilder valueDefinitionQueryBuilder,
+<span class="nc" id="L22">                                     NamedParameterJdbcTemplate namedParameterJdbcTemplate) {</span>
+<span class="nc" id="L23">        this.valueDefinitionQueryBuilder = valueDefinitionQueryBuilder;</span>
+<span class="nc" id="L24">        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;</span>
+<span class="nc" id="L25">    }</span>
+
+    public void save(ValueDefinition valueDefinition){
+<span class="nc" id="L28">        namedParameterJdbcTemplate.update(valueDefinitionQueryBuilder.getInsertQuery(),</span>
+<span class="nc" id="L29">                getInsertMap(valueDefinition));</span>
+<span class="nc" id="L30">    }</span>
+
+    public List&lt;ValueDefinition&gt; fetchValueDefinition(String code, String tenantId, String attributeCode){
+
+<span class="nc" id="L34">      return  namedParameterJdbcTemplate.query(valueDefinitionQueryBuilder.findByTenantIdAndServiceCodeAndAttributeCode(),</span>
+<span class="nc" id="L35">                getValueDefinitionMap(code, tenantId, attributeCode),</span>
+                new BeanPropertyRowMapper&lt;&gt;(ValueDefinition.class));
+    }
+    
+    public List&lt;org.egov.pgr.domain.model.ValueDefinition&gt; getValueDefinitionTenantData(org.egov.pgr.domain.model.ValueDefinition valueDefinition,
+    		String serviceCode,String attributeCode,String tenantid) {
+        org.egov.pgr.domain.model.ValueDefinition valueCodeuniqueCheck = org.egov.pgr.domain.model.ValueDefinition
+<span class="nc" id="L42">        		.builder()</span>
+<span class="nc" id="L43">        		.serviceCode(serviceCode)</span>
+<span class="nc" id="L44">                .key(valueDefinition.getKey())</span>
+<span class="nc" id="L45">                .attributeCode(attributeCode)</span>
+<span class="nc" id="L46">                .tenantid(tenantid)</span>
+<span class="nc" id="L47">                .build();</span>
+        
+<span class="nc" id="L49">        List&lt;ValueDefinition&gt; valueDefinitionList = getValueList(valueDefinitionQueryBuilder.getCodeTenantQuery(valueCodeuniqueCheck),</span>
+<span class="nc" id="L50">                getDetailQuery(valueCodeuniqueCheck), new BeanPropertyRowMapper&lt;&gt;(ValueDefinition.class));</span>
+<span class="nc" id="L51">        System.out.println(valueDefinitionQueryBuilder.getCodeTenantQuery(valueCodeuniqueCheck));</span>
+        
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (!valueDefinitionList.isEmpty()) {</span>
+<span class="nc" id="L54">            return valueDefinitionList.stream()</span>
+<span class="nc" id="L55">                    .map(ValueDefinition::toDomain)</span>
+<span class="nc" id="L56">                    .collect(Collectors.toList());</span>
+        }
+
+<span class="nc" id="L59">        return Collections.EMPTY_LIST;</span>
+    }
+    
+    private List&lt;ValueDefinition&gt; getValueList(String sql, HashMap&lt;String, Object&gt; searchNamedQuery, BeanPropertyRowMapper&lt;ValueDefinition&gt; rowMapper) {
+<span class="nc" id="L63">        return namedParameterJdbcTemplate.query(sql,searchNamedQuery, rowMapper);</span>
+    }
+    
+    private HashMap&lt;String, Object&gt; getDetailQuery(org.egov.pgr.domain.model.ValueDefinition valueDefinition) {
+<span class="nc" id="L67">        HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L68">        parametersMap.put(&quot;servicecode&quot;, valueDefinition.getServiceCode().toUpperCase());</span>
+<span class="nc" id="L69">        parametersMap.put(&quot;tenantid&quot;, valueDefinition.getTenantid());</span>
+<span class="nc" id="L70">        parametersMap.put(&quot;attributecode&quot;, valueDefinition.getAttributeCode());</span>
+<span class="nc" id="L71">        parametersMap.put(&quot;key&quot;, valueDefinition.getKey());</span>
+<span class="nc" id="L72">        return parametersMap;</span>
+    }
+
+    private HashMap getInsertMap(ValueDefinition valueDefinition){
+<span class="nc" id="L76">        HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L78">        parametersMap.put(&quot;servicecode&quot;, valueDefinition.getServiceCode());</span>
+<span class="nc" id="L79">        parametersMap.put(&quot;tenantid&quot;, valueDefinition.getTenantId());</span>
+<span class="nc" id="L80">        parametersMap.put(&quot;active&quot;, valueDefinition.getActive());</span>
+<span class="nc" id="L81">        parametersMap.put(&quot;required&quot;, valueDefinition.getRequired());</span>
+<span class="nc" id="L82">        parametersMap.put(&quot;key&quot;, valueDefinition.getKey());</span>
+<span class="nc" id="L83">        parametersMap.put(&quot;name&quot;, valueDefinition.getName());</span>
+<span class="nc" id="L84">        parametersMap.put(&quot;attributecode&quot;, valueDefinition.getAttributeCode());</span>
+<span class="nc" id="L85">        parametersMap.put(&quot;createddate&quot;, valueDefinition.getCreatedDate());</span>
+<span class="nc" id="L86">        parametersMap.put(&quot;createdby&quot;, valueDefinition.getCreatedBy());</span>
+
+<span class="nc" id="L88">        return parametersMap;</span>
+    }
+
+    private HashMap&lt;String, Object&gt; getValueDefinitionMap(String code, String tenantId, String attributeCode){
+<span class="nc" id="L92">        HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L93">        parametersMap.put(&quot;servicecode&quot;, code);</span>
+<span class="nc" id="L94">        parametersMap.put(&quot;tenantid&quot;, tenantId);</span>
+<span class="nc" id="L95">        parametersMap.put(&quot;attributecode&quot;, attributeCode);</span>
+
+<span class="nc" id="L97">        return parametersMap;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

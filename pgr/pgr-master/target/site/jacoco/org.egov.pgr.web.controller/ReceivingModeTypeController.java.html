@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingModeTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">ReceivingModeTypeController.java</span></div><h1>ReceivingModeTypeController.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.web.controller;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.ReceivingModeType;
+import org.egov.pgr.domain.model.enums.ChannelType;
+import org.egov.pgr.service.ReceivingModeTypeService;
+import org.egov.pgr.util.PgrMasterConstants;
+import org.egov.pgr.web.contract.ReceivingModeTypeGetReq;
+import org.egov.pgr.web.contract.ReceivingModeTypeReq;
+import org.egov.pgr.web.contract.ReceivingModeTypeRes;
+import org.egov.pgr.web.contract.RequestInfoWrapper;
+import org.egov.pgr.web.contract.factory.ResponseInfoFactory;
+import org.egov.pgr.web.errorhandlers.Error;
+import org.egov.pgr.web.errorhandlers.ErrorHandler;
+import org.egov.pgr.web.errorhandlers.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/receivingmode&quot;)
+<span class="nc" id="L74">public class ReceivingModeTypeController {</span>
+
+<span class="nc" id="L76">    private static final Logger logger = LoggerFactory.getLogger(ReceivingModeTypeController.class);</span>
+    public static final String CODE = &quot;code&quot;;
+    public static final String MESSAGE = &quot;message&quot;;
+    public static final String FIELD = &quot;field&quot;;
+
+    @Autowired
+    private ReceivingModeTypeService modeTypeService;
+
+    @Autowired
+    private ResponseInfoFactory responseInfoFactory;
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+    @Autowired
+    private ErrorHandler errHandler;
+
+<span class="nc" id="L93">    HashMap&lt;String, String&gt; receivingModeException = new HashMap&lt;&gt;();</span>
+
+    @PostMapping(value = &quot;/v1/_create&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; create(@RequestBody @Valid final ReceivingModeTypeReq ModeTypeRequest,
+                                    final BindingResult errors) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L100">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L101">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L103">        logger.info(&quot;ReceivingModeType Create : Request::&quot; + ModeTypeRequest);</span>
+
+<span class="nc" id="L105">        validateReceivingModeRequest(ModeTypeRequest, &quot;create&quot;);</span>
+
+<span class="nc" id="L107">        final ReceivingModeType ReceivingMode = modeTypeService.sendMessage(</span>
+<span class="nc" id="L108">                applicationProperties.getCreateReceivingModeTopicName(),</span>
+<span class="nc" id="L109">                applicationProperties.getCreateReceivingModeTopicKey(), ModeTypeRequest);</span>
+<span class="nc" id="L110">        final List&lt;ReceivingModeType&gt; ReceivingModes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L111">        ReceivingModes.add(ReceivingMode);</span>
+<span class="nc" id="L112">        return getSuccessResponse(ReceivingModes, ModeTypeRequest.getRequestInfo());</span>
+
+    }
+
+    @PostMapping(value = &quot;/v1/_update&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; update(@RequestBody @Valid final ReceivingModeTypeReq modeTypeRequest,
+                                    final BindingResult errors) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L121">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L122">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L124">        logger.info(&quot;ReceivingMode Update : Request::&quot; + modeTypeRequest);</span>
+
+<span class="nc" id="L126">        validateReceivingModeRequest(modeTypeRequest, &quot;update&quot;);</span>
+
+<span class="nc" id="L128">        final ReceivingModeType modeType = modeTypeService.sendMessage(</span>
+<span class="nc" id="L129">                applicationProperties.getUpdateReceivingModeTopicName(),</span>
+<span class="nc" id="L130">                applicationProperties.getUpdateReceivingModeTopicKey(), modeTypeRequest);</span>
+<span class="nc" id="L131">        final List&lt;ReceivingModeType&gt; modeTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L132">        modeTypes.add(modeType);</span>
+<span class="nc" id="L133">        return getSuccessResponse(modeTypes, modeTypeRequest.getRequestInfo());</span>
+    }
+
+    @PostMapping(&quot;/v1/_search&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; search(@ModelAttribute @Valid final ReceivingModeTypeGetReq modeTypeGetRequest,
+                                    final BindingResult modelAttributeBindingResult,
+                                    @RequestBody @Valid final RequestInfoWrapper requestInfoWrapper,
+                                    final BindingResult requestBodyBindingResult) {
+<span class="nc" id="L142">        final RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();</span>
+
+        // validate input params
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (modelAttributeBindingResult.hasErrors())</span>
+<span class="nc" id="L146">            return errHandler.getErrorResponseEntityForMissingParameters(modelAttributeBindingResult, requestInfo);</span>
+
+        // validate input params
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (requestBodyBindingResult.hasErrors())</span>
+<span class="nc" id="L150">            return errHandler.getErrorResponseEntityForMissingRequestInfo(requestBodyBindingResult, requestInfo);</span>
+
+        // Call service
+<span class="nc" id="L153">        List&lt;ReceivingModeType&gt; centerTypeList = null;</span>
+        try {
+<span class="nc" id="L155">            centerTypeList = modeTypeService.getAllReceivingModeTypes(modeTypeGetRequest);</span>
+<span class="nc" id="L156">        } catch (final Exception exception) {</span>
+<span class="nc" id="L157">            logger.error(&quot;Error while processing request &quot; + modeTypeGetRequest, exception);</span>
+<span class="nc" id="L158">            return errHandler.getResponseEntityForUnexpectedErrors(requestInfo);</span>
+<span class="nc" id="L159">        }</span>
+
+<span class="nc" id="L161">        return getSuccessResponse(centerTypeList, requestInfo);</span>
+
+    }
+
+    private ResponseEntity&lt;?&gt; getSuccessResponse(final List&lt;ReceivingModeType&gt; modeList,
+                                                 final RequestInfo requestInfo) {
+<span class="nc" id="L167">        final ReceivingModeTypeRes receivingModeResponse = new ReceivingModeTypeRes();</span>
+<span class="nc" id="L168">        receivingModeResponse.setModeTypes(modeList);</span>
+<span class="nc" id="L169">        final ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true);</span>
+<span class="nc" id="L170">        responseInfo.setStatus(HttpStatus.OK.toString());</span>
+<span class="nc" id="L171">        receivingModeResponse.setResponseInfo(responseInfo);</span>
+<span class="nc" id="L172">        return new ResponseEntity&lt;&gt;(receivingModeResponse, HttpStatus.OK);</span>
+
+    }
+
+    private void validateReceivingModeRequest(final ReceivingModeTypeReq receivingModeRequest,
+                                              String mode) {
+<span class="nc" id="L178">        validate(receivingModeRequest, mode);</span>
+<span class="nc" id="L179">        addTenantIdValidationErrors(receivingModeRequest);</span>
+<span class="nc" id="L180">        addChannelValidationErrors(receivingModeRequest);</span>
+<span class="nc" id="L181">    }</span>
+
+    private ErrorResponse populateErrors(final BindingResult errors) {
+<span class="nc" id="L184">        final ErrorResponse errRes = new ErrorResponse();</span>
+
+<span class="nc" id="L186">        final Error error = new Error();</span>
+<span class="nc" id="L187">        error.setCode(1);</span>
+<span class="nc" id="L188">        error.setDescription(&quot;Error while binding request&quot;);</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        if (errors.hasFieldErrors())</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            for (final FieldError fieldError : errors.getFieldErrors())</span>
+<span class="nc" id="L191">                error.getFields().put(fieldError.getField(), fieldError.getRejectedValue());</span>
+<span class="nc" id="L192">        errRes.setError(error);</span>
+<span class="nc" id="L193">        return errRes;</span>
+    }
+
+    private void validate(final ReceivingModeTypeReq receivingModeRequest, String mode) {
+<span class="nc" id="L197">        final ReceivingModeType receivingMode = receivingModeRequest.getModeType();</span>
+<span class="nc bnc" id="L198" title="All 4 branches missed.">        if (receivingMode.getCode() == null || receivingMode.getCode().isEmpty()) {</span>
+<span class="nc" id="L199">            receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_CODE_MANDATORY_CODE);</span>
+<span class="nc" id="L200">            receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_CODE_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L201">            receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_CODE_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L202">            throw new PGRMasterException(receivingModeException);</span>
+        }
+<span class="nc bnc" id="L204" title="All 4 branches missed.">        if (receivingMode.getName() == null || receivingMode.getName().isEmpty()) {</span>
+<span class="nc" id="L205">            receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_NAME_MANDATORY_CODE);</span>
+<span class="nc" id="L206">            receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_NAME_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L207">            receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_NAME_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L208">            throw new PGRMasterException(receivingModeException);</span>
+        }
+
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        if (modeTypeService.checkReceivingModeTypeByNameAndCode(receivingMode.getCode(),</span>
+<span class="nc" id="L212">                receivingMode.getName(), receivingMode.getTenantId(), mode)) {</span>
+<span class="nc" id="L213">            receivingModeException.put(CODE, PgrMasterConstants.CODENAME_UNIQUE_CODE);</span>
+<span class="nc" id="L214">            receivingModeException.put(MESSAGE, PgrMasterConstants.CODENAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L215">            receivingModeException.put(FIELD, PgrMasterConstants.CODENAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L216">            throw new PGRMasterException(receivingModeException);</span>
+        }
+
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (modeTypeService.checkReceivingModeTypeByName(receivingMode.getCode(), receivingMode.getName(),</span>
+<span class="nc" id="L220">                receivingMode.getTenantId(), mode)) {</span>
+<span class="nc" id="L221">            receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_NAME_UNIQUE_CODE);</span>
+<span class="nc" id="L222">            receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_NAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L223">            receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_NAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L224">            throw new PGRMasterException(receivingModeException);</span>
+        }
+
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (modeTypeService.checkReceivingModeTypeByCode(receivingMode.getCode(), receivingMode.getTenantId(), mode)) {</span>
+<span class="nc" id="L228">            receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_CODE_UNIQUE_CODE);</span>
+<span class="nc" id="L229">            receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_UNQ_ERROR_MESSAGE);</span>
+<span class="nc" id="L230">            receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_CODE_UNQ_FIELD_NAME);</span>
+<span class="nc" id="L231">            throw new PGRMasterException(receivingModeException);</span>
+        }
+
+<span class="nc bnc" id="L234" title="All 8 branches missed.">        if (receivingMode.getDescription() != null &amp;&amp; !receivingMode.getDescription().isEmpty() &amp;&amp; !(receivingMode.getDescription().length() &gt; 0 &amp;&amp; receivingMode.getDescription().length() &lt;= 250)) {</span>
+<span class="nc" id="L235">            receivingModeException.put(CODE, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_CODE);</span>
+<span class="nc" id="L236">            receivingModeException.put(FIELD, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_FIELD_NAME);</span>
+<span class="nc" id="L237">            receivingModeException.put(MESSAGE, PgrMasterConstants.SERVICETYPE_DESCRIPTION_LENGTH_ERROR_MESSAGE);</span>
+<span class="nc" id="L238">            throw new PGRMasterException(receivingModeException);</span>
+        }
+
+<span class="nc" id="L241">    }</span>
+
+
+    private void addChannelValidationErrors(final ReceivingModeTypeReq receivingModeRequest) {
+
+<span class="nc" id="L246">        final ReceivingModeType receivingMode = receivingModeRequest.getModeType();</span>
+
+<span class="nc bnc" id="L248" title="All 4 branches missed.">        if (receivingMode.getChannels().isEmpty() || receivingMode.getChannels().size() == 0) {</span>
+<span class="nc" id="L249">            receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_CHANNEL_MANDATORY_CODE);</span>
+<span class="nc" id="L250">            receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_CHANNEL_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L251">            receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_CHANNEL_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L252">            throw new PGRMasterException(receivingModeException);</span>
+        }
+<span class="nc" id="L254">    }</span>
+
+    private void addTenantIdValidationErrors(final ReceivingModeTypeReq receivingModeRequest) {
+<span class="nc" id="L257">        final ReceivingModeType receivingMode = receivingModeRequest.getModeType();</span>
+<span class="nc bnc" id="L258" title="All 4 branches missed.">        if (receivingMode.getTenantId() == null || receivingMode.getTenantId().isEmpty()) {</span>
+<span class="nc" id="L259">            receivingModeException.put(CODE, PgrMasterConstants.TENANTID_MANDATORY_CODE);</span>
+<span class="nc" id="L260">            receivingModeException.put(MESSAGE, PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L261">            receivingModeException.put(FIELD, PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L262">            throw new PGRMasterException(receivingModeException);</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        } else if (receivingMode.getChannels().size() &gt; 0) {</span>
+
+<span class="nc bnc" id="L265" title="All 2 branches missed.">            for (String chanel : receivingMode.getChannels()) {</span>
+
+<span class="nc" id="L267">                ChannelType chaType = ChannelType.fromValue(chanel);</span>
+
+<span class="nc bnc" id="L269" title="All 2 branches missed.">                if (chaType == null) {</span>
+<span class="nc" id="L270">                    receivingModeException.put(CODE, PgrMasterConstants.RECEIVINGMODE_CHANNEL_VALID_CODE);</span>
+<span class="nc" id="L271">                    receivingModeException.put(MESSAGE, PgrMasterConstants.RECEIVINGMODE_CHANNEL_VALID_ERROR_MESSAGE);</span>
+<span class="nc" id="L272">                    receivingModeException.put(FIELD, PgrMasterConstants.RECEIVINGMODE_CHANNEL_VALID__FIELD_NAME);</span>
+<span class="nc" id="L273">                    throw new PGRMasterException(receivingModeException);</span>
+                }
+
+<span class="nc" id="L276">            }</span>
+
+        }
+<span class="nc" id="L279">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

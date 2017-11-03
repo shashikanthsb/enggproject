@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDefinitionRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.repository</a> &gt; <span class="el_source">ServiceDefinitionRepository.java</span></div><h1>ServiceDefinitionRepository.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.repository;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.egov.pgr.domain.model.ServiceDefinitionSearchCriteria;
+import org.egov.pgr.persistence.dto.ServiceDefinition;
+import org.egov.pgr.persistence.querybuilder.ServiceDefinitionQueryBuilder;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class ServiceDefinitionRepository {
+
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+	private ServiceDefinitionQueryBuilder serviceDefinitionQueryBuilder;
+
+	public ServiceDefinitionRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+<span class="nc" id="L23">			ServiceDefinitionQueryBuilder serviceDefinitionQueryBuilder) {</span>
+<span class="nc" id="L24">		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;</span>
+<span class="nc" id="L25">		this.serviceDefinitionQueryBuilder = serviceDefinitionQueryBuilder;</span>
+<span class="nc" id="L26">	}</span>
+
+	public void save(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L29">		namedParameterJdbcTemplate.update(serviceDefinitionQueryBuilder.getInsertQuery(),</span>
+<span class="nc" id="L30">				getInsertMap(serviceDefinition));</span>
+<span class="nc" id="L31">	}</span>
+
+	public void update(ServiceDefinition serviceDefinition){
+<span class="nc" id="L34">		namedParameterJdbcTemplate.update(serviceDefinitionQueryBuilder.updateQuery(),</span>
+<span class="nc" id="L35">                getUpdateMap(serviceDefinition));</span>
+<span class="nc" id="L36">	}</span>
+
+	public List&lt;org.egov.pgr.domain.model.ServiceDefinition&gt; search(ServiceDefinitionSearchCriteria searchCriteria) {
+
+<span class="nc" id="L40">		List&lt;ServiceDefinition&gt; serviceDefinitions = namedParameterJdbcTemplate.query(</span>
+<span class="nc" id="L41">				serviceDefinitionQueryBuilder.getSearchQuery(),</span>
+<span class="nc" id="L42">				getSearchMap(searchCriteria.getServiceCode(), searchCriteria.getTenantId()),</span>
+				new BeanPropertyRowMapper&lt;&gt;(ServiceDefinition.class));
+
+<span class="nc" id="L45">		return serviceDefinitions.stream().map(ServiceDefinition::toDomain).collect(Collectors.toList());</span>
+	}
+
+	private HashMap getInsertMap(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L49">		HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L51">		parametersMap.put(&quot;code&quot;, serviceDefinition.getCode());</span>
+<span class="nc" id="L52">		parametersMap.put(&quot;tenantid&quot;, serviceDefinition.getTenantId());</span>
+<span class="nc" id="L53">		parametersMap.put(&quot;createddate&quot;, serviceDefinition.getCreatedDate());</span>
+<span class="nc" id="L54">		parametersMap.put(&quot;createdby&quot;, serviceDefinition.getCreatedBy());</span>
+
+<span class="nc" id="L56">		return parametersMap;</span>
+	}
+
+	private HashMap getUpdateMap(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L60">        HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L62">        parametersMap.put(&quot;code&quot;, serviceDefinition.getCode());</span>
+<span class="nc" id="L63">        parametersMap.put(&quot;tenantid&quot;, serviceDefinition.getTenantId());</span>
+<span class="nc" id="L64">        parametersMap.put(&quot;lastModifiedBy&quot;, serviceDefinition.getLastModifiedBy());</span>
+<span class="nc" id="L65">        parametersMap.put(&quot;lastModifiedDate&quot;, serviceDefinition.getLastModifiedDate());</span>
+
+<span class="nc" id="L67">        return parametersMap;</span>
+    }
+
+	public List&lt;org.egov.pgr.domain.model.ServiceDefinition&gt; getData(
+			org.egov.pgr.domain.model.ServiceDefinition serviceDefinition) {
+
+<span class="nc" id="L73">		List&lt;ServiceDefinition&gt; serviceTypeList = getServiceList(</span>
+<span class="nc" id="L74">				serviceDefinitionQueryBuilder.buildSearchQuery(serviceDefinition),</span>
+<span class="nc" id="L75">				getDetailNamedQuery(serviceDefinition), new BeanPropertyRowMapper&lt;&gt;(ServiceDefinition.class));</span>
+
+<span class="nc" id="L77">		System.out.println(serviceDefinitionQueryBuilder.buildSearchQuery(serviceDefinition));</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">		if (!serviceTypeList.isEmpty()) {</span>
+<span class="nc" id="L79">			return serviceTypeList.stream().map(ServiceDefinition::toDomain).collect(Collectors.toList());</span>
+		}
+
+<span class="nc" id="L82">		return Collections.EMPTY_LIST;</span>
+	}
+
+	public List&lt;org.egov.pgr.domain.model.ServiceDefinition&gt; getDefinitionCode(
+			org.egov.pgr.domain.model.ServiceDefinition serviceDefinition) {
+
+<span class="nc" id="L88">		List&lt;ServiceDefinition&gt; definitionList = getServiceList(</span>
+<span class="nc" id="L89">				serviceDefinitionQueryBuilder.getSubmissionData(serviceDefinition),</span>
+<span class="nc" id="L90">				getDetailNamedQuery(serviceDefinition), new BeanPropertyRowMapper&lt;&gt;(ServiceDefinition.class));</span>
+
+<span class="nc" id="L92">		System.out.println(serviceDefinitionQueryBuilder.buildSearchQuery(serviceDefinition));</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">		if (!definitionList.isEmpty()) {</span>
+<span class="nc" id="L94">			return definitionList.stream().map(ServiceDefinition::toDomain).collect(Collectors.toList());</span>
+		}
+
+<span class="nc" id="L97">		return Collections.EMPTY_LIST;</span>
+	}
+
+	private HashMap&lt;String, String&gt; getDetailNamedQuery(org.egov.pgr.domain.model.ServiceDefinition serviceDefinition) {
+<span class="nc" id="L101">		HashMap&lt;String, String&gt; parametersMap = new HashMap&lt;String, String&gt;();</span>
+
+<span class="nc" id="L103">		parametersMap.put(&quot;code&quot;, serviceDefinition.getCode().toUpperCase());</span>
+<span class="nc" id="L104">		parametersMap.put(&quot;tenantid&quot;, serviceDefinition.getTenantId());</span>
+
+<span class="nc" id="L106">		return parametersMap;</span>
+	}
+
+	private List&lt;ServiceDefinition&gt; getServiceList(String sql, HashMap&lt;String, String&gt; searchNamedQuery,
+			BeanPropertyRowMapper&lt;ServiceDefinition&gt; rowMapper) {
+<span class="nc" id="L111">		return namedParameterJdbcTemplate.query(sql, searchNamedQuery, rowMapper);</span>
+	}
+
+	private HashMap getSearchMap(String serviceCode, String tenantId) {
+<span class="nc" id="L115">		HashMap&lt;String, Object&gt; parametersMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L117">		parametersMap.put(&quot;serviceCode&quot;, serviceCode);</span>
+<span class="nc" id="L118">		parametersMap.put(&quot;tenantid&quot;, tenantId);</span>
+
+<span class="nc" id="L120">		return parametersMap;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

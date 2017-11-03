@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeDefinitionCreateValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service.validator.AttributedefinitionValidator</a> &gt; <span class="el_source">AttributeDefinitionCreateValidator.java</span></div><h1>AttributeDefinitionCreateValidator.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service.validator.AttributedefinitionValidator;
+
+import java.util.HashMap;
+
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.AttributeDefinition;
+import org.springframework.stereotype.Service;
+
+@Service
+<span class="nc" id="L10">public class AttributeDefinitionCreateValidator implements AttributeDefinitionValidator {</span>
+
+
+	@Override
+	public boolean canValidate(AttributeDefinition attributeDefinition) {
+<span class="nc" id="L15">		return true;</span>
+	}
+
+	@Override
+	public void validatingLength(AttributeDefinition attributeDefinition) {
+		
+			
+<span class="nc bnc" id="L22" title="All 2 branches missed.">			if(!attributeDefinition.isTenantIdLengthMatch())	</span>
+			{
+<span class="nc" id="L24">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L25">			error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.1&quot;);</span>
+<span class="nc" id="L26">			error.put(&quot;field&quot;, &quot;AttributeDefinition.tenant&quot;);</span>
+<span class="nc" id="L27">			error.put(&quot;message&quot;, &quot;tenant Id should be Min: 1 Characters. Max: 256 Characters&quot;);</span>
+<span class="nc" id="L28">			throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L32" title="All 2 branches missed.">			if(!attributeDefinition.isCodeLengthMatch())	</span>
+			{
+<span class="nc" id="L34">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L35">			error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.2&quot;);</span>
+<span class="nc" id="L36">			error.put(&quot;field&quot;, &quot;AttributeDefinition.code&quot;);</span>
+<span class="nc" id="L37">			error.put(&quot;message&quot;, &quot;code should be Min: 1 Characters. Max: 50 Characters&quot;);</span>
+<span class="nc" id="L38">			throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L42" title="All 2 branches missed.">			if(!attributeDefinition.isDatatypedescriptionLengthMatch())	</span>
+			{
+<span class="nc" id="L44">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L45">			error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.3&quot;);</span>
+<span class="nc" id="L46">			error.put(&quot;field&quot;, &quot;AttributeDefinition.dataTypeDescription&quot;);</span>
+<span class="nc" id="L47">			error.put(&quot;message&quot;, &quot;dataTypeDescription  should be Min: 1 Characters. Max: 200 Characters&quot;);</span>
+<span class="nc" id="L48">			throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L52" title="All 2 branches missed.">			if(!attributeDefinition.isDataTypeLengthMatch())	</span>
+			{
+<span class="nc" id="L54">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L55">				error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.4&quot;);</span>
+<span class="nc" id="L56">				error.put(&quot;field&quot;, &quot;AttributeDefinition.dataType&quot;);</span>
+<span class="nc" id="L57">				error.put(&quot;message&quot;, &quot;dataType should be Min: 1 Characters. Max: 100 Characters&quot;);</span>
+<span class="nc" id="L58">				throw new PGRMasterException(error);</span>
+				
+			}	
+			
+<span class="nc bnc" id="L62" title="All 2 branches missed.">			if(!attributeDefinition.isServicecodeLengthMatch())	</span>
+			{
+<span class="nc" id="L64">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L65">				error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.5&quot;);</span>
+<span class="nc" id="L66">				error.put(&quot;field&quot;, &quot;AttributeDefinition.serviceCode&quot;);</span>
+<span class="nc" id="L67">				error.put(&quot;message&quot;, &quot;serviceCode should be Min: 1 Characters. Max: 256 Characters&quot;);</span>
+<span class="nc" id="L68">				throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L72" title="All 2 branches missed.">			if(!attributeDefinition.isUrlLengthMatch())	</span>
+			{
+<span class="nc" id="L74">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L75">				error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.6&quot;);</span>
+<span class="nc" id="L76">				error.put(&quot;field&quot;, &quot;AttributeDefinition.url&quot;);</span>
+<span class="nc" id="L77">				error.put(&quot;message&quot;, &quot;url should be Min: 1 Characters. Max: 300 Characters&quot;);</span>
+<span class="nc" id="L78">				throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			if(!attributeDefinition.isGroupCodeLengthMatch())	</span>
+			{
+<span class="nc" id="L84">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L85">				error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.7&quot;);</span>
+<span class="nc" id="L86">				error.put(&quot;field&quot;, &quot;AttributeDefinition.groupCode&quot;);</span>
+<span class="nc" id="L87">				error.put(&quot;message&quot;, &quot;groupCode should be Min: 1 Characters. Max: 300 Characters&quot;);</span>
+<span class="nc" id="L88">				throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc bnc" id="L92" title="All 2 branches missed.">			if(!attributeDefinition.isDescriptionLengthMatch())	</span>
+			{
+<span class="nc" id="L94">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L95">				error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.8&quot;);</span>
+<span class="nc" id="L96">				error.put(&quot;field&quot;, &quot;AttributeDefinition.description&quot;);</span>
+<span class="nc" id="L97">				error.put(&quot;message&quot;, &quot;description should be Min: 1 Characters. Max: 300 Characters&quot;);</span>
+<span class="nc" id="L98">				throw new PGRMasterException(error);</span>
+				
+			}
+			
+<span class="nc" id="L102">	}</span>
+	
+	@Override
+	public void checkMandatoryField(AttributeDefinition attributeDefinition) {
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		if (attributeDefinition.isTenantAbsent()) {</span>
+<span class="nc" id="L108">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L110">			error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.9&quot;);</span>
+<span class="nc" id="L111">			error.put(&quot;field&quot;, &quot;AttributeDefinition.tanantId&quot;);</span>
+<span class="nc" id="L112">			error.put(&quot;message&quot;, &quot;tanantId Required&quot;);</span>
+
+<span class="nc" id="L114">			throw new PGRMasterException(error);</span>
+		}
+
+<span class="nc bnc" id="L117" title="All 2 branches missed.">		if (attributeDefinition.isAttributCodeAbsent()) {</span>
+<span class="nc" id="L118">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L120">			error.put(&quot;code&quot;, &quot;AttributeDefinition Vaalidator.10&quot;);</span>
+<span class="nc" id="L121">			error.put(&quot;field&quot;, &quot;AttributeDefinition.code&quot;);</span>
+<span class="nc" id="L122">			error.put(&quot;message&quot;, &quot;AttributeCode Required &quot;);</span>
+
+<span class="nc" id="L124">			throw new PGRMasterException(error);</span>
+		}
+		
+<span class="nc bnc" id="L127" title="All 2 branches missed.">		if (attributeDefinition.isDatatypeAbsent()) {</span>
+<span class="nc" id="L128">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L130">			error.put(&quot;code&quot;, &quot; AttributeDefinition Vaalidator.11&quot;);</span>
+<span class="nc" id="L131">			error.put(&quot;field&quot;, &quot;AttributeDefinition.dataType&quot;);</span>
+<span class="nc" id="L132">			error.put(&quot;message&quot;, &quot;DataType Required &quot;);</span>
+
+<span class="nc" id="L134">			throw new PGRMasterException(error);</span>
+		}
+		
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		if (attributeDefinition.isServiceCodeAbsent()) {</span>
+<span class="nc" id="L138">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L140">			error.put(&quot;code&quot;, &quot;  AttributeDefinition Vaalidator.12&quot;);</span>
+<span class="nc" id="L141">			error.put(&quot;field&quot;, &quot;AttributeDefinition .servicecode&quot;);</span>
+<span class="nc" id="L142">			error.put(&quot;message&quot;, &quot;Servicecode Required &quot;);</span>
+
+<span class="nc" id="L144">			throw new PGRMasterException(error);</span>
+		}
+<span class="nc" id="L146">	}</span>
+	
+	@Override
+	public void validateDataType(AttributeDefinition attributeDefinition) {
+		
+<span class="nc bnc" id="L151" title="All 2 branches missed.">	        if (attributeDefinition.isValueList())</span>
+	               {
+<span class="nc" id="L153">	            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L154">	            error.put(&quot;code&quot;, &quot;ValueDefinition.13&quot;);</span>
+<span class="nc" id="L155">	            error.put(&quot;field&quot;, &quot;ValueDefinition.DataType,key Pair&quot;);</span>
+<span class="nc" id="L156">	            error.put(&quot;message&quot;, &quot;Value List Should be empty for this DataType &quot;);</span>
+<span class="nc" id="L157">	            throw new PGRMasterException(error);</span>
+	        }
+
+	       	
+<span class="nc" id="L161">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OTPConfigRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">OTPConfigRepository.java</span></div><h1>OTPConfigRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository;
+
+import java.sql.Date;
+import java.util.List;
+
+import org.egov.pgr.domain.model.OTPConfig;
+import org.egov.pgr.repository.rowmapper.OTPConfigRowMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+<span class="nc" id="L54">public class OTPConfigRepository {</span>
+	
+<span class="fc" id="L56">	public static final Logger LOGGER = LoggerFactory.getLogger(OTPConfigRepository.class);</span>
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private OTPConfigRowMapper otpConfigMapper;
+	
+	public OTPConfig persistOTPConfig(final OTPConfig otpConfig) {
+<span class="nc" id="L65">		LOGGER.info(&quot;OTP Config Create Object :&quot; + otpConfig);</span>
+<span class="nc" id="L66">		String query = &quot;INSERT into egpgr_otp_config (tenantid, enabled, createddate) values (?,?,?)&quot;;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">		final Object[] obj = new Object[] { otpConfig.getTenantId(), otpConfig.isOtpConfigEnabled()? &quot;Y&quot; : &quot;N&quot;, </span>
+<span class="nc" id="L68">		new Date(new java.util.Date().getTime()) };</span>
+<span class="nc" id="L69">		jdbcTemplate.update(query,obj);</span>
+<span class="nc" id="L70">		return otpConfig;</span>
+	}
+	
+	public boolean updateOTPConfig(final OTPConfig otpConfig) {
+<span class="nc" id="L74">		LOGGER.info(&quot;OTP Config Update Object: &quot; + otpConfig);</span>
+<span class="nc" id="L75">		String query = &quot;UPDATE egpgr_otp_config SET enabled = ?, lastmodifieddate = ? &quot;</span>
+				+ &quot;WHERE tenantid = ? &quot; ; 
+<span class="nc bnc" id="L77" title="All 2 branches missed.">		final Object[] obj = new Object[] { otpConfig.isOtpConfigEnabled()? &quot;Y&quot; : &quot;N&quot;, </span>
+<span class="nc" id="L78">			new Date(new java.util.Date().getTime()), otpConfig.getTenantId() };</span>
+<span class="nc" id="L79">		int updateStatus = jdbcTemplate.update(query,obj);</span>
+<span class="nc" id="L80">		LOGGER.info(&quot;Status of Updated : &quot; + updateStatus);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">		if(updateStatus &gt; 0){</span>
+<span class="nc" id="L82">			return true;</span>
+		}
+<span class="nc" id="L84">		return false; </span>
+	}
+	
+	public List&lt;OTPConfig&gt; getAllOtpConfig(List&lt;String&gt; tenantList) {
+<span class="nc" id="L88">		LOGGER.info(&quot;Tenant ID Received ::&quot; + tenantList);</span>
+<span class="nc" id="L89">		final String queryStr = &quot;SELECT tenantid, enabled FROM egpgr_otp_config &quot; + constructQuery(tenantList);</span>
+<span class="nc" id="L90">		final List&lt;OTPConfig&gt; otpConfigs = jdbcTemplate.query(queryStr,</span>
+				otpConfigMapper);
+<span class="nc" id="L92">		return otpConfigs;</span>
+	}
+	
+	private String constructQuery(List&lt;String&gt; tenantList){
+<span class="nc" id="L96">		final StringBuilder query = new StringBuilder();</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">		if(tenantList.size() == 1) {</span>
+<span class="nc" id="L98">			query.append(&quot;WHERE tenantid = '&quot; + tenantList.get(0) + &quot;'&quot;);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">		} else if(tenantList.size() &gt; 1){</span>
+<span class="nc" id="L100">			query.append(&quot;WHERE tenantid IN (&quot;);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">			for(int i=0; i&lt;tenantList.size(); i++) {</span>
+<span class="nc" id="L102">				query.append(&quot;'&quot; + tenantList.get(i) + &quot;'&quot;);</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">				if(i != tenantList.size()-1){</span>
+<span class="nc" id="L104">					query.append(&quot;,&quot;);</span>
+				}
+			}
+<span class="nc" id="L107">			query.append(&quot;)&quot;);</span>
+		}
+		
+<span class="nc" id="L110">		return query.toString();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

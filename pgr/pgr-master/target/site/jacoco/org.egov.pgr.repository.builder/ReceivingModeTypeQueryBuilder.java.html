@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingModeTypeQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">ReceivingModeTypeQueryBuilder.java</span></div><h1>ReceivingModeTypeQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.repository.builder;
+
+import org.egov.pgr.web.contract.ReceivingModeTypeGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+<span class="nc" id="L51">public class ReceivingModeTypeQueryBuilder {</span>
+
+<span class="fc" id="L53">    private static final Logger logger = LoggerFactory.getLogger(ReceivingModeTypeQueryBuilder.class);</span>
+
+    private static final String BASE_QUERY = &quot;SELECT modeType.id,modeType.code,modeType.name,modeType.description,modeType.tenantId,modeType.active,channel.channel from egpgr_receivingmode modeType left join egpgr_receivingmode_channel channel&quot;
+            + &quot; on channel.receivingmodecode = modeType.code&quot;;
+
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public String getQuery(final ReceivingModeTypeGetReq modeTypeRequest, final List preparedStatementValues) {
+<span class="nc" id="L60">        final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L61">        addWhereClause(selectQuery, preparedStatementValues, modeTypeRequest);</span>
+<span class="nc" id="L62">        addOrderByClause(selectQuery, modeTypeRequest);</span>
+<span class="nc" id="L63">        addPagingClause(selectQuery, preparedStatementValues, modeTypeRequest);</span>
+<span class="nc" id="L64">        logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L65">        return selectQuery.toString();</span>
+    }
+
+    @SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot;})
+    private void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+                                final ReceivingModeTypeGetReq modeTypeRequest) {
+
+<span class="nc bnc" id="L72" title="All 6 branches missed.">        if (modeTypeRequest.getId() == null &amp;&amp; modeTypeRequest.getName() == null &amp;&amp; modeTypeRequest.getActive() == null</span>
+<span class="nc bnc" id="L73" title="All 4 branches missed.">                &amp;&amp; modeTypeRequest.getTenantId() == null &amp;&amp; modeTypeRequest.getCode() == null)</span>
+<span class="nc" id="L74">            return;</span>
+
+<span class="nc" id="L76">        selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L77">        boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (modeTypeRequest.getTenantId() != null) {</span>
+<span class="nc" id="L80">            isAppendAndClause = true;</span>
+<span class="nc" id="L81">            selectQuery.append(&quot; modeType.tenantId = ?&quot;);</span>
+<span class="nc" id="L82">            preparedStatementValues.add(modeTypeRequest.getTenantId());</span>
+        }
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (modeTypeRequest.getId() != null) {</span>
+<span class="nc" id="L86">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L87">            selectQuery.append(&quot; modeType.id IN &quot; + getIdQuery(modeTypeRequest.getId()));</span>
+        }
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (modeTypeRequest.getName() != null) {</span>
+<span class="nc" id="L91">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L92">            selectQuery.append(&quot; modeType.name = ?&quot;);</span>
+<span class="nc" id="L93">            preparedStatementValues.add(modeTypeRequest.getName());</span>
+        }
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (modeTypeRequest.getCode() != null) {</span>
+<span class="nc" id="L97">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L98">            selectQuery.append(&quot; modeType.code = ?&quot;);</span>
+<span class="nc" id="L99">            preparedStatementValues.add(modeTypeRequest.getCode());</span>
+        }
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (modeTypeRequest.getActive() != null) {</span>
+<span class="nc" id="L103">            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L104">            selectQuery.append(&quot; modeType.active = ?&quot;);</span>
+<span class="nc" id="L105">            preparedStatementValues.add(modeTypeRequest.getActive());</span>
+        }
+<span class="nc" id="L107">    }</span>
+
+    /**
+     * This method is always called at the beginning of the method so that and
+     * is prepended before the field's predicate is handled.
+     *
+     * @param appendAndClauseFlag
+     * @param queryString
+     * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+     */
+    private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (appendAndClauseFlag)</span>
+<span class="nc" id="L119">            queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L121">        return true;</span>
+    }
+
+    private static String getIdQuery(final List&lt;Long&gt; idList) {
+<span class="nc" id="L125">        final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L127">            query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            for (int i = 1; i &lt; idList.size(); i++)</span>
+<span class="nc" id="L129">                query.append(&quot;, &quot; + idList.get(i));</span>
+        }
+<span class="nc" id="L131">        return query.append(&quot;)&quot;).toString();</span>
+    }
+
+    private void addOrderByClause(final StringBuilder selectQuery, final ReceivingModeTypeGetReq modeTypeGetRequest) {
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        final String sortBy = modeTypeGetRequest.getSortBy() == null ? &quot;modeType.code&quot;</span>
+<span class="nc" id="L136">                : &quot;modeType.&quot; + modeTypeGetRequest.getSortBy();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        final String sortOrder = modeTypeGetRequest.getSortOrder() == null ? &quot;DESC&quot; : modeTypeGetRequest.getSortOrder();</span>
+<span class="nc" id="L138">        selectQuery.append(&quot; ORDER BY &quot; + sortBy + &quot; &quot; + sortOrder);</span>
+<span class="nc" id="L139">    }</span>
+
+    @SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot;})
+    private void addPagingClause(final StringBuilder selectQuery, final List preparedStatementValues,
+                                 final ReceivingModeTypeGetReq modeTypeGetRequest) {
+        // handle limit(also called pageSize) here
+<span class="nc" id="L145">        selectQuery.append(&quot; LIMIT ?&quot;);</span>
+<span class="nc" id="L146">        long pageSize = Integer.parseInt(&quot;100&quot;);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (modeTypeGetRequest.getPageSize() != null)</span>
+<span class="nc" id="L148">            pageSize = modeTypeGetRequest.getPageSize();</span>
+<span class="nc" id="L149">        preparedStatementValues.add(pageSize); // Set limit to pageSize</span>
+
+        // handle offset here
+<span class="nc" id="L152">        selectQuery.append(&quot; OFFSET ?&quot;);</span>
+<span class="nc" id="L153">        int pageNumber = 0; // Default pageNo is zero meaning first page</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (modeTypeGetRequest.getPageNumber() != null)</span>
+<span class="nc" id="L155">            pageNumber = modeTypeGetRequest.getPageNumber() - 1;</span>
+<span class="nc" id="L156">        preparedStatementValues.add(pageNumber * pageSize); // Set offset to</span>
+        // pageNo * pageSize
+<span class="nc" id="L158">    }</span>
+
+    public static String insertReceivingModeTypeQuery() {
+<span class="fc" id="L161">        return &quot;INSERT INTO egpgr_receivingmode(id,code,name,description,active,createdby,lastmodifiedby,createddate,lastmodifieddate,tenantid) values &quot;</span>
+                + &quot;(nextval('seq_egpgr_receivingmode'),?,?,?,?,?,?,?,?,?)&quot;;
+    }
+
+    public static String updateReceivingModeTypeQuery() {
+<span class="nc" id="L166">        return &quot;UPDATE egpgr_receivingmode SET name = ?,description = ?,&quot;</span>
+                + &quot;active=?,lastmodifiedby = ?,lastmodifieddate = ? where code = ?&quot;;
+    }
+
+    public static String checkReceivingModeTypeByCode() {
+
+<span class="nc" id="L172">        return &quot;select code from egpgr_receivingmode where tenantid = ? and trim(upper(code)) = ?&quot;;</span>
+    }
+
+    public static String checkReceivinModeTypeByNameAndCode() {
+
+<span class="nc" id="L177">        return &quot;select code from egpgr_receivingmode where tenantid = ? and trim(upper(code)) = ? and trim(upper(name)) = ?&quot;;</span>
+
+    }
+
+    public static String checkReceivinModeTypeByName() {
+
+<span class="nc" id="L183">        return &quot;select code from egpgr_receivingmode where tenantid=? and trim(upper(name)) =? &quot;;</span>
+
+    }
+
+    public static String deleteReceivingModeChannelQuery() {
+
+<span class="nc" id="L189">        return &quot;delete from egpgr_receivingmode_channel where receivingmodecode=? &quot;;</span>
+    }
+
+    public static String insertReceivingModeChannelQuery() {
+
+<span class="fc" id="L194">        return &quot;INSERT INTO egpgr_receivingmode_channel(id,receivingmodecode,channel) values (nextval('seq_egpgr_receivingmode_channel'),?,?) &quot;;</span>
+
+    }
+
+    public static String checkReceivingModeChannelExist() {
+
+<span class="nc" id="L200">        return &quot;select id from egpgr_receivingmode_channel where receivingmodecode=? and channel=?&quot;;</span>
+    }
+
+    public static String getAllNameAndCodeReceivingMode() {
+
+<span class="nc" id="L205">        return &quot;select code,name from egpgr_receivingmode  &quot;;</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

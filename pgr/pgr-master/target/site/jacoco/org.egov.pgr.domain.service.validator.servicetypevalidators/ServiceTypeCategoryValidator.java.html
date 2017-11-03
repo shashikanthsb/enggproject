@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceTypeCategoryValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service.validator.servicetypevalidators</a> &gt; <span class="el_source">ServiceTypeCategoryValidator.java</span></div><h1>ServiceTypeCategoryValidator.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service.validator.servicetypevalidators;
+
+import org.egov.common.contract.response.ErrorField;
+import org.egov.pgr.domain.exception.InvalidServiceTypeException;
+import org.egov.pgr.domain.model.ServiceType;
+import org.egov.pgr.persistence.dto.ServiceCategory;
+import org.egov.pgr.persistence.repository.ServiceCategoryRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class ServiceTypeCategoryValidator implements ServiceTypeValidator {
+
+    private static final String CATEGORY_MESSAGE = &quot;Invalid Service Category&quot;;
+    private static final String CATEGORY_CODE = &quot;PGR.INVALID_SERVICE_CATEGORY&quot;;
+    private static final String CATEGORY_FIELD_NAME = &quot;serviceType.category&quot;;
+
+    private ServiceCategoryRepository serviceCategoryRepository;
+
+<span class="nc" id="L22">    public ServiceTypeCategoryValidator(ServiceCategoryRepository serviceCategoryRepository) {</span>
+<span class="nc" id="L23">        this.serviceCategoryRepository = serviceCategoryRepository;</span>
+<span class="nc" id="L24">    }</span>
+
+    @Override
+    public boolean canValidate(ServiceType serviceType) {
+<span class="nc" id="L28">        return serviceType.isUpdate();</span>
+    }
+
+    @Override
+    public void validate(ServiceType serviceType) {
+
+<span class="nc" id="L34">        List&lt;ServiceCategory&gt;  categoryList = serviceCategoryRepository.</span>
+<span class="nc" id="L35">                findByTenantIdAndId(serviceType.getTenantId(),serviceType.getCategory());</span>
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if(categoryList.isEmpty())</span>
+<span class="nc" id="L38">            throw new InvalidServiceTypeException(getErrorFields());</span>
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if(!categoryList.isEmpty()){</span>
+<span class="nc" id="L41">            ServiceCategory category = categoryList.get(0);</span>
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            if(!category.getId().equals(serviceType.getCategory()))</span>
+<span class="nc" id="L44">                throw new InvalidServiceTypeException(getErrorFields());</span>
+        }
+<span class="nc" id="L46">    }</span>
+
+    private List&lt;ErrorField&gt; getErrorFields(){
+
+<span class="nc" id="L50">        List&lt;ErrorField&gt; errorFields = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L52">        final ErrorField error = ErrorField.builder()</span>
+<span class="nc" id="L53">                .code(CATEGORY_CODE)</span>
+<span class="nc" id="L54">                .field(CATEGORY_FIELD_NAME)</span>
+<span class="nc" id="L55">                .message(CATEGORY_MESSAGE)</span>
+<span class="nc" id="L56">                .build();</span>
+
+<span class="nc" id="L58">        errorFields.add(error);</span>
+
+<span class="nc" id="L60">        return  errorFields;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

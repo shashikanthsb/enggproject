@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EscalationHierarchyQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">EscalationHierarchyQueryBuilder.java</span></div><h1>EscalationHierarchyQueryBuilder.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.domain.model.EscalationHierarchy;
+import org.egov.pgr.web.contract.EscalationHierarchyGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L51">public class EscalationHierarchyQueryBuilder {</span>
+	
+<span class="nc" id="L53">private static final Logger logger = LoggerFactory.getLogger(EscalationHierarchyQueryBuilder.class);</span>
+	
+	private static final String BASE_QUERY = &quot;SELECT tenantid, fromposition, toposition, servicecode, department, designation FROM egpgr_escalation_hierarchy esc &quot;;
+	
+	@SuppressWarnings(&quot;rawtypes&quot;)
+	public String getQuery(final EscalationHierarchyGetReq escHierarchy, final List preparedStatementValues) {
+<span class="nc" id="L59">		final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L60">		addWhereClause(selectQuery, preparedStatementValues, escHierarchy);</span>
+<span class="nc" id="L61">		logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L62">		return selectQuery.toString();</span>
+	}
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+			final EscalationHierarchyGetReq escHierarchy) {
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">		if (escHierarchy.getTenantId() == null)</span>
+<span class="nc" id="L70">			return;</span>
+
+<span class="nc" id="L72">		selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L73">		boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">		if (escHierarchy.getTenantId() != null) {</span>
+<span class="nc" id="L76">			isAppendAndClause = true;</span>
+<span class="nc" id="L77">			selectQuery.append(&quot; esc.tenantid = ?&quot;);</span>
+<span class="nc" id="L78">			preparedStatementValues.add(escHierarchy.getTenantId());</span>
+		}
+
+<span class="nc bnc" id="L81" title="All 4 branches missed.">		if (null != escHierarchy.getFromPosition() &amp;&amp; escHierarchy.getFromPosition() != 0) {</span>
+<span class="nc" id="L82">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L83">			selectQuery.append(&quot; esc.fromposition = ?&quot;);</span>
+<span class="nc" id="L84">			preparedStatementValues.add(escHierarchy.getFromPosition());</span>
+		}
+		
+<span class="nc bnc" id="L87" title="All 4 branches missed.">		if (null != escHierarchy.getToPosition() &amp;&amp; escHierarchy.getToPosition() != 0) {</span>
+<span class="nc" id="L88">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L89">			selectQuery.append(&quot; esc.toposition = ?&quot;);</span>
+<span class="nc" id="L90">			preparedStatementValues.add(escHierarchy.getToPosition());</span>
+		}
+		
+<span class="nc bnc" id="L93" title="All 4 branches missed.">		if (null != escHierarchy.getServiceCode() &amp;&amp; 0 &lt;= escHierarchy.getServiceCode().size()) {</span>
+<span class="nc" id="L94">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L95">			selectQuery.append(&quot; esc.servicecode IN &quot; + getCodeQuery(escHierarchy.getServiceCode()));</span>
+		}
+<span class="nc" id="L97">	}	</span>
+	/**
+	 * This method is always called at the beginning of the method so that and
+	 * is prepended before the field's predicate is handled.
+	 *
+	 * @param appendAndClauseFlag
+	 * @param queryString
+	 * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+	 */
+	private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		if (appendAndClauseFlag)</span>
+<span class="nc" id="L108">			queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L110">		return true;</span>
+	}
+
+	private static String getCodeQuery(final List&lt;String&gt; codeList) {
+<span class="nc" id="L114">		final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">		if (codeList.size() &gt;= 1) {</span>
+<span class="nc" id="L116">			query.append(&quot;'&quot; + codeList.get(0).toString()+ &quot;'&quot;);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">			for (int i = 1; i &lt; codeList.size(); i++)</span>
+<span class="nc" id="L118">				query.append(&quot;, &quot; + &quot;'&quot; + codeList.get(i) + &quot;'&quot;);</span>
+		}
+<span class="nc" id="L120">		return query.append(&quot;)&quot;).toString();</span>
+	}
+	
+	public String insertEscalationHierarchy() {
+<span class="nc" id="L124">		return &quot;INSERT INTO egpgr_escalation_hierarchy (tenantid, fromposition, toposition, servicecode, department, designation, createdby, createddate) &quot;</span>
+				+ &quot; values (?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+	}
+	
+	public String deleteEscalationHierarchy(List&lt;EscalationHierarchy&gt; escHierarchyList) {
+<span class="nc" id="L129">		StringBuilder deleteBaseQuery = new StringBuilder();</span>
+<span class="nc" id="L130">		StringBuilder tenantIdConstructor= new StringBuilder();</span>
+<span class="nc" id="L131">		StringBuilder fromPositionConstructor = new StringBuilder();</span>
+<span class="nc" id="L132">		StringBuilder serviceCodeConstructor = new StringBuilder();</span>
+<span class="nc bnc" id="L133" title="All 4 branches missed.">		if (null != escHierarchyList &amp;&amp; escHierarchyList.size() &gt; 0) {</span>
+<span class="nc" id="L134">			serviceCodeConstructor.append(&quot;servicecode IN (&quot;);</span>
+<span class="nc" id="L135">			tenantIdConstructor.append(&quot;tenantid IN (&quot;);</span>
+<span class="nc" id="L136">			fromPositionConstructor.append(&quot;fromposition IN (&quot;);</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">			for (int i = 0; i &lt; escHierarchyList.size(); i++) {</span>
+<span class="nc bnc" id="L138" title="All 4 branches missed.">				if(i==0 &amp;&amp; escHierarchyList.size()-1==0){</span>
+<span class="nc" id="L139">					serviceCodeConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getServiceCode() + &quot;'&quot;); </span>
+<span class="nc" id="L140">					tenantIdConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getTenantId() + &quot;'&quot;);</span>
+<span class="nc" id="L141">					fromPositionConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getFromPosition() + &quot;'&quot;);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">				} else if (i== escHierarchyList.size()-1) {</span>
+<span class="nc" id="L143">					serviceCodeConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getServiceCode() + &quot;'&quot;);</span>
+<span class="nc" id="L144">					tenantIdConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getTenantId() + &quot;'&quot;);</span>
+<span class="nc" id="L145">					fromPositionConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getFromPosition() + &quot;'&quot;);</span>
+				} else {
+<span class="nc" id="L147">					serviceCodeConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getServiceCode() + &quot;'&quot;);</span>
+<span class="nc" id="L148">					serviceCodeConstructor.append(&quot;,&quot;);</span>
+<span class="nc" id="L149">					tenantIdConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getTenantId() + &quot;'&quot;);</span>
+<span class="nc" id="L150">					tenantIdConstructor.append(&quot;,&quot;);</span>
+<span class="nc" id="L151">					fromPositionConstructor.append(&quot;'&quot; + escHierarchyList.get(i).getFromPosition() + &quot;'&quot;);</span>
+<span class="nc" id="L152">					fromPositionConstructor.append(&quot;,&quot;);</span>
+				}
+			}
+<span class="nc" id="L155">			deleteBaseQuery.append(&quot;DELETE FROM egpgr_escalation_hierarchy WHERE &quot;);</span>
+<span class="nc" id="L156">			deleteBaseQuery.append(serviceCodeConstructor.toString() + &quot;)&quot;);</span>
+<span class="nc" id="L157">			deleteBaseQuery.append(&quot; AND &quot; + tenantIdConstructor.toString() + &quot;)&quot;);</span>
+<span class="nc" id="L158">			deleteBaseQuery.append(&quot; AND &quot; + fromPositionConstructor.toString() + &quot;)&quot;);</span>
+		}
+<span class="nc" id="L160">		logger.info(&quot;We will be running this : &quot;+ deleteBaseQuery);</span>
+<span class="nc" id="L161">		return deleteBaseQuery.toString();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

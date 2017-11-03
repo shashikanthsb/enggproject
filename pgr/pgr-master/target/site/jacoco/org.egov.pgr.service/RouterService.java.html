@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouterService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.service</a> &gt; <span class="el_source">RouterService.java</span></div><h1>RouterService.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.service;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.egov.pgr.domain.model.GrievanceType;
+import org.egov.pgr.domain.model.PersistRouter;
+import org.egov.pgr.domain.model.PersistRouterReq;
+import org.egov.pgr.producers.PGRProducer;
+import org.egov.pgr.repository.RouterRepository;
+import org.egov.pgr.web.contract.BoundaryIdType;
+import org.egov.pgr.web.contract.RouterType;
+import org.egov.pgr.web.contract.RouterTypeGetReq;
+import org.egov.pgr.web.contract.RouterTypeReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Service
+<span class="nc" id="L64">public class RouterService {</span>
+	
+	
+	
+	public List&lt;RouterType&gt; getRouterTypes(final RouterTypeGetReq routerTypeGetRequest) {
+<span class="nc" id="L69">        return routerRepository.findForCriteria(routerTypeGetRequest);</span>
+    }
+
+<span class="nc" id="L72">	public static final Logger logger = LoggerFactory.getLogger(RouterService.class);</span>
+
+	@Autowired
+	private RouterRepository routerRepository;
+
+	@Autowired
+	private PGRProducer pgrProducer;
+
+	
+	public PersistRouterReq create(final RouterTypeReq routerRequests) {
+<span class="nc" id="L82">		List&lt;GrievanceType&gt; grievanceTypes = new ArrayList&lt;GrievanceType&gt;();</span>
+<span class="nc" id="L83">		grievanceTypes = routerRequests.getRouterType().getServices();</span>
+<span class="nc" id="L84">		logger.info(&quot;Service Type size is&quot; + grievanceTypes.size());</span>
+		
+<span class="nc" id="L86">		List&lt;BoundaryIdType&gt; boundaries = new ArrayList&lt;BoundaryIdType&gt;();</span>
+<span class="nc" id="L87">		boundaries = routerRequests.getRouterType().getBoundary();</span>
+		
+<span class="nc" id="L89">		PersistRouterReq prq = new PersistRouterReq();</span>
+<span class="nc" id="L90">		PersistRouter pr = new PersistRouter();</span>
+<span class="nc" id="L91">		prq.setRequestInfo(routerRequests.getRequestInfo());</span>
+<span class="nc" id="L92">	    pr.setPosition(routerRequests.getRouterType().getPosition());</span>
+<span class="nc" id="L93">	    pr.setId(routerRequests.getRouterType().getId());</span>
+<span class="nc" id="L94">	    pr.setTenantId(routerRequests.getRouterType().getTenantId());</span>
+	    
+<span class="nc bnc" id="L96" title="All 2 branches missed.">	    for(int i = 0; i&lt; grievanceTypes.size(); i++){</span>
+<span class="nc" id="L97">	    	Long serviceID = grievanceTypes.get(i).getId();</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">	    	for (int j=0;j&lt;boundaries.size();j++){</span>
+	    		
+<span class="nc" id="L100">	    		logger.info(&quot;Boundary Size is&quot; +boundaries.get(j).getBoundaryType());</span>
+<span class="nc" id="L101">	    		int boundaryID = boundaries.get(j).getBoundaryType();</span>
+<span class="nc" id="L102">	    		pr.setService(serviceID);</span>
+<span class="nc" id="L103">	    		pr.setBoundary(boundaryID);</span>
+<span class="nc" id="L104">	    		prq.setRouterType(pr);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">	    		if(checkforDuplicate(prq)){</span>
+<span class="nc" id="L106">	    		routerRepository.createRouter(prq);</span>
+<span class="nc" id="L107">	    		logger.info(&quot;Creating the Router Entry&quot;);</span>
+	    		}
+	    		else {
+<span class="nc" id="L110">	    			routerRepository.updateRouter(prq);</span>
+<span class="nc" id="L111">	    			logger.info(&quot;Updating the Router Entry&quot;);</span>
+	    		}
+	    	}
+	    }
+<span class="nc" id="L115">		logger.info(&quot;Persisting Router record&quot;);</span>
+		//return routerRepository.createRouter(prq);
+<span class="nc" id="L117">		return null;</span>
+		
+	}
+	
+	public boolean checkforDuplicate(PersistRouterReq persistRouterReq){
+<span class="nc" id="L122">		PersistRouter pr = new PersistRouter();</span>
+<span class="nc" id="L123">		pr = routerRepository.ValidateRouter(persistRouterReq);</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">		if (pr != null){</span>
+<span class="nc" id="L125">			return false;</span>
+		}
+			else {
+<span class="nc" id="L128">				return true;</span>
+			}
+		
+		
+		
+	}
+	
+
+	public RouterType createRouter(final String topic, final String key,
+			final RouterTypeReq routerTypeReq) {
+<span class="nc" id="L138">		final ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L139">		String routerValue = null;</span>
+		try {
+<span class="nc" id="L141">			logger.info(&quot;RouterTypeRequest::&quot; + routerTypeReq);</span>
+<span class="nc" id="L142">			routerValue = mapper.writeValueAsString(routerTypeReq);</span>
+<span class="nc" id="L143">			logger.info(&quot;Value being pushed on the Queue, RouterGroupValue::&quot; + routerValue);</span>
+<span class="nc" id="L144">		} catch (final JsonProcessingException e) {</span>
+<span class="nc" id="L145">			logger.error(&quot;Exception Encountered : &quot; + e);</span>
+<span class="nc" id="L146">		}</span>
+		try {
+<span class="nc" id="L148">			pgrProducer.sendMessage(topic, key, routerValue);</span>
+<span class="nc" id="L149">		} catch (final Exception e) {</span>
+<span class="nc" id="L150">			logger.error(&quot;Exception while posting to kafka Queue : &quot; + e);</span>
+<span class="nc" id="L151">			return routerTypeReq.getRouterType();</span>
+<span class="nc" id="L152">		}</span>
+<span class="nc" id="L153">		logger.info(&quot;Producer successfully posted the request to Queue&quot;);</span>
+<span class="nc" id="L154">		return routerTypeReq.getRouterType();</span>
+	}
+	
+	
+	
+	
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

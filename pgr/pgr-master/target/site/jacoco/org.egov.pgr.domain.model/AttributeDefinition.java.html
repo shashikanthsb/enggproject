@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.model</a> &gt; <span class="el_source">AttributeDefinition.java</span></div><h1>AttributeDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.model;
+
+import static org.springframework.util.StringUtils.isEmpty;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+<span class="nc" id="L13">@AllArgsConstructor</span>
+<span class="nc" id="L14">@Builder</span>
+public class AttributeDefinition {
+
+<span class="nc" id="L17">    private boolean readOnly;</span>
+<span class="nc" id="L18">    private String dataType;</span>
+<span class="nc" id="L19">    private boolean required;</span>
+<span class="nc" id="L20">    private String dataTypeDescription;</span>
+<span class="nc" id="L21">    private Integer order;</span>
+<span class="nc" id="L22">    private String description;</span>
+<span class="nc" id="L23">    private String code;</span>
+<span class="nc" id="L24">    private String url;</span>
+<span class="nc" id="L25">    private String groupCode;</span>
+<span class="nc" id="L26">    private String tenantId;</span>
+<span class="nc" id="L27">    private String serviceCode;</span>
+<span class="nc" id="L28">    private boolean active;</span>
+<span class="nc" id="L29">    private List&lt;ValueDefinition&gt; valueDefinitions;</span>
+
+    private char requiredToChar() {
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        return required == true ? 'Y' : 'N';</span>
+    }
+
+    private char readOnlyToChar() {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        return readOnly == true ? 'Y' : 'N';</span>
+    }
+
+    private char activeToChar(){
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        return active ? 'Y' : 'N';</span>
+    }
+
+    /* field length validation*/
+    public boolean isTenantIdLengthMatch(){
+<span class="nc bnc" id="L45" title="All 6 branches missed.">        return (!isEmpty(tenantId) &amp;&amp; (tenantId.length() &gt; 0 &amp;&amp; tenantId.length() &lt;= 256));</span>
+    }
+    
+    public boolean isCodeLengthMatch(){
+<span class="nc bnc" id="L49" title="All 6 branches missed.">        return (!isEmpty(code) &amp;&amp; (code.length() &gt; 0 &amp;&amp; code.length() &lt;= 50));</span>
+    }
+
+    public boolean isDataTypeLengthMatch(){
+<span class="nc bnc" id="L53" title="All 6 branches missed.">        return (!isEmpty(dataType) &amp;&amp; (dataType.length() &gt; 0 &amp;&amp; dataType.length() &lt;= 100));</span>
+    }
+    
+    public boolean isDatatypedescriptionLengthMatch(){
+<span class="nc bnc" id="L57" title="All 2 branches missed.">    	if(dataTypeDescription != null){</span>
+<span class="nc bnc" id="L58" title="All 4 branches missed.">        return (dataTypeDescription.length() &gt; 0 &amp;&amp; dataTypeDescription.length() &lt;= 200);</span>
+    	}
+<span class="nc" id="L60">    	return true;</span>
+    }
+    
+   public boolean isValueList(){
+<span class="nc bnc" id="L64" title="All 4 branches missed.">    	if(!(dataType.equalsIgnoreCase(&quot;multivaluelist&quot;)|| dataType.equalsIgnoreCase(&quot;singlevaluelist&quot;)))</span>
+	{
+<span class="nc bnc" id="L66" title="All 2 branches missed.">    		if(!valueDefinitions.isEmpty())</span>
+    		
+<span class="nc" id="L68">    		return true;</span>
+    	}
+<span class="nc" id="L70">    	return false;</span>
+    }
+    
+    public boolean isDescriptionLengthMatch(){
+<span class="nc bnc" id="L74" title="All 2 branches missed.">    	if(description != null)</span>
+    	{
+<span class="nc bnc" id="L76" title="All 4 branches missed.">        return (description.length() &gt; 0 &amp;&amp; description.length() &lt;= 300);</span>
+    }
+<span class="nc" id="L78">    	return true;</span>
+	}
+    
+    public boolean isServicecodeLengthMatch(){
+<span class="nc bnc" id="L82" title="All 6 branches missed.">        return (!isEmpty(serviceCode) &amp;&amp; (serviceCode.length() &gt; 0 &amp;&amp; serviceCode.length() &lt;= 256));</span>
+    }
+    
+    public boolean isUrlLengthMatch(){
+<span class="nc bnc" id="L86" title="All 2 branches missed.">    	if(url != null)</span>
+    	{
+<span class="nc bnc" id="L88" title="All 4 branches missed.">        return (url.length() &gt; 0 &amp;&amp; url.length() &lt;= 300);</span>
+    	}
+<span class="nc" id="L90">    	return true;</span>
+    }
+    
+    public boolean isGroupCodeLengthMatch(){
+<span class="nc bnc" id="L94" title="All 2 branches missed.">    	if(groupCode != null)</span>
+    	{
+    		
+<span class="nc bnc" id="L97" title="All 4 branches missed.">        return (groupCode.length() &gt; 0 &amp;&amp; groupCode.length() &lt;= 300);</span>
+    }
+<span class="nc" id="L99">    	return true;</span>
+    }
+    
+
+    
+    /* mandatory validation*/
+    public boolean isTenantAbsent()
+    {
+<span class="nc bnc" id="L107" title="All 4 branches missed.">    	return isEmpty(tenantId) || tenantId == null;  </span>
+    }
+    
+    public boolean isServiceCodeAbsent()
+    {
+<span class="nc bnc" id="L112" title="All 4 branches missed.">    	return isEmpty(serviceCode) || serviceCode == null;      </span>
+    }
+    
+    public boolean isAttributCodeAbsent()
+    {
+<span class="nc bnc" id="L117" title="All 4 branches missed.">        return isEmpty(code) || code == null;</span>
+    }
+    
+    public boolean isDatatypeAbsent()
+    {
+<span class="nc bnc" id="L122" title="All 4 branches missed.">    	return isEmpty(dataType) || dataType == null;      </span>
+    }
+
+    
+    
+    public org.egov.pgr.persistence.dto.AttributeDefinition toDto(ServiceDefinition serviceDefinition){
+<span class="nc" id="L128">        return org.egov.pgr.persistence.dto.AttributeDefinition.builder()</span>
+<span class="nc" id="L129">                .code(code)</span>
+<span class="nc" id="L130">                .tenantId(tenantId)</span>
+<span class="nc" id="L131">                .description(description)</span>
+<span class="nc" id="L132">                .dataType(dataType)</span>
+<span class="nc" id="L133">                .dataTypeDescription(dataTypeDescription)</span>
+<span class="nc" id="L134">                .ordernum(order)</span>
+<span class="nc" id="L135">                .groupCode(groupCode)</span>
+<span class="nc" id="L136">                .serviceCode(serviceCode)</span>
+<span class="nc" id="L137">                .url(url)</span>
+<span class="nc" id="L138">                .required(requiredToChar())</span>
+<span class="nc" id="L139">                .variable(readOnlyToChar())</span>
+<span class="nc" id="L140">                .active(activeToChar())</span>
+<span class="nc" id="L141">                .createdBy(serviceDefinition.getCreatedBy())</span>
+<span class="nc" id="L142">                .createdDate(serviceDefinition.getCreatedDate())</span>
+<span class="nc" id="L143">                .lastModifiedBy(serviceDefinition.getLastModifiedBy())</span>
+<span class="nc" id="L144">                .lastModifiedDate(serviceDefinition.getLastModifiedDate())</span>
+<span class="nc" id="L145">                .valueDefinitions(mapToValueDefinitionDto(serviceDefinition, code, tenantId, serviceCode))</span>
+<span class="nc" id="L146">                .build();</span>
+    }
+
+    private List mapToValueDefinitionDto(ServiceDefinition serviceDefinition,
+                                         String attributeCode, String tenantId, String serviceCode){
+<span class="nc" id="L151">        return valueDefinitions.stream()</span>
+<span class="nc" id="L152">                    .map(vd -&gt; vd.toDto(serviceDefinition, attributeCode, tenantId, serviceCode))</span>
+<span class="nc" id="L153">                    .collect(Collectors.toList());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

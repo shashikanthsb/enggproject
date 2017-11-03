@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.dto</a> &gt; <span class="el_source">ServiceType.java</span></div><h1>ServiceType.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.dto;
+
+import lombok.*;
+
+import java.util.Date;
+import java.util.List;
+
+<span class="nc" id="L8">@Builder</span>
+@Getter
+<span class="nc" id="L10">@Setter</span>
+<span class="nc" id="L11">@NoArgsConstructor</span>
+<span class="nc" id="L12">@AllArgsConstructor</span>
+<span class="nc bnc" id="L13" title="All 146 branches missed.">@EqualsAndHashCode</span>
+public class ServiceType {
+
+<span class="nc" id="L16">    private Long id;</span>
+<span class="nc" id="L17">    private String name;</span>
+<span class="nc" id="L18">    private String code;</span>
+<span class="nc" id="L19">    private String description;</span>
+<span class="nc" id="L20">    private Integer department;</span>
+<span class="nc" id="L21">    private Boolean metadata;</span>
+<span class="nc" id="L22">    private String type;</span>
+<span class="nc" id="L23">    private List&lt;String&gt; keywords;</span>
+<span class="nc" id="L24">    private Integer category;</span>
+<span class="nc" id="L25">    private Integer slaHours;</span>
+<span class="nc" id="L26">    private String tenantId;</span>
+<span class="nc" id="L27">    private Boolean isday;</span>
+<span class="nc" id="L28">    private Boolean isactive;</span>
+<span class="nc" id="L29">    private boolean hasfinancialimpact;</span>
+<span class="nc" id="L30">    private Long createdBy;</span>
+<span class="nc" id="L31">    private Date createdDate;</span>
+<span class="nc" id="L32">    private Long lastModifiedBy;</span>
+<span class="nc" id="L33">    private Date lastModifiedDate;</span>
+
+    public org.egov.pgr.domain.model.ServiceType toDomain(){
+<span class="nc" id="L36">        return org.egov.pgr.domain.model.ServiceType.builder()</span>
+<span class="nc" id="L37">                .id(id)</span>
+<span class="nc" id="L38">                .serviceCode(code)</span>
+<span class="nc" id="L39">                .serviceName(name)</span>
+<span class="nc" id="L40">                .type(type)</span>
+<span class="nc" id="L41">                .department(department)</span>
+<span class="nc" id="L42">                .description(description)</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                .slaHours(slaHours)</span>
+<span class="nc" id="L44">                .metadata(null == metadata ? false : metadata)</span>
+<span class="nc" id="L45">                .active(isactive)</span>
+<span class="nc" id="L46">                .category(category)</span>
+<span class="nc" id="L47">                .hasFinancialImpact(hasfinancialimpact)</span>
+<span class="nc" id="L48">                .isDay(isday)</span>
+<span class="nc" id="L49">                .tenantId(tenantId)</span>
+<span class="nc" id="L50">                .keywords(keywords)</span>
+<span class="nc" id="L51">                .build();</span>
+    }
+
+    public boolean isKeywordPresent(List&lt;String&gt; keywordsList){
+<span class="nc" id="L55">        return keywords.stream().anyMatch(keywordsList::contains);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

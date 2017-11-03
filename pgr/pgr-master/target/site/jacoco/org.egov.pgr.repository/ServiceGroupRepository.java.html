@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceGroupRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">ServiceGroupRepository.java</span></div><h1>ServiceGroupRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.egov.pgr.domain.model.ServiceGroup;
+import org.egov.pgr.domain.model.ServiceType;
+import org.egov.pgr.domain.model.ServiceTypeSearchCriteria;
+import org.egov.pgr.domain.service.ServiceTypeService;
+import org.egov.pgr.repository.builder.ServiceGroupQueryBuilder;
+import org.egov.pgr.repository.rowmapper.ServiceGroupRowMapper;
+import org.egov.pgr.web.contract.ServiceGroupGetRequest;
+//import org.egov.pgrrest.master.repository.rowmapper.CategoryTypeRowMapper;
+import org.egov.pgr.web.contract.ServiceGroupRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+<span class="fc" id="L63">public class ServiceGroupRepository {</span>
+
+<span class="fc" id="L65">	public static final Logger LOGGER = LoggerFactory.getLogger(ServiceGroupRepository.class);</span>
+
+<span class="fc" id="L67">	private static final String[] taskAction = { &quot;create&quot;, &quot;update&quot; };</span>
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private ServiceGroupRowMapper serviceGroupMapper;
+
+	@Autowired
+	private ServiceGroupQueryBuilder serviceGroupQueryBuilder;
+
+	@Autowired
+	private ServiceTypeService serviceTypeService;
+
+	public ServiceGroupRequest persistCreateServiceGroup(final ServiceGroupRequest serviceGroupRequest) {
+<span class="fc" id="L82">		LOGGER.info(&quot;ServiceGroupRequest::&quot; + serviceGroupRequest);</span>
+<span class="fc" id="L83">		final String serviceGroupInsert = serviceGroupQueryBuilder.insertServiceGroupQuery();</span>
+<span class="fc" id="L84">		final ServiceGroup serviceGroup = serviceGroupRequest.getServiceGroup();</span>
+<span class="fc" id="L85">		final Object[] obj = new Object[] { serviceGroup.getCode(), serviceGroup.getName(),</span>
+<span class="fc" id="L86">				serviceGroup.getDescription(), serviceGroup.getActive(),</span>
+<span class="fc" id="L87">				Long.valueOf(serviceGroupRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L88">				Long.valueOf(serviceGroupRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L89">				new Date(new java.util.Date().getTime()), new Date(new java.util.Date().getTime()),</span>
+<span class="fc" id="L90">				serviceGroup.getTenantId(), serviceGroup.getKeyword() };</span>
+<span class="fc" id="L91">		jdbcTemplate.update(serviceGroupInsert, obj);</span>
+<span class="fc" id="L92">		return serviceGroupRequest;</span>
+	}
+
+	public ServiceGroupRequest persistUpdateServiceGroup(final ServiceGroupRequest serviceGroupRequest) {
+<span class="fc" id="L96">		LOGGER.info(&quot;ServiceGroupRequest::&quot; + serviceGroupRequest);</span>
+
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">		if (serviceGroupRequest != null &amp;&amp; serviceGroupRequest.getServiceGroup() != null</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">				&amp;&amp; serviceGroupRequest.getServiceGroup().getActive() != null</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">				&amp;&amp; !serviceGroupRequest.getServiceGroup().getActive())</span>
+<span class="nc" id="L101">			disableServiceTypes(serviceGroupRequest.getServiceGroup().getKeyword(),</span>
+<span class="nc" id="L102">					serviceGroupRequest.getServiceGroup().getId(),</span>
+<span class="nc" id="L103">					serviceGroupRequest.getServiceGroup().getTenantId());</span>
+
+<span class="fc" id="L105">		final String serviceGroupUpdate = serviceGroupQueryBuilder.updateServiceGroupQuery();</span>
+<span class="fc" id="L106">		final ServiceGroup serviceGroup = serviceGroupRequest.getServiceGroup();</span>
+<span class="fc" id="L107">		final Object[] obj = new Object[] { serviceGroup.getName(), serviceGroup.getDescription(),</span>
+<span class="fc" id="L108">				serviceGroup.getActive(), Long.valueOf(serviceGroupRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L109">				Long.valueOf(serviceGroupRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L110">				new Date(new java.util.Date().getTime()), new Date(new java.util.Date().getTime()),</span>
+<span class="fc" id="L111">				serviceGroup.getTenantId(), serviceGroup.getKeyword(), serviceGroup.getCode() };</span>
+<span class="fc" id="L112">		jdbcTemplate.update(serviceGroupUpdate, obj);</span>
+<span class="fc" id="L113">		return serviceGroupRequest;</span>
+	}
+
+	private void disableServiceTypes(String keyword,Long id, String tenantId) {
+
+<span class="nc" id="L118">		List&lt;ServiceType&gt; serviceTyes = serviceTypeService</span>
+<span class="nc" id="L119">				.search(ServiceTypeSearchCriteria.builder().category(id.intValue()).tenantId(tenantId).build());</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">		if (serviceTyes != null)</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">			for (ServiceType type : serviceTyes) {</span>
+<span class="nc" id="L122">				type.setActive(false);</span>
+<span class="nc" id="L123">				serviceTypeService.persistForUpdate(type);</span>
+<span class="nc" id="L124">			}</span>
+<span class="nc" id="L125">	}</span>
+
+	public List&lt;ServiceGroup&gt; getAllServiceGroup(ServiceGroupGetRequest serviceGroupGetRequest) {
+<span class="fc" id="L128">		LOGGER.info(&quot;Requesting the Service Group List for the tenant ID :&quot; + serviceGroupGetRequest.getTenantId());</span>
+<span class="fc" id="L129">		final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L130">		String getQuery = serviceGroupQueryBuilder.getQuery(serviceGroupGetRequest, preparedStatementValues);</span>
+<span class="fc" id="L131">		final List&lt;ServiceGroup&gt; serviceGroupTypes = jdbcTemplate.query(getQuery, preparedStatementValues.toArray(),</span>
+				serviceGroupMapper);
+<span class="fc" id="L133">		return serviceGroupTypes;</span>
+	}
+
+	public boolean verifyRequestUniqueness(ServiceGroupRequest serviceGroupRequest) {
+<span class="nc" id="L137">		String checkQuery = serviceGroupQueryBuilder.checkIfAvailable();</span>
+<span class="nc" id="L138">		List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L139">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getCode());</span>
+<span class="nc" id="L140">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getTenantId());</span>
+<span class="nc" id="L141">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getName());</span>
+<span class="nc" id="L142">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getTenantId());</span>
+
+<span class="nc" id="L144">		final List&lt;Integer&gt; availableCount = jdbcTemplate.queryForList(checkQuery, preparedStatementValues.toArray(),</span>
+				Integer.class);
+<span class="nc bnc" id="L146" title="All 2 branches missed.">		if (availableCount.size() &gt; 0) {</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">			if (availableCount.get(0) &gt; 0) {</span>
+<span class="nc" id="L148">				return true;</span>
+			} else {
+<span class="nc" id="L150">				preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L151">				preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getName());</span>
+<span class="nc" id="L152">				preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getTenantId());</span>
+<span class="nc" id="L153">				checkQuery = serviceGroupQueryBuilder.checkIfNameTenantIdAvailable();</span>
+<span class="nc" id="L154">				final List&lt;Integer&gt; count = jdbcTemplate.queryForList(checkQuery, preparedStatementValues.toArray(),</span>
+						Integer.class);
+<span class="nc bnc" id="L156" title="All 2 branches missed.">				if (count.size() &gt; 0) {</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">					if (count.get(0) &gt; 0) {</span>
+<span class="nc" id="L158">						return true;</span>
+					}
+				}
+			}
+		}
+<span class="nc" id="L163">		return false;</span>
+	}
+
+	public boolean verifyIfNameAlreadyExists(ServiceGroupRequest serviceGroupRequest, String action) {
+<span class="nc" id="L167">		List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L168">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getName().toUpperCase().trim());</span>
+<span class="nc" id="L169">		preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getTenantId());</span>
+<span class="nc" id="L170">		String checkQuery = &quot;&quot;;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">		if (action.equals(taskAction[0])) {</span>
+<span class="nc" id="L172">			checkQuery = serviceGroupQueryBuilder.checkIfNameTenantIdAvailable();</span>
+		} else {
+<span class="nc" id="L174">			preparedStatementValues.add(serviceGroupRequest.getServiceGroup().getId());</span>
+<span class="nc" id="L175">			checkQuery = serviceGroupQueryBuilder.checkIfNameTenantIdAvailableUpdate();</span>
+		}
+<span class="nc" id="L177">		final List&lt;Integer&gt; count = jdbcTemplate.queryForList(checkQuery, preparedStatementValues.toArray(),</span>
+				Integer.class);
+<span class="nc bnc" id="L179" title="All 2 branches missed.">		if (count.size() &gt; 0) {</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">			if (count.get(0) &gt; 0) {</span>
+<span class="nc" id="L181">				return true;</span>
+			}
+		}
+<span class="nc" id="L184">		return false;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

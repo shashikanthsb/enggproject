@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">ServiceTypeController.java</span></div><h1>ServiceTypeController.java</h1><pre class="source lang-java linenums">package org.egov.pgr.web.controller;
+
+import org.egov.pgr.domain.model.ServiceTypeSearchCriteria;
+import org.egov.pgr.domain.service.ServiceTypeService;
+import org.egov.pgr.web.contract.RequestInfoBody;
+import org.egov.pgr.web.contract.ServiceType;
+import org.egov.pgr.web.contract.ServiceTypeRequest;
+import org.egov.pgr.web.contract.ServiceTypeResponse;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping(&quot;/service&quot;)
+public class ServiceTypeController {
+
+    private ServiceTypeService serviceTypeService;
+
+<span class="nc" id="L20">    public ServiceTypeController(ServiceTypeService serviceTypeService) {</span>
+<span class="nc" id="L21">        this.serviceTypeService = serviceTypeService;</span>
+<span class="nc" id="L22">    }</span>
+
+    @PostMapping(&quot;/v2/_create&quot;)
+    public ServiceTypeResponse create(@RequestBody ServiceTypeRequest serviceTypeRequest){
+<span class="nc" id="L26">        serviceTypeService.create(serviceTypeRequest.toDomain(), serviceTypeRequest);</span>
+<span class="nc" id="L27">        return new ServiceTypeResponse(null, serviceTypeRequest.getServiceType());</span>
+    }
+
+    @PostMapping(&quot;/v2/_update&quot;)
+    public ServiceTypeResponse update(@RequestBody ServiceTypeRequest serviceTypeRequest){
+<span class="nc" id="L32">        serviceTypeService.update(serviceTypeRequest.toDomain(), serviceTypeRequest);</span>
+<span class="nc" id="L33">        return new ServiceTypeResponse(null, serviceTypeRequest.getServiceType());</span>
+    }
+
+    @PostMapping(&quot;/v2/_search&quot;)
+    public List&lt;ServiceType&gt; search(@RequestParam(value = &quot;tenantId&quot;, defaultValue = &quot;default&quot;) String tenantId,
+                                    @RequestParam(value = &quot;serviceCode&quot;, required = false) String serviceCode,
+                                    @RequestParam(value = &quot;categoryId&quot;, required = false) Integer category,
+                                    @RequestParam(value = &quot;keywords&quot;, required = false) List&lt;String&gt; keywords,
+                                    @RequestBody RequestInfoBody requestInfoBody){
+
+<span class="nc" id="L43">        ServiceTypeSearchCriteria serviceTypeSearchCriteria = ServiceTypeSearchCriteria.builder()</span>
+<span class="nc" id="L44">                .tenantId(tenantId)</span>
+<span class="nc" id="L45">                .serviceCode(serviceCode)</span>
+<span class="nc" id="L46">                .category(category)</span>
+<span class="nc" id="L47">                .keywords(keywords)</span>
+<span class="nc" id="L48">                .build();</span>
+
+<span class="nc" id="L50">        List&lt;org.egov.pgr.domain.model.ServiceType&gt; serviceTypeList = serviceTypeService.search(serviceTypeSearchCriteria);</span>
+
+<span class="nc" id="L52">        return serviceTypeList.stream()</span>
+<span class="nc" id="L53">                .map(serviceType -&gt; new ServiceType(serviceType))</span>
+<span class="nc" id="L54">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

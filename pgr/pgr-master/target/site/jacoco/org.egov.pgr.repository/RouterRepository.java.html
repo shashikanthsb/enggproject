@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouterRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">RouterRepository.java</span></div><h1>RouterRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.egov.pgr.domain.model.*;
+import org.egov.pgr.domain.model.GrievanceType;
+import org.egov.pgr.repository.builder.RouterQueryBuilder;
+import org.egov.pgr.repository.rowmapper.PersistRouteRowMapper;
+import org.egov.pgr.repository.rowmapper.RouterRowMapper;
+import org.egov.pgr.web.contract.RouterType;
+import org.egov.pgr.web.contract.RouterTypeGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+<span class="nc" id="L64">public class RouterRepository {</span>
+
+<span class="nc" id="L66">	public static final Logger LOGGER = LoggerFactory.getLogger(RouterRepository.class);</span>
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+    @Autowired 
+    private RouterQueryBuilder routerQueryBuilder;
+	
+	@Autowired 
+	private RouterRowMapper routerRowMapper;
+	
+
+	public PersistRouterReq createRouter(final PersistRouterReq routerReq) {
+		
+<span class="nc" id="L80">		LOGGER.info(&quot;Router Request::&quot; + routerReq);</span>
+<span class="nc" id="L81">		final String routerInsert = RouterQueryBuilder.insertRouter();</span>
+<span class="nc" id="L82">		final PersistRouter persistRouter = routerReq.getRouterType();</span>
+<span class="nc" id="L83">		final Object[] obj = new Object[] {persistRouter.getService(),persistRouter.getPosition(), persistRouter.getBoundary(),0,</span>
+<span class="nc" id="L84">				Long.valueOf(routerReq.getRequestInfo().getUserInfo().getId()),new Date(new java.util.Date().getTime()),</span>
+<span class="nc" id="L85">				Long.valueOf(routerReq.getRequestInfo().getUserInfo().getId()),new Date(new java.util.Date().getTime()),</span>
+<span class="nc" id="L86">				persistRouter.getTenantId() };</span>
+		
+<span class="nc" id="L88">		jdbcTemplate.update(routerInsert, obj);</span>
+<span class="nc" id="L89">		return routerReq;</span>
+	}
+public PersistRouterReq updateRouter(final PersistRouterReq routerReq) {
+		
+<span class="nc" id="L93">		LOGGER.info(&quot;Update Router Request::&quot; + routerReq);</span>
+<span class="nc" id="L94">		final String routerUpdate = RouterQueryBuilder.updateRouter();</span>
+<span class="nc" id="L95">		final PersistRouter persistRouter = routerReq.getRouterType();</span>
+<span class="nc" id="L96">		final Object[] obj = new Object[] {persistRouter.getPosition(),0,</span>
+<span class="nc" id="L97">				Long.valueOf(routerReq.getRequestInfo().getUserInfo().getId()),new Date(new java.util.Date().getTime()),</span>
+<span class="nc" id="L98">				Long.valueOf(routerReq.getRequestInfo().getUserInfo().getId()),new Date(new java.util.Date().getTime()),</span>
+<span class="nc" id="L99">				persistRouter.getTenantId(), persistRouter.getBoundary(),persistRouter.getService(),persistRouter.getId() };</span>
+		
+<span class="nc" id="L101">		jdbcTemplate.update(routerUpdate, obj);</span>
+<span class="nc" id="L102">		return routerReq;</span>
+	}
+public PersistRouter ValidateRouter(final PersistRouterReq routerReq) {
+		
+		
+<span class="nc" id="L107">		final String validateQuery = RouterQueryBuilder.validateRouter();</span>
+<span class="nc" id="L108">		PersistRouter persistRouter = new PersistRouter();</span>
+		try{
+<span class="nc" id="L110">		persistRouter = (PersistRouter)jdbcTemplate.queryForObject(</span>
+<span class="nc" id="L111">				validateQuery, new Object[] { routerReq.getRouterType().getService(),routerReq.getRouterType().getBoundary()}, new PersistRouteRowMapper());</span>
+<span class="nc" id="L112">		LOGGER.info(&quot;Value coming from validate query boundary::&quot; + persistRouter.getBoundary());</span>
+		}
+<span class="nc" id="L114">		catch (EmptyResultDataAccessException e) {</span>
+<span class="nc" id="L115">			return null;</span>
+<span class="nc" id="L116">		}</span>
+<span class="nc" id="L117">		return persistRouter;</span>
+	}
+
+	
+	
+	
+
+	
+	public List&lt;RouterType&gt; findForCriteria(final RouterTypeGetReq routerTypeGetRequest) {
+<span class="nc" id="L126">		final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L127">        final String queryStr = routerQueryBuilder.getQuery(routerTypeGetRequest, preparedStatementValues);</span>
+<span class="nc" id="L128">        jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), routerRowMapper);</span>
+<span class="nc" id="L129">        return prepareRouterTypeList(routerRowMapper);</span>
+    }
+	
+	private List&lt;RouterType&gt; prepareRouterTypeList(RouterRowMapper rowMapper){
+<span class="nc" id="L133">		Map&lt;String, List&lt;Value&gt;&gt; attribValue = rowMapper.attribValue;</span>
+<span class="nc" id="L134">		Map&lt;String, Map&lt;String, Attribute&gt;&gt; serviceAttrib = rowMapper.serviceAttrib;</span>
+<span class="nc" id="L135">		Map&lt;Long, Map&lt;String, List&lt;GrievanceType&gt;&gt;&gt; serviceMap = rowMapper.serviceMap;</span>
+<span class="nc" id="L136">		Map&lt;Long, RouterType&gt; routerMap = rowMapper.routerMap;</span>
+<span class="nc" id="L137">		RouterType routerType = new RouterType();</span>
+<span class="nc" id="L138">		List&lt;RouterType&gt; routerTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L139">		List&lt;GrievanceType&gt; grievanceTypeList = new ArrayList&lt;&gt;();</span>
+		
+<span class="nc" id="L141">		Iterator&lt;Entry&lt;Long, RouterType&gt;&gt; itr = routerMap.entrySet().iterator();</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">		while (itr.hasNext()) {</span>
+<span class="nc" id="L143">			Entry&lt;Long, RouterType&gt; routerEntry = itr.next();</span>
+<span class="nc" id="L144">			routerType = routerEntry.getValue();</span>
+<span class="nc" id="L145">			Long routerId = routerEntry.getKey();</span>
+<span class="nc" id="L146">			Map&lt;String, List&lt;GrievanceType&gt;&gt; innerServiceMap = serviceMap.get(routerId);</span>
+<span class="nc" id="L147">			Iterator&lt;Entry&lt;String, List&lt;GrievanceType&gt;&gt;&gt; innerItr = innerServiceMap.entrySet().iterator();</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">			while (innerItr.hasNext()) {</span>
+<span class="nc" id="L149">				Entry&lt;String, List&lt;GrievanceType&gt;&gt; innerEntry = innerItr.next();</span>
+<span class="nc" id="L150">				grievanceTypeList = innerEntry.getValue();</span>
+<span class="nc" id="L151">				List&lt;GrievanceType&gt; finalServiceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L152">				Iterator&lt;GrievanceType&gt; serviceItr = grievanceTypeList.iterator();</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">				while (serviceItr.hasNext()) {</span>
+<span class="nc" id="L154">					GrievanceType grievanceType = new GrievanceType();</span>
+<span class="nc" id="L155">					grievanceType = serviceItr.next();</span>
+<span class="nc" id="L156">					Map&lt;String, Attribute&gt; innerAttrMap = serviceAttrib.get(grievanceType.getServiceCode());</span>
+<span class="nc" id="L157">					Iterator&lt;Entry&lt;String, Attribute&gt;&gt; innerAttrItr = innerAttrMap.entrySet().iterator();</span>
+<span class="nc" id="L158">					List&lt;Attribute&gt; finalAttributeList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">					while (innerAttrItr.hasNext()) {</span>
+<span class="nc" id="L160">						Entry&lt;String,Attribute&gt; attrEntry = innerAttrItr.next();</span>
+<span class="nc" id="L161">						List&lt;Value&gt; valueList = attribValue.get(attrEntry.getValue().getCode());</span>
+<span class="nc" id="L162">						attrEntry.getValue().setAttributes(valueList);</span>
+<span class="nc" id="L163">						finalAttributeList.add(attrEntry.getValue());</span>
+<span class="nc" id="L164">					}</span>
+<span class="nc" id="L165">					grievanceType.setAttributes(finalAttributeList);</span>
+<span class="nc" id="L166">					finalServiceList.add(grievanceType);</span>
+<span class="nc" id="L167">				}</span>
+<span class="nc" id="L168">				routerType.setServices(finalServiceList);</span>
+<span class="nc" id="L169">				routerTypes.add(routerType);</span>
+<span class="nc" id="L170">			}</span>
+<span class="nc" id="L171">		}</span>
+<span class="nc" id="L172">		return routerTypes;</span>
+	}
+	
+	
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

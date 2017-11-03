@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDefinitionCreateValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service.validator.serviceDefinitionCreateValidator</a> &gt; <span class="el_source">ServiceDefinitionCreateValidator.java</span></div><h1>ServiceDefinitionCreateValidator.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service.validator.serviceDefinitionCreateValidator;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.ServiceDefinition;
+import org.egov.pgr.persistence.repository.ServiceDefinitionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+<span class="nc" id="L13">public class ServiceDefinitionCreateValidator implements ServiceDefinitionValidator {</span>
+
+	@Autowired
+	private ServiceDefinitionRepository serviceDefinitionRepository;
+
+	@Override
+	public boolean canValidate(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L20">		return true;</span>
+	}
+
+	@Override
+	public void checkMandatoryField(ServiceDefinition serviceDefinition) {
+
+<span class="nc bnc" id="L26" title="All 2 branches missed.">		if (serviceDefinition.isTenantIdAbsent()) {</span>
+<span class="nc" id="L27">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L29">			error.put(&quot;code&quot;, &quot;tanantId Vaalidator.1&quot;);</span>
+<span class="nc" id="L30">			error.put(&quot;field&quot;, &quot;ServiceDefinition.tanantId&quot;);</span>
+<span class="nc" id="L31">			error.put(&quot;message&quot;, &quot;tanantId Required&quot;);</span>
+
+<span class="nc" id="L33">			throw new PGRMasterException(error);</span>
+		}
+
+<span class="nc bnc" id="L36" title="All 2 branches missed.">		if (serviceDefinition.isCodeAbsent()) {</span>
+<span class="nc" id="L37">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L39">			error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.2&quot;);</span>
+<span class="nc" id="L40">			error.put(&quot;field&quot;, &quot;ServiceDefinition.DefinitionCode&quot;);</span>
+<span class="nc" id="L41">			error.put(&quot;message&quot;, &quot;Code Required &quot;);</span>
+
+<span class="nc" id="L43">			throw new PGRMasterException(error);</span>
+		}
+		
+<span class="nc" id="L46">	}</span>
+	@Override
+	public void matchServiceandAttributeCodes(ServiceDefinition serviceDefinition)
+	{
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		if(serviceDefinition.valueDefinMandatoryFieldValidation(serviceDefinition))</span>
+		{
+<span class="nc" id="L52">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L53">			error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.7&quot;);</span>
+<span class="nc" id="L54">			error.put(&quot;field&quot;, &quot;DefinitionCode.codeMissMatch&quot;);</span>
+<span class="nc" id="L55">			error.put(&quot;message&quot;, &quot;Miss Match in Attribute code And Service code  &quot;);</span>
+
+<span class="nc" id="L57">			throw new PGRMasterException(error);</span>
+		}
+<span class="nc" id="L59">	}</span>
+
+	@Override
+	public void checkConstraints(ServiceDefinition serviceDefinition) {
+
+<span class="nc" id="L64">		List&lt;org.egov.pgr.domain.model.ServiceDefinition&gt; complaintCodeList = serviceDefinitionRepository</span>
+<span class="nc" id="L65">				.getData(serviceDefinition);</span>
+
+<span class="nc" id="L67">		List&lt;org.egov.pgr.domain.model.ServiceDefinition&gt; definitionList = serviceDefinitionRepository</span>
+<span class="nc" id="L68">				.getDefinitionCode(serviceDefinition);</span>
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		if (complaintCodeList.isEmpty()) {</span>
+<span class="nc" id="L71">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L72">			error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.3&quot;);</span>
+<span class="nc" id="L73">			error.put(&quot;field&quot;, &quot;DefinitionTypeConfiguration.ServiceCode&quot;);</span>
+<span class="nc" id="L74">			error.put(&quot;message&quot;, &quot;Mapping not exist &quot;);</span>
+<span class="nc" id="L75">			throw new PGRMasterException(error);</span>
+
+		}
+
+<span class="nc bnc" id="L79" title="All 4 branches missed.">		if (!definitionList.isEmpty() &amp;&amp; (definitionList.get(0).getCode().equalsIgnoreCase(serviceDefinition.getCode())</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">				&amp;&amp; definitionList.get(0).getTenantId().equalsIgnoreCase(serviceDefinition.getTenantId()))) {</span>
+<span class="nc" id="L81">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L82">			error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.4&quot;);</span>
+<span class="nc" id="L83">			error.put(&quot;field&quot;, &quot;ServiceDefinitionConfiguration.code&quot;);</span>
+<span class="nc" id="L84">			error.put(&quot;message&quot;, &quot;Data Present in Service Definition&quot;);</span>
+<span class="nc" id="L85">			throw new PGRMasterException(error);</span>
+
+		}
+		
+
+<span class="nc" id="L90">	}</span>
+
+	@Override
+	public void checkLength(ServiceDefinition serviceDefinition) {
+			
+<span class="nc bnc" id="L95" title="All 2 branches missed.">			if(!serviceDefinition.isTenantIdLengthMatch())	</span>
+			{
+<span class="nc" id="L97">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L98">			error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.5&quot;);</span>
+<span class="nc" id="L99">			error.put(&quot;field&quot;, &quot;DefinitionTypeConfiguration.tenant&quot;);</span>
+<span class="nc" id="L100">			error.put(&quot;message&quot;, &quot;tenantId length should Min: 1 Characters. Max: 256 Characters&quot;);</span>
+<span class="nc" id="L101">			throw new PGRMasterException(error);</span>
+				
+			}
+<span class="nc bnc" id="L104" title="All 2 branches missed.">			if(!serviceDefinition.isCodeLengthMatch())	</span>
+			{
+<span class="nc" id="L106">				HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L107">				error.put(&quot;code&quot;, &quot;DefinitionCode Vaalidator.6&quot;);</span>
+<span class="nc" id="L108">				error.put(&quot;field&quot;, &quot;DefinitionTypeConfiguration.code&quot;);</span>
+<span class="nc" id="L109">				error.put(&quot;message&quot;, &quot;code length should  Min: 1 Characters. Max: 20 Characters&quot;);</span>
+<span class="nc" id="L110">				throw new PGRMasterException(error);</span>
+				
+<span class="nc" id="L112">			}	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

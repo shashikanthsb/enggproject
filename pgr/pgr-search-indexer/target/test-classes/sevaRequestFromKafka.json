@@ -1,0 +1,66 @@
+{
+  "RequestInfo": {
+    "apiId": "org.egov.pgr",
+    "ver": "1.0",
+    "ts": null,
+    "action": "create",
+    "did": "4354648646",
+    "key": "xyz",
+    "msgId": "f10f89d7-7520-4bbe-bc51-980f3c228ad6",
+    "authToken": null
+  },
+  "serviceRequest": {
+    "tenantId": "ap.public",
+    "serviceRequestId": "00312-2017-FQ",
+    "status": true,
+    "serviceName": "Public Health/Dengue/Malaria/Gastro-enteritis",
+    "serviceCode": "PHDMG",
+    "description": "dsadadsadsasd",
+    "requestedDatetime": null,
+    "expectedDatetime": null,
+    "address": "",
+    "lat": 0.0,
+    "lng": 0.0,
+    "firstName": "wewwrwer",
+    "phone": "1123123123",
+    "email": "nseady@gmail.com",
+    "attribValues": [
+        {
+            "key": "receivingMode",
+            "name": "Website"
+        },
+        {
+            "key": "receivingCenter",
+            "name": ""
+        },
+        {
+            "key": "status",
+            "name": "REGISTERED"
+        },
+        {
+            "key": "requesterAddress",
+            "name": "sadadadasd"
+        },
+        {
+            "key": "locationId",
+            "name": "178"
+        },
+        {
+            "key": "locationName",
+            "name": "Election Ward No 6"
+        },
+        {
+            "key": "childLocationId",
+            "name": "169"
+        },
+        {
+            "key": "assignmentId",
+            "name": "2"
+        },
+        {
+            "key": "stateId",
+            "name": "355"
+        }
+    ]
+  }
+}

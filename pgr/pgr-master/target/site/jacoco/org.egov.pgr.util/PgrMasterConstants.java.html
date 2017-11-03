@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PgrMasterConstants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.util</a> &gt; <span class="el_source">PgrMasterConstants.java</span></div><h1>PgrMasterConstants.java</h1><pre class="source lang-java linenums">
+/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.util;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+
+@Configuration
+@PropertySource(value = {&quot;classpath:messages/messages.properties&quot;,
+        &quot;classpath:messages/errors.properties&quot;}, ignoreResourceNotFound = true)
+@Order(0)
+<span class="nc" id="L54">public class PgrMasterConstants {</span>
+
+    @Autowired
+    private Environment environment;
+
+    public static final String INVALID_REQUEST_MESSAGE = &quot;Request is invalid&quot;;
+    public static final String INVALID_SERVICEGROUP_REQUEST_MESSAGE = &quot;Service Group is invalid&quot;;
+    public static final String INVALID_RECEIVING_CENTERTYPE_REQUEST_MESSAGE = &quot;ReceivingCenter is Invalid.&quot;;
+    public static final String INVALID_RECEIVING_MODETYPE_REQUEST_MESSAGE = &quot;ReceivingMode is Invalid.&quot;;
+    public static final String INVALID_SERVICETYPE_REQUEST_MESSAGE = &quot;Service Type Message is Invalid&quot;;
+    public static final String INVALID_ESCALATIONTIMETYPE_REQUEST_MESSAGE = &quot;Escalation Time Type is Invalid&quot;;
+    public static final String INVALID_ESCALATIONHIERARCHY_REQUEST_MESSAGE = &quot;Escalation Hierarchy is Invalid&quot;;
+
+
+    public static final String TENANTID_MANDATORY_CODE = &quot;pgr.0011&quot;;
+    public static final String TENANTID_MANADATORY_FIELD_NAME = &quot;tenantId&quot;;
+    public static final String TENANTID_MANADATORY_ERROR_MESSAGE = &quot;Tenant Id is required&quot;;
+
+    public static final String SERVICEGROUP_NAME_MANDATORY_CODE = &quot;pgr.0002&quot;;
+    public static final String SERVICEGROUP_NAME_MANADATORY_FIELD_NAME = &quot;name&quot;;
+    public static final String SERVICEGROUP_NAME_MANADATORY_ERROR_MESSAGE = &quot;Service Group is required&quot;;
+
+    public static final String SERVICEGROUP_CODE_MANDATORY_CODE = &quot;pgr.0003&quot;;
+    public static final String SERVICEGROUP_CODE_MANADATORY_FIELD_NAME = &quot;code&quot;;
+    public static final String SERVICEGROUP_CODE_MANADATORY_ERROR_MESSAGE = &quot;Service Group code is required&quot;;
+
+
+    public static final String ROUTER_SERVICE_MANDATORY_CODE = &quot;pgr.0003&quot;;
+    public static final String ROUTER_SERVICE_MANADATORY_FIELD_NAME = &quot;service&quot;;
+    public static final String ROUTER_SERVICE_MANADATORY_ERROR_MESSAGE = &quot;Service required&quot;;
+
+    public static final String ROUTER_POSITION_MANDATORY_CODE = &quot;pgr.0004&quot;;
+    public static final String ROUTER_POSITION_MANADATORY_FIELD_NAME = &quot;position&quot;;
+    public static final String ROUTER_POSITION_MANADATORY_ERROR_MESSAGE = &quot;Position is required&quot;;
+
+    public static final String ROUTER_BOUNDARY_MANDATORY_CODE = &quot;pgr.0005&quot;;
+    public static final String ROUTER_BOUNDARY_MANADATORY_FIELD_NAME = &quot;boundary&quot;;
+    public static final String ROUTER_BOUNDARY_MANADATORY_ERROR_MESSAGE = &quot;Boundary is required&quot;;
+
+    public static final String RECEIVINGCENTER_NAME_MANDATORY_CODE = &quot;pgr.0037&quot;;
+    public static final String RECEIVINGCENTER_NAME_MANADATORY_FIELD_NAME = &quot;name&quot;;
+    public static final String RECEIVINGCENTER_NAME_MANADATORY_ERROR_MESSAGE = &quot;Receiving Center name is required&quot;;
+
+    public static final String RECEIVINGCENTER_CODE_MANDATORY_CODE = &quot;pgr.0038&quot;;
+    public static final String RECEIVINGCENTER_CODE_MANADATORY_FIELD_NAME = &quot;name&quot;;
+    public static final String RECEIVINGCENTER_CODE_MANADATORY_ERROR_MESSAGE = &quot;Receiving Center code is required&quot;;
+
+    public static final String RECEIVINGCENTER_CODE_EXISTS_CODE = &quot;pgr.0039&quot;;
+    public static final String RECEIVINGCENTER_CODE_EXISTS_FIELD_NAME = &quot;code&quot;;
+    public static final String RECEIVINGCENTER_CODE_EXISTS_ERROR_MESSAGE = &quot;Receiving Center code already exists&quot;;
+
+    public static final String RECEIVINGMODE_NAME_MANDATORY_CODE = &quot;pgr.0032&quot;;
+    public static final String RECEIVINGMODE_NAME_MANADATORY_FIELD_NAME = &quot;name&quot;;
+    public static final String RECEIVINGMODE_NAME_MANADATORY_ERROR_MESSAGE = &quot;Receiving Mode name is required&quot;;
+
+    public static final String GRIEVANCETYPE_NAME_MANDATORY_CODE = &quot;pgr.0006&quot;;
+    public static final String GRIEVANCETYPE_NAME_MANADATORY_FIELD_NAME = &quot;serviceName&quot;;
+    public static final String GRIEVANCETYPE_NAME_MANADATORY_ERROR_MESSAGE = &quot;Service Type Name is required&quot;;
+
+    public static final String GRIEVANCETYPE_CODE_MANDATORY_CODE = &quot;pgr.0007&quot;;
+    public static final String GRIEVANCETYPE_CODE_MANADATORY_FIELD_NAME = &quot;serviceCode&quot;;
+    public static final String GRIEVANCETYPE_CODE_MANADATORY_ERROR_MESSAGE = &quot;Service Type Code is required&quot;;
+
+    public static final String GRIEVANCETYPE_ID_MANDATORY_CODE = &quot;pgr.0008&quot;;
+    public static final String GRIEVANCETYPE_ID_MANADATORY_FIELD_NAME = &quot;serviceId&quot;;
+    public static final String GRIEVANCETYPE_ID_MANADATORY_ERROR_MESSAGE = &quot;Service Type/ Grievance Type Id is required&quot;;
+
+    public static final String NO_0F_HOURS_MANDATORY_CODE = &quot;pgr.0009&quot;;
+    public static final String NO_0F_HOURS_MANADATORY_FIELD_NAME = &quot;noOfHours&quot;;
+    public static final String NO_0F_HOURS_MANADATORY_ERROR_MESSAGE = &quot;No of hours is required&quot;;
+
+    public static final String RECEIVINGCENTER_NAME_UNIQUE_CODE = &quot;pgr.0040&quot;;
+    public static final String RECEIVINGCENTER_UNQ_ERROR_MESSAGE = &quot;Receiving Center name already exist.&quot;;
+    public static final String RECEIVINGCENTER_NAME_UNQ_FIELD_NAME = &quot;name&quot;;
+
+    public static final String RECEIVINGMODE_CODE_UNIQUE_CODE = &quot;pgr.0034&quot;;
+    public static final String RECEIVINGMODE_UNQ_ERROR_MESSAGE = &quot;Receiving Mode code already exist.&quot;;
+    public static final String RECEIVINGMODE_CODE_UNQ_FIELD_NAME = &quot;code&quot;;
+
+    public static final String RECEIVINGMODE_CODE_MANDATORY_CODE = &quot;pgr.0031&quot;;
+    public static final String RECEIVINGMODE_CODE_MANADATORY_FIELD_NAME = &quot;code&quot;;
+    public static final String RECEIVINGMODE_CODE_MANADATORY_ERROR_MESSAGE = &quot;Receiving Mode code is required&quot;;
+
+    public static final String ATTRIBUTE_DETAILS_MANDATORY_CODE = &quot;pgr.0023&quot;;
+    public static final String ATTRIBUTE_DETAILS_MANADATORY_FIELD_NAME = &quot;attributes&quot;;
+    public static final String ATTRIBUTE_DETAILS_MANADATORY_ERROR_MESSAGE = &quot;Attributes are mandatory if Metadata is True&quot;;
+
+    public static final String SERVICETYPE_TENANTID_NAME_UNIQUE_CODE = &quot;pgr.0024&quot;;
+    public static final String SERVICETYPE_TENANTID_NAME_UNIQUE_FIELD_NAME = &quot;code&quot;;
+    public static final String SERVICETYPE_TENANTID_NAME_UNIQUE_ERROR_MESSAGE = &quot;Grievance Type Code already exists&quot;;
+
+    public static final String SERVICETYPE_DESCRIPTION_LENGTH_CODE = &quot;pgr.0050&quot;;
+    public static final String SERVICETYPE_DESCRIPTION_LENGTH_FIELD_NAME = &quot;description&quot;;
+    public static final String SERVICETYPE_DESCRIPTION_LENGTH_ERROR_MESSAGE = &quot;Description length is greater than 250 characters&quot;;
+
+    public static final String CATEGORY_ID_MANDATORY_CODE = &quot;pgr.0025&quot;;
+    public static final String CATEGORY_ID_MANDATORY_FIELD_NAME = &quot;code&quot;;
+    public static final String CATEGORY_ID_MANDATORY_ERROR_MESSAGE = &quot;Category Code is mandatory&quot;;
+
+    public static final String SLA_HOURS_MANDATORY_CODE = &quot;pgr.0020&quot;;
+    public static final String SLA_HOURS_MANDATORY_FIELD_NAME = &quot;slaHours&quot;;
+    public static final String SLA_HOURS_MANDATORY_ERROR_MESSAGE = &quot;SLA Hours is mandatory&quot;;
+
+    public static final String RECEIVINGMODE_CHANNEL_VALID_CODE = &quot;pgr.0012&quot;;
+    public static final String RECEIVINGMODE_CHANNEL_VALID__FIELD_NAME = &quot;channels&quot;;
+    public static final String RECEIVINGMODE_CHANNEL_VALID_ERROR_MESSAGE = &quot;Channels should be WEB or MOBILE.&quot;;
+
+    public static final String RECEIVINGMODE_CHANNEL_MANDATORY_CODE = &quot;pgr.0035&quot;;
+    public static final String RECEIVINGMODE_CHANNEL_MANADATORY_ERROR_MESSAGE = &quot;Channels Are Required.&quot;;
+    public static final String RECEIVINGMODE_CHANNEL_MANADATORY_FIELD_NAME = &quot;channels;&quot;;
+
+    public static final String FROMPOSITION_MANDATORY_CODE = &quot;pgr.0013&quot;;
+    public static final String FROMPOSITION_MANADATORY_ERROR_MESSAGE = &quot;From Position is required.&quot;;
+    public static final String FROMPOSITION_MANADATORY_FIELD_NAME = &quot;fromPosition&quot;;
+
+    public static final String TOPOSITION_MANDATORY_CODE = &quot;pgr.0014&quot;;
+    public static final String TOPOSITION_MANADATORY_ERROR_MESSAGE = &quot;To Position is required.&quot;;
+    public static final String TOPOSITION_MANADATORY_FIELD_NAME = &quot;toPosition&quot;;
+
+    public static final String SERVICEGROUP_CODENAME_UNIQUE_CODE = &quot;pgr.0015&quot;;
+    public static final String SERVICEGROUP_CODENAME_ERROR_MESSAGE = &quot;Service Group Code or Name already exists&quot;;
+    public static final String SERVICEGROUP_CODENAME_FIELD_NAME = &quot;name&quot;;
+
+    public static final String GRIEVANCETYPE_NAME_UNIQUE_CODE = &quot;pgr.0027&quot;;
+    public static final String GRIEVANCETYPE_NAME_UNIQUE_FIELD_NAME = &quot;serviceName&quot;;
+    public static final String GRIEVANCETYPE_NAME_UNIQUE_ERROR_MESSAGE = &quot;Grievance Type Name already exists&quot;;
+
+    public static final String RECEIVINGMODE_NAME_UNIQUE_CODE = &quot;pgr.0033&quot;;
+    public static final String RECEIVINGMODE_NAME_UNIQUE_ERROR_MESSAGE = &quot;Receiving Mode Name Already Exist.&quot;;
+    public static final String RECEIVINGMODE_NAME_UNIQUE_FIELD_NAME = &quot;name&quot;;
+
+    public static final String FROMTOPOSITION_UNIQUE_CODE = &quot;pgr.0018&quot;;
+    public static final String FROMTOPOSITION_UNIQUE_ERROR_MESSAGE = &quot;From Position and To Position cannot be same&quot;;
+    public static final String FROMTOPOSITION_UNIQUE_FIELD_NAME = &quot;toPosition&quot;;
+
+    public static final String CODENAME_UNIQUE_CODE = &quot;pgr.0019&quot;;
+    public static final String CODENAME_UNIQUE_ERROR_MESSAGE = &quot;Combination of code and name already exists&quot;;
+    public static final String CODENAME_UNIQUE_FIELD_NAME = &quot;code,name&quot;;
+
+    public String getErrorMessage(final String property) {
+<span class="nc" id="L194">        return environment.getProperty(property);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

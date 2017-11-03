@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeDefinitionQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.querybuilder</a> &gt; <span class="el_source">AttributeDefinitionQueryBuilder.java</span></div><h1>AttributeDefinitionQueryBuilder.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.querybuilder;
+
+import org.egov.pgr.domain.model.AttributeDefinition;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L7">public class AttributeDefinitionQueryBuilder {</span>
+
+    public String findByServiceCodeAndTenantId(){
+
+<span class="nc" id="L11">        StringBuilder query = new StringBuilder(&quot;SELECT * FROM attribute_definition WHERE tenantid = :tenantid AND servicecode = :servicecode&quot;);</span>
+
+<span class="nc" id="L13">        return query.toString();</span>
+    }
+
+    public String getInsertQuery(){
+<span class="nc" id="L17">        return &quot;INSERT INTO attribute_definition (code, datatype, variable, required, datatypedescription, ordernum, description, servicecode, active, tenantid, createddate, createdby, lastmodifieddate, lastmodifiedby)&quot;</span>
+                + &quot; VALUES (:code, :datatype, :variable, :required, :datatypedescription, :ordernum, :description, :servicecode, :active, :tenantid, :createddate, :createdby, :lastmodifieddate, :lastmodifiedby)&quot;;
+    }
+    
+    public String getCodeTenantQuery(AttributeDefinition attributeDefinition){
+
+<span class="nc" id="L23">        StringBuilder query = new StringBuilder(&quot;SELECT * FROM attribute_definition WHERE tenantid = :tenantid&quot; );</span>
+
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if(!attributeDefinition.isAttributCodeAbsent())</span>
+<span class="nc" id="L26">            addWhereClauseWithAnd(query,&quot;upper(code)&quot;,&quot;code&quot;);</span>
+
+
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if(!attributeDefinition.isServiceCodeAbsent())</span>
+<span class="nc" id="L30">        	addWhereClauseWithAnd(query, &quot;upper(servicecode)&quot;, &quot;servicecode&quot;);</span>
+
+<span class="nc" id="L32">        return query.toString();</span>
+    }
+    
+    private StringBuilder addWhereClauseWithAnd(StringBuilder query, String fieldName, String paramName){
+<span class="nc" id="L36">        return query.append(&quot; AND &quot;).append(fieldName).append(&quot;= :&quot;).append(paramName);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

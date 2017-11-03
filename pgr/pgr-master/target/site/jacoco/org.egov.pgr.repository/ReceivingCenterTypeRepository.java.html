@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingCenterTypeRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">ReceivingCenterTypeRepository.java</span></div><h1>ReceivingCenterTypeRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.repository;
+
+import org.egov.pgr.domain.model.ReceivingCenterType;
+import org.egov.pgr.repository.builder.ReceivingCenterTypeQueryBuilder;
+import org.egov.pgr.repository.rowmapper.ReceivingCenterTypeRowMapper;
+import org.egov.pgr.web.contract.ReceivingCenterTypeGetReq;
+import org.egov.pgr.web.contract.ReceivingCenterTypeReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Repository
+<span class="fc" id="L60">public class ReceivingCenterTypeRepository {</span>
+
+<span class="fc" id="L62">    public static final Logger LOGGER = LoggerFactory.getLogger(ReceivingCenterTypeRepository.class);</span>
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ReceivingCenterTypeQueryBuilder receivingCenterQueryBuilder;
+
+    @Autowired
+    private ReceivingCenterTypeRowMapper receivingCenterRowMapper;
+
+    public ReceivingCenterTypeReq persistReceivingCenterType(final ReceivingCenterTypeReq centerTypeRequest) {
+<span class="fc" id="L74">        LOGGER.info(&quot;ReceivingCenterType Create Request::&quot; + centerTypeRequest);</span>
+<span class="fc" id="L75">        final String receivingCenterTypeInsert = ReceivingCenterTypeQueryBuilder.insertReceivingCenterTypeQuery();</span>
+<span class="fc" id="L76">        final ReceivingCenterType centerType = centerTypeRequest.getCenterType();</span>
+
+<span class="fc" id="L78">        final Object[] obj = new Object[]{centerType.getCode(), centerType.getName(), centerType.getDescription(),</span>
+<span class="fc" id="L79">                centerType.getIscrnrequired(), centerType.getOrderno(), centerType.getActive(),</span>
+<span class="fc" id="L80">                Long.valueOf(centerTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L81">                Long.valueOf(centerTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L82">                new Date(new java.util.Date().getTime()), new Date(new java.util.Date().getTime()),</span>
+<span class="fc" id="L83">                centerType.getTenantId()};</span>
+
+<span class="fc" id="L85">        jdbcTemplate.update(receivingCenterTypeInsert, obj);</span>
+<span class="fc" id="L86">        return centerTypeRequest;</span>
+    }
+
+    public ReceivingCenterTypeReq persistModifyReceivingCenterType(final ReceivingCenterTypeReq centerTypeRequest) {
+<span class="nc" id="L90">        LOGGER.info(&quot;ReceivingCenterType Update Request::&quot; + centerTypeRequest);</span>
+<span class="nc" id="L91">        final String receivingCenterTypeUpdate = ReceivingCenterTypeQueryBuilder.updateReceivingCenterTypeQuery();</span>
+<span class="nc" id="L92">        final ReceivingCenterType centerType = centerTypeRequest.getCenterType();</span>
+<span class="nc" id="L93">        final Object[] obj = new Object[]{centerType.getName(), centerType.getDescription(),</span>
+<span class="nc" id="L94">                centerType.getIscrnrequired(), centerType.getOrderno(), centerType.getActive(),</span>
+<span class="nc" id="L95">                Long.valueOf(centerTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="nc" id="L96">                new Date(new java.util.Date().getTime()), centerType.getCode()};</span>
+<span class="nc" id="L97">        jdbcTemplate.update(receivingCenterTypeUpdate, obj);</span>
+<span class="nc" id="L98">        return centerTypeRequest;</span>
+
+    }
+
+    public List&lt;ReceivingCenterType&gt; getAllReceivingCenterTypes(final ReceivingCenterTypeGetReq centerTypeGetRequest) {
+<span class="fc" id="L103">        LOGGER.info(&quot;ReceivingCenterType search Request::&quot; + centerTypeGetRequest);</span>
+<span class="fc" id="L104">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L105">        final String queryStr = receivingCenterQueryBuilder.getQuery(centerTypeGetRequest, preparedStatementValues);</span>
+<span class="fc" id="L106">        final List&lt;ReceivingCenterType&gt; receivingCenterTypes = jdbcTemplate.query(queryStr,</span>
+<span class="fc" id="L107">                preparedStatementValues.toArray(), receivingCenterRowMapper);</span>
+<span class="fc" id="L108">        return receivingCenterTypes;</span>
+    }
+
+    public boolean checkReceivingCenterTypeByCode(final String code, final String tenantId) {
+<span class="nc" id="L112">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+        // preparedStatementValues.add(id);
+<span class="nc" id="L115">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L116">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L117" title="All 4 branches missed.">        if ((code != null &amp;&amp; code != &quot;&quot;)) {</span>
+
+<span class="nc" id="L119">            preparedStatementValues.add(code);</span>
+<span class="nc" id="L120">            query = ReceivingCenterTypeQueryBuilder.checkReceivingCenterTypeByCode();</span>
+
+        }
+        /*
+         * if(name!=null &amp;&amp; tenantId!=null){ preparedStatementValues.add(name);
+		 * query =
+		 * ReceivingCenterTypeQueryBuilder.checkReceivingCenterTypeByName(); }
+		 */
+<span class="nc" id="L128">        final List&lt;Map&lt;String, Object&gt;&gt; ceneterTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L129">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!ceneterTypes.isEmpty())</span>
+<span class="nc" id="L131">            return false;</span>
+
+<span class="nc" id="L133">        return true;</span>
+    }
+
+    public boolean checkReceivingCenterTypeByCodeAndName(String code, String name, String tenantId, String mode) {
+<span class="nc" id="L137">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+        // preparedStatementValues.add(id);
+<span class="nc" id="L140">        preparedStatementValues.add(tenantId.trim());</span>
+<span class="nc" id="L141">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L142" title="All 10 branches missed.">        if (code != null &amp;&amp; code != &quot;&quot; &amp;&amp; name != null &amp; name != &quot;&quot;) {</span>
+
+<span class="nc" id="L144">            preparedStatementValues.add(code.toUpperCase().trim());</span>
+<span class="nc" id="L145">            preparedStatementValues.add(name.toUpperCase().toUpperCase());</span>
+<span class="nc" id="L146">            query = ReceivingCenterTypeQueryBuilder.checkReceivingCenterTypeByCodeName();</span>
+
+        }
+<span class="nc" id="L149">        final List&lt;Map&lt;String, Object&gt;&gt; centerTypes = jdbcTemplate.queryForList(query, preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L150" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L151">            String codeFromDB = (String) centerTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(code))</span>
+<span class="nc" id="L153">                return true;</span>
+        }
+<span class="nc bnc" id="L155" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L156">            return true;</span>
+        }
+
+<span class="nc" id="L159">        return false;</span>
+    }
+
+    public boolean checkReceivingCenterNameExists(ReceivingCenterType receivingCenter, String mode) {
+<span class="nc" id="L163">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+        // preparedStatementValues.add(id);
+<span class="nc" id="L166">        preparedStatementValues.add(receivingCenter.getTenantId());</span>
+<span class="nc" id="L167">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L168" title="All 4 branches missed.">        if (null != receivingCenter.getName() &amp;&amp; receivingCenter.getName() != &quot;&quot;) {</span>
+<span class="nc" id="L169">            preparedStatementValues.add(receivingCenter.getName().toUpperCase().trim());</span>
+<span class="nc" id="L170">            query = ReceivingCenterTypeQueryBuilder.checkReceivingCenterTypeByName();</span>
+        }
+
+<span class="nc" id="L173">        final List&lt;Map&lt;String, Object&gt;&gt; centerTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L174">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L175" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L176">            String codeFromDB = (String) centerTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(receivingCenter.getCode()))</span>
+<span class="nc" id="L178">                return true;</span>
+        }
+<span class="nc bnc" id="L180" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L181">            return true;</span>
+        }
+<span class="nc" id="L183">        return false;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

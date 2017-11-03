@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrievanceTypeRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">GrievanceTypeRepository.java</span></div><h1>GrievanceTypeRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ *    accountability and the service delivery of the government  organizations.
+ *
+ *     Copyright (C) &lt;2015&gt;  eGovernments Foundation
+ *
+ *     The updated version of eGov suite of products as by eGovernments Foundation
+ *     is available at http://www.egovernments.org
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see http://www.gnu.org/licenses/ or
+ *     http://www.gnu.org/licenses/gpl.html .
+ *
+ *     In addition to the terms of the GPL license to be adhered to in using this
+ *     program, the following additional terms are to be complied with:
+ *
+ *         1) All versions of this program, verbatim or modified must carry this
+ *            Legal Notice.
+ *
+ *         2) Any misrepresentation of the origin of the material is prohibited. It
+ *            is required that all modified versions of this material be marked in
+ *            reasonable ways as different from the original version.
+ *
+ *         3) This license does not grant any rights to any user of the program
+ *            with regards to rights under trademark law for use of the trade names
+ *            or trademarks of eGovernments Foundation.
+ *
+ *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+package org.egov.pgr.repository;
+
+import org.egov.pgr.domain.model.Attribute;
+import org.egov.pgr.domain.model.GrievanceType;
+import org.egov.pgr.domain.model.Value;
+import org.egov.pgr.repository.builder.GrievanceTypeQueryBuilder;
+import org.egov.pgr.repository.rowmapper.GrievanceTypeRowMapper;
+import org.egov.pgr.web.contract.ServiceGetRequest;
+import org.egov.pgr.web.contract.ServiceRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Date;
+import java.util.*;
+import java.util.Map.Entry;
+
+@Repository
+<span class="fc" id="L61">public class GrievanceTypeRepository {</span>
+
+<span class="fc" id="L63">    public static final Logger LOGGER = LoggerFactory.getLogger(GrievanceTypeRepository.class);</span>
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private GrievanceTypeQueryBuilder grievanceTypeQueryBuilder;
+
+    public ServiceRequest persistServiceType(final ServiceRequest serviceRequest) {
+<span class="fc" id="L72">        LOGGER.info(&quot;Service Type Request::&quot; + serviceRequest);</span>
+<span class="nc" id="L73">        final String complaintInsert = grievanceTypeQueryBuilder.insertComplaintTypeQuery();</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        boolean active = (null != serviceRequest.getService().getActive() ? serviceRequest.getService().getActive() : true);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        boolean days = (null != serviceRequest.getService().getDays() ? serviceRequest.getService().getDays() : false);</span>
+<span class="nc" id="L76">        final Object[] object = new Object[]{serviceRequest.getService().getServiceName(),</span>
+<span class="nc" id="L77">                serviceRequest.getService().getServiceCode(), serviceRequest.getService().getDescription(), active, serviceRequest.getService().getSlaHours(),</span>
+<span class="nc" id="L78">                serviceRequest.getService().getTenantId(), serviceRequest.getService().getType(),</span>
+<span class="nc" id="L79">                serviceRequest.getRequestInfo().getUserInfo().getId(), new Date(new java.util.Date().getTime()), serviceRequest.getService().getCategory(), days</span>
+        };
+<span class="nc" id="L81">        jdbcTemplate.update(complaintInsert, object);</span>
+
+<span class="nc" id="L83">        final String serviceInsert = grievanceTypeQueryBuilder.insertServiceTypeQuery();</span>
+<span class="nc" id="L84">        final Object[] obj = new Object[]{serviceRequest.getService().getServiceCode(),</span>
+<span class="nc" id="L85">                serviceRequest.getService().getTenantId(), serviceRequest.getRequestInfo().getUserInfo().getId(),</span>
+<span class="nc" id="L86">                new Date(new java.util.Date().getTime())};</span>
+<span class="nc" id="L87">        jdbcTemplate.update(serviceInsert, obj);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (serviceRequest.getService().isMetadata()) {</span>
+<span class="nc" id="L89">            persistAttributeValues(serviceRequest);</span>
+        }
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (null != serviceRequest.getService().getKeywords()) {</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (serviceRequest.getService().getKeywords().size() &gt; 0) {</span>
+<span class="nc" id="L93">                persistKeywordServiceCodeMapping(serviceRequest);</span>
+            }
+        }
+<span class="nc" id="L96">        return serviceRequest;</span>
+    }
+
+    private void persistAttributeValues(ServiceRequest serviceRequest) {
+<span class="nc" id="L100">        final String serviceInsertAttribValues = GrievanceTypeQueryBuilder.insertServiceTypeQueryAttribValues();</span>
+<span class="nc" id="L101">        List&lt;Attribute&gt; attributeList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (null != serviceRequest.getService().getAttributes()) {</span>
+<span class="nc" id="L103">            attributeList = serviceRequest.getService().getAttributes();</span>
+        }
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        for (int i = 0; i &lt; attributeList.size(); i++) {</span>
+<span class="nc" id="L106">            Attribute attribute = attributeList.get(i);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            final Object[] obj1 = new Object[]{attribute.getCode(), attribute.getVariable() ? &quot;Y&quot; : &quot;N&quot;,</span>
+<span class="nc" id="L108">                    attribute.getDatatype(), attribute.getDescription(), attribute.getDatatypeDescription(),</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                    serviceRequest.getService().getServiceCode(), attribute.getRequired() ? &quot;Y&quot; : &quot;N&quot;,</span>
+<span class="nc" id="L110">                    attribute.getGroupCode(), serviceRequest.getService().getTenantId(),</span>
+<span class="nc" id="L111">                    serviceRequest.getRequestInfo().getUserInfo().getId(), new Date(new java.util.Date().getTime())};</span>
+<span class="nc" id="L112">            jdbcTemplate.update(serviceInsertAttribValues, obj1);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (null != attribute.getAttributes()) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                if (attribute.getAttributes().size() &gt; 0) {</span>
+<span class="nc" id="L115">                    final String valueInsertQuery = GrievanceTypeQueryBuilder.insertValueDefinitionQuery();</span>
+<span class="nc" id="L116">                    List&lt;Value&gt; valueList = attribute.getAttributes();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                    for (int j = 0; j &lt; valueList.size(); j++) {</span>
+<span class="nc" id="L118">                        Value value = valueList.get(j);</span>
+<span class="nc" id="L119">                        final Object[] obj2 = new Object[]{serviceRequest.getService().getServiceCode(),</span>
+<span class="nc" id="L120">                                attribute.getCode(), value.getKey(), value.getName(),</span>
+<span class="nc" id="L121">                                serviceRequest.getService().getTenantId(), new Date(new java.util.Date().getTime()),</span>
+<span class="nc" id="L122">                                serviceRequest.getRequestInfo().getUserInfo().getId()};</span>
+<span class="nc" id="L123">                        jdbcTemplate.update(valueInsertQuery, obj2);</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L128">    }</span>
+
+    private void persistKeywordServiceCodeMapping(ServiceRequest serviceRequest) {
+<span class="nc" id="L131">        GrievanceType grievanceType = serviceRequest.getService();</span>
+<span class="nc" id="L132">        final String serviceKeywordMappingQuery = GrievanceTypeQueryBuilder.insertServiceKeyworkMappingQuery();</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        for (int i = 0; i &lt; grievanceType.getKeywords().size(); i++) {</span>
+<span class="nc" id="L134">            final Object[] obj1 = new Object[]{grievanceType.getServiceCode(), grievanceType.getKeywords().get(i), grievanceType.getTenantId(),</span>
+<span class="nc" id="L135">                    serviceRequest.getRequestInfo().getUserInfo().getId(),</span>
+<span class="nc" id="L136">                    new Date(new java.util.Date().getTime())};</span>
+<span class="nc" id="L137">            jdbcTemplate.update(serviceKeywordMappingQuery, obj1);</span>
+        }
+<span class="nc" id="L139">    }</span>
+
+    public ServiceRequest persistModifyServiceType(final ServiceRequest serviceRequest) {
+<span class="nc" id="L142">        LOGGER.info(&quot;Service Type Request::&quot; + serviceRequest);</span>
+<span class="nc" id="L143">        final String serviceTypeUpdate = GrievanceTypeQueryBuilder.updateServiceTypeQuery();</span>
+<span class="nc" id="L144">        final GrievanceType grievanceType = serviceRequest.getService();</span>
+<span class="nc" id="L145">        final Object[] obj = new Object[]{grievanceType.getServiceName(),</span>
+<span class="nc" id="L146">                grievanceType.getDescription(), grievanceType.getCategory(), grievanceType.getSlaHours(), grievanceType.getActive(), grievanceType.isHasFinancialImpact(), grievanceType.getDays(), serviceRequest.getRequestInfo().getUserInfo().getId(),</span>
+<span class="nc" id="L147">                new Date(new java.util.Date().getTime()), grievanceType.getServiceCode(), grievanceType.getTenantId()};</span>
+<span class="nc" id="L148">        jdbcTemplate.update(serviceTypeUpdate, obj);</span>
+<span class="nc" id="L149">        final String valueRemove = GrievanceTypeQueryBuilder.removeValueQuery();</span>
+<span class="nc" id="L150">        final Object[] objValueRemove = new Object[]{grievanceType.getServiceCode(), grievanceType.getTenantId()};</span>
+<span class="nc" id="L151">        jdbcTemplate.update(valueRemove, objValueRemove);</span>
+<span class="nc" id="L152">        final String attributeRemove = GrievanceTypeQueryBuilder.removeAttributeQuery();</span>
+<span class="nc" id="L153">        final Object[] objAttributeRemove = new Object[]{grievanceType.getServiceCode(), grievanceType.getTenantId()};</span>
+<span class="nc" id="L154">        jdbcTemplate.update(attributeRemove, objAttributeRemove);</span>
+<span class="nc" id="L155">        final String serviceKeywordRemove = GrievanceTypeQueryBuilder.removeServiceKeywordMapping();</span>
+<span class="nc" id="L156">        final Object[] objserviceKeywordRemove = new Object[]{grievanceType.getServiceCode(), grievanceType.getTenantId()};</span>
+<span class="nc" id="L157">        jdbcTemplate.update(serviceKeywordRemove, objserviceKeywordRemove);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (serviceRequest.getService().isMetadata()) {</span>
+<span class="nc" id="L159">            persistAttributeValues(serviceRequest);</span>
+        }
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (null != serviceRequest.getService().getKeywords()) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            if (serviceRequest.getService().getKeywords().size() &gt; 0) {</span>
+<span class="nc" id="L163">                persistKeywordServiceCodeMapping(serviceRequest);</span>
+            }
+        }
+<span class="nc" id="L166">        return serviceRequest;</span>
+
+    }
+
+    public boolean checkServiceByNameAndCode(final String code, final String name, final String tenantId) {
+<span class="nc" id="L171">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L172">        preparedStatementValues.add(name);</span>
+<span class="nc" id="L173">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L174">        preparedStatementValues.add(code);</span>
+<span class="nc" id="L175">        final String query = GrievanceTypeQueryBuilder.selectServiceNameAndCodeQuery();</span>
+<span class="nc" id="L176">        final List&lt;Map&lt;String, Object&gt;&gt; serviceTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L177">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (!serviceTypes.isEmpty())</span>
+<span class="nc" id="L179">            return false;</span>
+<span class="nc" id="L180">        return true;</span>
+    }
+
+    public boolean checkServiceCodeIfExists(final String serviceCode, final String tenantId) {
+<span class="nc" id="L184">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L185">        preparedStatementValues.add(serviceCode);</span>
+<span class="nc" id="L186">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L187">        final String query = GrievanceTypeQueryBuilder.checkServiceCodeIfExists();</span>
+<span class="nc" id="L188">        final List&lt;Map&lt;String, Object&gt;&gt; serviceTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L189">                preparedStatementValues.toArray());</span>
+<span class="nc" id="L190">        final String query2 = GrievanceTypeQueryBuilder.checkComplaintCodeIfExists();</span>
+<span class="nc" id="L191">        final List&lt;Map&lt;String, Object&gt;&gt; serviceTypes2 = jdbcTemplate.queryForList(query2,</span>
+<span class="nc" id="L192">                preparedStatementValues.toArray());</span>
+
+<span class="nc bnc" id="L194" title="All 4 branches missed.">        if (!serviceTypes.isEmpty() &amp;&amp; !serviceTypes2.isEmpty())</span>
+<span class="nc" id="L195">            return true;</span>
+<span class="nc" id="L196">        return false;</span>
+    }
+
+    public boolean checkComplaintNameIfExists(final String serviceName, final String tenantId, final String serviceCode, String mode) {
+<span class="nc" id="L200">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L201">        preparedStatementValues.add(serviceName.toUpperCase().trim());</span>
+<span class="nc" id="L202">        preparedStatementValues.add(tenantId);</span>
+
+<span class="nc" id="L204">        final String query = GrievanceTypeQueryBuilder.checkServiceNameIfExists();</span>
+<span class="nc" id="L205">        final List&lt;Map&lt;String, Object&gt;&gt; serviceTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L206">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">        if (!serviceTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L208">            String codeFromDB = (String) serviceTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(serviceCode))</span>
+<span class="nc" id="L210">                return true;</span>
+        }
+<span class="nc bnc" id="L212" title="All 4 branches missed.">        if (!serviceTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L213">            return true;</span>
+        }
+<span class="nc" id="L215">        return false;</span>
+    }
+
+    public boolean checkComplaintCodeNameIfExists(final String serviceName, final String tenantId, final String serviceCode, String mode) {
+<span class="nc" id="L219">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L220">        preparedStatementValues.add(serviceName.toUpperCase().trim());</span>
+<span class="nc" id="L221">        preparedStatementValues.add(serviceCode.toUpperCase().trim());</span>
+<span class="nc" id="L222">        preparedStatementValues.add(tenantId);</span>
+
+<span class="nc" id="L224">        final String query = GrievanceTypeQueryBuilder.checkServiceCodeNameIfExists();</span>
+<span class="nc" id="L225">        final List&lt;Map&lt;String, Object&gt;&gt; serviceTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L226">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">        if (!serviceTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L228">            return true;</span>
+        }
+<span class="nc" id="L230">        return false;</span>
+    }
+
+    public List&lt;GrievanceType&gt; findForCriteria(final ServiceGetRequest serviceTypeGetRequest) {
+<span class="nc" id="L234">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L235">        String queryStr = grievanceTypeQueryBuilder.getQuery(serviceTypeGetRequest, preparedStatementValues);</span>
+<span class="nc" id="L236">        GrievanceTypeRowMapper serviceTypeRowMapper = new GrievanceTypeRowMapper();</span>
+<span class="nc" id="L237">        jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), serviceTypeRowMapper);</span>
+<span class="nc" id="L238">        return assembleServiceTypeObject(serviceTypeRowMapper);</span>
+    }
+
+    private List&lt;GrievanceType&gt; assembleServiceTypeObject(GrievanceTypeRowMapper rowMapper) {
+<span class="nc" id="L242">        final String separator = &quot;&gt;&quot;;</span>
+<span class="nc" id="L243">        List&lt;GrievanceType&gt; grievanceTypeList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L244">        Set&lt;Entry&lt;String, GrievanceType&gt;&gt; sMapEntrySet = rowMapper.serviceMap.entrySet();</span>
+<span class="nc" id="L245">        Iterator&lt;Entry&lt;String, GrievanceType&gt;&gt; sMapItr = sMapEntrySet.iterator();</span>
+<span class="nc" id="L246">        Set&lt;Entry&lt;String, Map&lt;String, Attribute&gt;&gt;&gt; sAttrEntrySet = rowMapper.serviceAttrib.entrySet();</span>
+<span class="nc" id="L247">        Iterator&lt;Entry&lt;String, Map&lt;String, Attribute&gt;&gt;&gt; sAttrItr = sAttrEntrySet.iterator();</span>
+<span class="nc" id="L248">        Set&lt;Entry&lt;String, List&lt;Value&gt;&gt;&gt; attrValueEntrySet = rowMapper.attribValue.entrySet();</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        while (sMapItr.hasNext()) {</span>
+<span class="nc" id="L250">            Entry&lt;String, GrievanceType&gt; srvEntry = sMapItr.next();</span>
+<span class="nc" id="L251">            GrievanceType grievanceType = srvEntry.getValue();</span>
+<span class="nc" id="L252">            List&lt;String&gt; keywordsList = getKeywordsForService(grievanceType);</span>
+<span class="nc" id="L253">            grievanceType.setKeywords(keywordsList);</span>
+<span class="nc" id="L254">            grievanceTypeList.add(grievanceType);</span>
+<span class="nc" id="L255">        }</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        for (int i = 0; i &lt; grievanceTypeList.size(); i++) {</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">            while (sAttrItr.hasNext()) {</span>
+<span class="nc" id="L258">                Entry&lt;String, Map&lt;String, Attribute&gt;&gt; attrEntry = sAttrItr.next();</span>
+<span class="nc" id="L259">                List&lt;Attribute&gt; attributeList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">                if (grievanceTypeList.get(i).getServiceCode().equals(attrEntry.getKey())) {</span>
+<span class="nc" id="L261">                    Iterator&lt;Entry&lt;String, Attribute&gt;&gt; attrInnerItr = attrEntry.getValue().entrySet().iterator();</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">                    while (attrInnerItr.hasNext()) {</span>
+<span class="nc" id="L263">                        Entry&lt;String, Attribute&gt; attrInnerEntry = attrInnerItr.next();</span>
+<span class="nc" id="L264">                        Attribute attribute = attrInnerEntry.getValue();</span>
+<span class="nc" id="L265">                        Iterator&lt;Entry&lt;String, List&lt;Value&gt;&gt;&gt; attrValueItr = attrValueEntrySet.iterator();</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">                        while (attrValueItr.hasNext()) {</span>
+<span class="nc" id="L267">                            Entry&lt;String, List&lt;Value&gt;&gt; valueEntry = attrValueItr.next();</span>
+<span class="nc" id="L268">                            if (grievanceTypeList.get(i).getServiceCode().concat(separator + attribute.getCode())</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">                                    .equals(valueEntry.getKey())) {</span>
+<span class="nc" id="L270">                                attribute.setAttributes(valueEntry.getValue());</span>
+                            }
+<span class="nc" id="L272">                        }</span>
+<span class="nc" id="L273">                        attributeList.add(attribute);</span>
+<span class="nc" id="L274">                    }</span>
+                }
+<span class="nc" id="L276">                grievanceTypeList.get(i).setAttributes(attributeList);</span>
+<span class="nc" id="L277">                grievanceTypeList.get(i).setMetadata(true);</span>
+<span class="nc" id="L278">            }</span>
+        }
+<span class="nc" id="L280">        return grievanceTypeList;</span>
+    }
+
+    public List&lt;String&gt; getKeywordsForService(GrievanceType grievanceType) {
+<span class="nc" id="L284">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L285">        String queryStr = grievanceTypeQueryBuilder.fetchServiceKeywords();</span>
+<span class="nc" id="L286">        preparedStatementValues.add(grievanceType.getServiceCode());</span>
+<span class="nc" id="L287">        preparedStatementValues.add(grievanceType.getTenantId());</span>
+<span class="nc" id="L288">        List&lt;String&gt; keywords = new ArrayList&lt;&gt;();</span>
+        try {
+<span class="nc" id="L290">            keywords = jdbcTemplate.queryForList(queryStr, preparedStatementValues.toArray(), String.class);</span>
+<span class="nc" id="L291">        } catch (EmptyResultDataAccessException ex) {</span>
+<span class="nc" id="L292">            LOGGER.info(&quot;There are no keywords available for the Service Code : &quot; + ex);</span>
+<span class="nc" id="L293">        } catch (Exception e) {</span>
+<span class="nc" id="L294">            LOGGER.error(&quot;Encountered an Exception : &quot; + e);</span>
+<span class="nc" id="L295">        }</span>
+<span class="nc" id="L296">        return keywords;</span>
+    }
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

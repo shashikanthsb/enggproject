@@ -1,0 +1,57 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    links:
+      - zookeeper:zk
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_CREATE_TOPICS: "ap.public.mseva.validated:1:1,ap.public.mseva.assigned:1:1,ap.public.mseva.locationassigned:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zk:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  postgres:
+    image: postgres:9.4
+    environment:
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/pg/data/
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pg-container-data:/var/lib/pg/data
+
+  location:
+    image: egovio/location:latest
+    ports:
+      - "8080:8080"
+    links:
+      - kafka
+      - postgres:pghost
+    environment:
+      - DB_HOST=pghost
+      - DB_PORT=5432
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - DB_PASSWORD=mypass
+      - REDIS_HOST=redis
+      - CORS_ENABLED=true
+      - MASTER_SERVER=false
+
+  locationenrichment:
+    image: egovio/locationenrichment:latest
+    ports:
+      - "9090:8080"
+    links:
+      - kafka

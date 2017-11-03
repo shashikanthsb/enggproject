@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingModeTypeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.service</a> &gt; <span class="el_source">ReceivingModeTypeService.java</span></div><h1>ReceivingModeTypeService.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.pgr.domain.model.ReceivingModeType;
+import org.egov.pgr.producers.PGRProducer;
+import org.egov.pgr.repository.ReceivingModeTypeRepository;
+import org.egov.pgr.web.contract.ReceivingModeTypeGetReq;
+import org.egov.pgr.web.contract.ReceivingModeTypeReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+<span class="fc" id="L58">public class ReceivingModeTypeService {</span>
+
+<span class="fc" id="L60">    public static final Logger logger = LoggerFactory.getLogger(ReceivingCenterTypeService.class);</span>
+
+    @Autowired
+    private ReceivingModeTypeRepository receivingModeRepository;
+
+    @Autowired
+    private PGRProducer pgrProducer;
+
+    public ReceivingModeTypeReq create(final ReceivingModeTypeReq modeTypeReq) {
+<span class="fc" id="L69">        return receivingModeRepository.persistReceivingModeType(modeTypeReq);</span>
+    }
+
+    public ReceivingModeTypeReq update(final ReceivingModeTypeReq modeTypeReq) {
+<span class="fc" id="L73">        return receivingModeRepository.persistModifyReceivingModeType(modeTypeReq);</span>
+    }
+
+    public List&lt;ReceivingModeType&gt; getAllReceivingModeTypes(final ReceivingModeTypeGetReq modeTypeGetRequest) {
+<span class="fc" id="L77">        return receivingModeRepository.getAllReceivingModeTypes(modeTypeGetRequest);</span>
+
+    }
+
+    public boolean checkReceivingModeTypeByNameAndCode(final String code, final String name, final String tenantId, String mode) {
+<span class="nc" id="L82">        return receivingModeRepository.checkReceivingModeTypeByNameAndCode(code, name, tenantId, mode);</span>
+    }
+
+    public boolean checkReceivingModeTypeByName(final String code, final String name, final String tenantId, final String mode) {
+<span class="nc" id="L86">        return receivingModeRepository.checkReceivingModeTypeByName(code, name, tenantId, mode);</span>
+    }
+
+    public boolean checkReceivingModeTypeByCode(final String code, final String tenantId, final String mode) {
+<span class="nc" id="L90">        return receivingModeRepository.checkReceivingModeTypeByCode(code, tenantId, mode);</span>
+    }
+
+
+    public ReceivingModeType sendMessage(String topic, String key, final ReceivingModeTypeReq modeTypeRequest) {
+
+<span class="fc" id="L96">        final ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L97">        String receivingModeValue = null;</span>
+
+        try {
+<span class="fc" id="L100">            logger.info(&quot;createReceivingCModeType Request::&quot; + modeTypeRequest);</span>
+<span class="fc" id="L101">            receivingModeValue = mapper.writeValueAsString(modeTypeRequest);</span>
+<span class="fc" id="L102">            logger.info(&quot;receivingModeValue::&quot; + receivingModeValue);</span>
+<span class="nc" id="L103">        } catch (final JsonProcessingException e) {</span>
+<span class="nc" id="L104">            logger.error(&quot;Exception Encountered : &quot; + e);</span>
+<span class="fc" id="L105">        }</span>
+        try {
+<span class="fc" id="L107">            pgrProducer.sendMessage(topic, key, receivingModeValue);</span>
+<span class="nc" id="L108">        } catch (final Exception ex) {</span>
+<span class="nc" id="L109">            logger.error(&quot;Exception Encountered : &quot; + ex);</span>
+<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">        return modeTypeRequest.getModeType();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

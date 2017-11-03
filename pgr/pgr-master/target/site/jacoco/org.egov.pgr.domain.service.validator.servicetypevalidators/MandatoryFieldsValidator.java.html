@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MandatoryFieldsValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service.validator.servicetypevalidators</a> &gt; <span class="el_source">MandatoryFieldsValidator.java</span></div><h1>MandatoryFieldsValidator.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service.validator.servicetypevalidators;
+
+import org.egov.common.contract.response.ErrorField;
+import org.egov.pgr.domain.exception.InvalidServiceTypeException;
+import org.egov.pgr.domain.model.ServiceType;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+<span class="nc" id="L12">public class MandatoryFieldsValidator implements ServiceTypeValidator {</span>
+
+    private static final String TENANT_MESSAGE = &quot;Tenant id is mandatory&quot;;
+    private static final String TENANT_CODE = &quot;PGR.TENANT_ID_MANDATORY&quot;;
+    private static final String TENANT_FIELD_NAME = &quot;serviceType.tenantId&quot;;
+
+    private static final String MESSAGE = &quot;Service Code is mandatory&quot;;
+    private static final String CODE = &quot;PGR.SERVICE_CODE_MANDATORY&quot;;
+    private static final String FIELD_NAME = &quot;serviceType.serviceCode&quot;;
+
+    private static final String SERVICE_NAME_MESSAGE = &quot;Service Name is mandatory&quot;;
+    private static final String SERVICE_NAME_CODE = &quot;PGR.SERVICE_NAME_MANDATORY&quot;;
+    private static final String SERVICE_NAME_FIELD_NAME = &quot;serviceType.serviceCode&quot;;
+
+    private static final String SERVICE_CATEGORY_MESSAGE = &quot;Service Category is mandatory&quot;;
+    private static final String SERVICE_CATEGORY_CODE = &quot;PGR.SERVICE_CATEGORY_MANDATORY&quot;;
+    private static final String SERVICE_CATEGORY_FIELD_NAME = &quot;serviceType.category&quot;;
+
+
+    @Override
+    public boolean canValidate(ServiceType serviceType) {
+<span class="nc" id="L33">        return serviceType.isUpdate();</span>
+    }
+
+    @Override
+    public void validate(ServiceType serviceType) {
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if(!getErrorFields(serviceType).isEmpty())</span>
+<span class="nc" id="L39">            throw new InvalidServiceTypeException(getErrorFields(serviceType));</span>
+<span class="nc" id="L40">    }</span>
+
+    private List&lt;ErrorField&gt; getErrorFields(ServiceType model){
+
+<span class="nc" id="L44">        List&lt;ErrorField&gt; errorFields = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L46">        updateValidations(model, errorFields);</span>
+
+<span class="nc" id="L48">        return  errorFields;</span>
+    }
+
+    private void updateValidations(ServiceType model, List&lt;ErrorField&gt; errorFields){
+<span class="nc" id="L52">        addTenantIdMandatoryError(model, errorFields);</span>
+<span class="nc" id="L53">        addServiceCodeMandatoryError(model, errorFields);</span>
+<span class="nc" id="L54">        addServiceNameMandatoryError(model, errorFields);</span>
+<span class="nc" id="L55">        addServiceCategoryMandatoryError(model, errorFields);</span>
+<span class="nc" id="L56">    }</span>
+
+    private void addTenantIdMandatoryError(ServiceType model, List&lt;ErrorField&gt; errorFields){
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if(!model.isTenantIdAbsent())</span>
+<span class="nc" id="L60">            return;</span>
+
+<span class="nc" id="L62">        final ErrorField error = ErrorField.builder()</span>
+<span class="nc" id="L63">                .code(TENANT_CODE)</span>
+<span class="nc" id="L64">                .field(TENANT_FIELD_NAME)</span>
+<span class="nc" id="L65">                .message(TENANT_MESSAGE)</span>
+<span class="nc" id="L66">                .build();</span>
+
+<span class="nc" id="L68">        errorFields.add(error);</span>
+<span class="nc" id="L69">    }</span>
+
+    private void addServiceCodeMandatoryError(ServiceType model, List&lt;ErrorField&gt; errorFields){
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if(!model.isServiceCodeAbsent())</span>
+<span class="nc" id="L73">            return;</span>
+
+<span class="nc" id="L75">        final ErrorField error = ErrorField.builder()</span>
+<span class="nc" id="L76">                .code(CODE)</span>
+<span class="nc" id="L77">                .field(FIELD_NAME)</span>
+<span class="nc" id="L78">                .message(MESSAGE)</span>
+<span class="nc" id="L79">                .build();</span>
+
+<span class="nc" id="L81">        errorFields.add(error);</span>
+<span class="nc" id="L82">    }</span>
+
+    private void addServiceNameMandatoryError(ServiceType model, List&lt;ErrorField&gt; errorFields){
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if(!model.isServiceNameAbsent())</span>
+<span class="nc" id="L86">            return;</span>
+
+<span class="nc" id="L88">        final ErrorField error = ErrorField.builder()</span>
+<span class="nc" id="L89">                .code(SERVICE_NAME_CODE)</span>
+<span class="nc" id="L90">                .field(SERVICE_NAME_FIELD_NAME)</span>
+<span class="nc" id="L91">                .message(SERVICE_NAME_MESSAGE)</span>
+<span class="nc" id="L92">                .build();</span>
+
+<span class="nc" id="L94">        errorFields.add(error);</span>
+<span class="nc" id="L95">    }</span>
+
+    private void addServiceCategoryMandatoryError(ServiceType model, List&lt;ErrorField&gt; errorFields){
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if(!model.isCategoryAbsent())</span>
+<span class="nc" id="L99">            return;</span>
+
+<span class="nc" id="L101">        final ErrorField error = ErrorField.builder()</span>
+<span class="nc" id="L102">                .code(SERVICE_CATEGORY_CODE)</span>
+<span class="nc" id="L103">                .field(SERVICE_CATEGORY_FIELD_NAME)</span>
+<span class="nc" id="L104">                .message(SERVICE_CATEGORY_MESSAGE)</span>
+<span class="nc" id="L105">                .build();</span>
+
+<span class="nc" id="L107">        errorFields.add(error);</span>
+<span class="nc" id="L108">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

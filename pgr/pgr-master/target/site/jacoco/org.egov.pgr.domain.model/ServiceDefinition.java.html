@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.model</a> &gt; <span class="el_source">ServiceDefinition.java</span></div><h1>ServiceDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.model;
+
+import static org.springframework.util.StringUtils.isEmpty;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.Builder;
+import lombok.Getter;
+
+<span class="nc" id="L13">@Builder</span>
+@Getter
+public class ServiceDefinition {
+
+<span class="nc" id="L17">    private String code;</span>
+<span class="nc" id="L18">    private String tenantId;</span>
+<span class="nc" id="L19">    private Long createdBy;</span>
+<span class="nc" id="L20">    private Date createdDate;</span>
+<span class="nc" id="L21">    private Long lastModifiedBy;</span>
+<span class="nc" id="L22">    private Date lastModifiedDate;</span>
+<span class="nc" id="L23">    private List&lt;AttributeDefinition&gt; attributes;</span>
+
+    public void setAttributes(List&lt;AttributeDefinition&gt; attributes) {
+<span class="nc" id="L26">        this.attributes = attributes;</span>
+<span class="nc" id="L27">    }</span>
+
+    public org.egov.pgr.persistence.dto.ServiceDefinition toDto(){
+<span class="nc" id="L30">        return org.egov.pgr.persistence.dto.ServiceDefinition.builder()</span>
+<span class="nc" id="L31">                    .code(code.trim())</span>
+<span class="nc" id="L32">                    .tenantId(tenantId)</span>
+<span class="nc" id="L33">                    .createdBy(createdBy)</span>
+<span class="nc" id="L34">                    .createdDate(createdDate)</span>
+<span class="nc" id="L35">                    .build();</span>
+    }
+     
+    
+    public boolean isTenantIdLengthMatch(){
+<span class="nc bnc" id="L40" title="All 6 branches missed.">        return (!isEmpty(tenantId) &amp;&amp; (tenantId.length() &gt; 0 &amp;&amp; tenantId.length() &lt;= 256));</span>
+    }
+    
+    public boolean isCodeLengthMatch(){
+<span class="nc bnc" id="L44" title="All 6 branches missed.">        return (!isEmpty(code) &amp;&amp; (code.length() &gt; 0 &amp;&amp; code.length() &lt;= 20));</span>
+    }
+    
+    public boolean isTenantIdAbsent(){
+<span class="nc bnc" id="L48" title="All 4 branches missed.">        return isEmpty(tenantId) || tenantId == null;</span>
+    }
+    
+    public boolean isCodeAbsent(){
+<span class="nc bnc" id="L52" title="All 4 branches missed.">        return isEmpty(code) || code == null;</span>
+    }
+    
+    
+    public boolean valueDefinMandatoryFieldValidation(ServiceDefinition serviceDefinition) {
+<span class="nc" id="L57">		List&lt;String&gt; attributeServiceCodes = serviceDefinition.getAttributes().stream().map(attribute -&gt; attribute.getServiceCode())</span>
+<span class="nc" id="L58">		.collect(Collectors.toList());</span>
+<span class="nc" id="L59">		List&lt;String&gt; serviceDefinitionCode = Collections.singletonList(code);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">		return !attributeServiceCodes.stream().allMatch(serviceDefinitionCode::contains);</span>
+				
+		
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

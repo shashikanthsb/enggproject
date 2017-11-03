@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValueDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.model</a> &gt; <span class="el_source">ValueDefinition.java</span></div><h1>ValueDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.model;
+
+import static org.springframework.util.StringUtils.isEmpty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+<span class="nc" id="L10">@AllArgsConstructor</span>
+<span class="nc" id="L11">@Builder</span>
+public class ValueDefinition {
+<span class="nc" id="L13">    private String name;</span>
+<span class="nc" id="L14">    private String key;</span>
+<span class="nc" id="L15">    private boolean active;</span>
+<span class="nc" id="L16">    private boolean required;</span>
+<span class="nc" id="L17">    private String serviceCode;</span>
+<span class="nc" id="L18">    private String tenantid;</span>
+<span class="nc" id="L19">    private String attributeCode;</span>
+
+    private char activeToChar(){
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        return active ? 'Y' : 'N';</span>
+    }
+
+    private char requiredToChar(){
+<span class="nc bnc" id="L26" title="All 2 branches missed.">        return required ? 'Y' : 'N';</span>
+    }
+
+    /* mandatory field validation*/
+    
+    public boolean isNameAbsent()
+    {
+<span class="nc bnc" id="L33" title="All 4 branches missed.">    	return isEmpty(name) || name == null;  </span>
+    }
+    
+    
+    public boolean isKeyAbsent()
+    {
+<span class="nc bnc" id="L39" title="All 4 branches missed.">    	return isEmpty(key) || key == null;      </span>
+    }
+    
+    
+    /* field length valiadtion*/
+    
+    public boolean isKeyLengthMatch(){
+<span class="nc bnc" id="L46" title="All 6 branches missed.">        return (!isEmpty(key) &amp;&amp; (key.length() &gt; 0 &amp;&amp; key.length() &lt;= 50));</span>
+    }
+    
+    public boolean isNameLengthMatch(){
+<span class="nc bnc" id="L50" title="All 6 branches missed.">        return (!isEmpty(name) &amp;&amp; (name.length() &gt; 0 &amp;&amp; name.length() &lt;= 100));</span>
+    }
+    
+    
+    
+
+    public org.egov.pgr.persistence.dto.ValueDefinition toDto(ServiceDefinition serviceDefinition,
+                                                              String attributeCode, String tenantId, String serviceCode){
+<span class="nc" id="L58">        return org.egov.pgr.persistence.dto.ValueDefinition.builder()</span>
+<span class="nc" id="L59">                    .name(name)</span>
+<span class="nc" id="L60">                    .key(key)</span>
+<span class="nc" id="L61">                    .serviceCode(serviceCode)</span>
+<span class="nc" id="L62">                    .tenantId(tenantId)</span>
+<span class="nc" id="L63">                    .attributeCode(attributeCode)</span>
+<span class="nc" id="L64">                    .createdBy(serviceDefinition.getCreatedBy())</span>
+<span class="nc" id="L65">                    .createdDate(serviceDefinition.getCreatedDate())</span>
+<span class="nc" id="L66">                    .lastModifiedBy(serviceDefinition.getLastModifiedBy())</span>
+<span class="nc" id="L67">                    .lastModifiedDate(serviceDefinition.getLastModifiedDate())</span>
+<span class="nc" id="L68">                    .active(activeToChar())</span>
+<span class="nc" id="L69">                    .required(requiredToChar())</span>
+<span class="nc" id="L70">                    .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

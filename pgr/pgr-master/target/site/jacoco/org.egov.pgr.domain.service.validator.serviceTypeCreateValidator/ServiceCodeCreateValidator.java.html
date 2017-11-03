@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceCodeCreateValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.domain.service.validator.serviceTypeCreateValidator</a> &gt; <span class="el_source">ServiceCodeCreateValidator.java</span></div><h1>ServiceCodeCreateValidator.java</h1><pre class="source lang-java linenums">package org.egov.pgr.domain.service.validator.serviceTypeCreateValidator;
+
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.ServiceType;
+import org.egov.pgr.persistence.repository.ServiceTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+
+@Service
+<span class="nc" id="L13">public class ServiceCodeCreateValidator implements ServiceTypeCreateValidator {</span>
+
+    public static final String FIELD = &quot;field&quot;;
+    public static final String MESSAGE = &quot;message&quot;;
+    public static final String CODE = &quot;code&quot;;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
+
+    @Override
+    public boolean canValidate(ServiceType serviceType) {
+<span class="nc" id="L23">        return true;</span>
+    }
+
+
+    @Override
+    public void checkMandatoryField(ServiceType serviceType) {
+
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (serviceType.isTenantIdAbsent()) {</span>
+<span class="nc" id="L31">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L32">            error.put(&quot;code&quot;, &quot;servicetype Validator.1&quot;);</span>
+<span class="nc" id="L33">            error.put(&quot;field&quot;, &quot;serviceType.tenantId&quot;);</span>
+<span class="nc" id="L34">            error.put(&quot;message&quot;, &quot;TenantId Required &quot;);</span>
+<span class="nc" id="L35">            throw new PGRMasterException(error);</span>
+        }
+
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (serviceType.isServiceCodeAbsent()) {</span>
+<span class="nc" id="L39">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L40">            error.put(&quot;code&quot;, &quot;servicetype Validator.2&quot;);</span>
+<span class="nc" id="L41">            error.put(&quot;field&quot;, &quot;serviceType.serviceCode&quot;);</span>
+<span class="nc" id="L42">            error.put(&quot;message&quot;, &quot;ServiceCode Required &quot;);</span>
+<span class="nc" id="L43">            throw new PGRMasterException(error);</span>
+        }
+
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (serviceType.isServiceNameAbsent()) {</span>
+<span class="nc" id="L47">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L48">            error.put(&quot;code&quot;, &quot;servicetype Vaalidator.3&quot;);</span>
+<span class="nc" id="L49">            error.put(&quot;field&quot;, &quot;serviceType.serviceName&quot;);</span>
+<span class="nc" id="L50">            error.put(&quot;message&quot;, &quot;ServiceName Required &quot;);</span>
+<span class="nc" id="L51">            throw new PGRMasterException(error);</span>
+        }
+        
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (serviceType.isKeywordAbsent()) {</span>
+<span class="nc" id="L55">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L56">            error.put(&quot;code&quot;, &quot;servicetype Vaalidator.4&quot;);</span>
+<span class="nc" id="L57">            error.put(&quot;field&quot;, &quot;serviceType.keyWord&quot;);</span>
+<span class="nc" id="L58">            error.put(&quot;message&quot;, &quot;KeyWord Required &quot;);</span>
+<span class="nc" id="L59">            throw new PGRMasterException(error);</span>
+        }
+        
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(serviceType.isKeywordValid())</span>
+        {
+<span class="nc" id="L64">        	 HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L65">             error.put(&quot;code&quot;, &quot;servicetype Vaalidator.5&quot;);</span>
+<span class="nc" id="L66">             error.put(&quot;field&quot;, &quot;serviceType.keyWord&quot;);</span>
+<span class="nc" id="L67">             error.put(&quot;message&quot;, &quot;Not a valid Required &quot;);</span>
+<span class="nc" id="L68">             throw new PGRMasterException(error);</span>
+        	
+        }
+        
+
+<span class="nc" id="L73">    }</span>
+
+    @Override
+    public void validateUniqueCombinations(ServiceType serviceType) {
+
+<span class="nc" id="L78">        List&lt;org.egov.pgr.domain.model.ServiceType&gt; serviceTypeList = serviceTypeRepository.getCodeTenantData(serviceType);</span>
+<span class="nc" id="L79">        List&lt;org.egov.pgr.domain.model.ServiceType&gt; getall = serviceTypeRepository.getData(serviceType);</span>
+
+<span class="nc" id="L81">        List&lt;org.egov.pgr.domain.model.ServiceType&gt; categoryTypeList = serviceTypeRepository.getCodeTenantDataFromCategory(serviceType);</span>
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (categoryTypeList.isEmpty()) {</span>
+<span class="nc" id="L84">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L85">            error.put(CODE, &quot;ServiceCodeValidator.&quot;);</span>
+<span class="nc" id="L86">            error.put(FIELD, &quot;serviceTypeConfiguration.category&quot;);</span>
+<span class="nc" id="L87">            error.put(MESSAGE, &quot;Mapping Not Presentt&quot;);</span>
+<span class="nc" id="L88">            throw new PGRMasterException(error);</span>
+        }
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (!serviceTypeList.isEmpty()</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                &amp;&amp; (serviceTypeList.get(0).getServiceCode().equalsIgnoreCase(serviceType.getServiceCode())</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                &amp;&amp; serviceTypeList.get(0).getTenantId().equalsIgnoreCase(serviceType.getTenantId()))) {</span>
+<span class="nc" id="L94">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L95">            error.put(CODE, &quot;ServiceCodeValidator.4&quot;);</span>
+<span class="nc" id="L96">            error.put(FIELD, &quot;serviceTypeConfiguration.serviceCode&quot;);</span>
+<span class="nc" id="L97">            error.put(MESSAGE, &quot;Data already exists&quot;);</span>
+<span class="nc" id="L98">            throw new PGRMasterException(error);</span>
+        }
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (!getall.isEmpty()</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                &amp;&amp; (getall.get(0).getServiceCode().equalsIgnoreCase(serviceType.getServiceCode())</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">                &amp;&amp; getall.get(0).getCategory() == serviceType.getCategory()</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                &amp;&amp; (getall.get(0).getServiceName().equalsIgnoreCase(serviceType.getServiceName()))</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                &amp;&amp; getall.get(0).getTenantId().equalsIgnoreCase(serviceType.getTenantId()))) {</span>
+<span class="nc" id="L106">            HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L107">            error.put(CODE, &quot;ServiceCodeValidator.5&quot;);</span>
+<span class="nc" id="L108">            error.put(FIELD, &quot;serviceTypeConfiguration.serviceCode&quot;);</span>
+<span class="nc" id="L109">            error.put(MESSAGE, &quot;Data already exists&quot;);</span>
+<span class="nc" id="L110">            throw new PGRMasterException(error);</span>
+        }
+
+<span class="nc" id="L113">    }</span>
+
+
+	@Override
+	public void lengthValidate(ServiceType serviceType) {
+		
+<span class="nc bnc" id="L119" title="All 2 branches missed.">		if(!serviceType.isTenantIdLengthMatch())	</span>
+		{
+<span class="nc" id="L121">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L122">            error.put(CODE, &quot;ServiceCodeValidator.6&quot;);</span>
+<span class="nc" id="L123">            error.put(FIELD, &quot;ServiceLengthValidator.tenant&quot;);</span>
+<span class="nc" id="L124">            error.put(MESSAGE, &quot;Tenant Id should be &gt;0 and &lt;=256&quot;);</span>
+<span class="nc" id="L125">            throw new PGRMasterException(error);</span>
+			
+		}
+<span class="nc bnc" id="L128" title="All 2 branches missed.">		if(!serviceType.isDescriptionLengthMatch())	</span>
+		{
+<span class="nc" id="L130">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L131">            error.put(CODE, &quot;ServiceCodeValidator.6&quot;);</span>
+<span class="nc" id="L132">            error.put(FIELD, &quot;ServiceLengthValidator.Description&quot;);</span>
+<span class="nc" id="L133">            error.put(MESSAGE, &quot;Description Length should be &gt;0 and &lt;=250&quot;);</span>
+<span class="nc" id="L134">            throw new PGRMasterException(error);</span>
+			
+		}
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		if(!serviceType.isCodeLengthMatch())	</span>
+		{
+<span class="nc" id="L139">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L140">            error.put(CODE, &quot;ServiceLengthValidator.7&quot;);</span>
+<span class="nc" id="L141">            error.put(FIELD, &quot;ServiceLengthValidator.Code&quot;);</span>
+<span class="nc" id="L142">            error.put(MESSAGE, &quot;Code should be &gt;0 and &lt;=20&quot;);</span>
+<span class="nc" id="L143">            throw new PGRMasterException(error);</span>
+			
+		}
+		
+<span class="nc bnc" id="L147" title="All 2 branches missed.">		if(!serviceType.isnameLengthMatch())	</span>
+		{
+<span class="nc" id="L149">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L150">            error.put(CODE, &quot;ServiceCodeValidator.9&quot;);</span>
+<span class="nc" id="L151">            error.put(FIELD, &quot;ServiceLengthValidator.name&quot;);</span>
+<span class="nc" id="L152">            error.put(MESSAGE, &quot;Name should be &gt;0 and &lt;=150&quot;);</span>
+<span class="nc" id="L153">            throw new PGRMasterException(error);</span>
+			
+		}
+<span class="nc bnc" id="L156" title="All 2 branches missed.">		if(!serviceType.isTypeLengthMatch())	</span>
+		{
+<span class="nc" id="L158">			HashMap&lt;String, String&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L159">            error.put(CODE, &quot;ServiceCodeValidator.10&quot;);</span>
+<span class="nc" id="L160">            error.put(FIELD, &quot;ServiceLengthValidator.type&quot;);</span>
+<span class="nc" id="L161">            error.put(MESSAGE, &quot;Type should be &gt;0 and &lt;=50&quot;);</span>
+<span class="nc" id="L162">            throw new PGRMasterException(error);</span>
+			
+		}
+<span class="nc" id="L165">		}</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,18 @@
+{
+    "ResponseInfo": {
+        "apiId": "1",
+        "ver": "1",
+        "resMsgId": "uief87324",
+        "msgId": "",
+        "status": "200"
+    },
+    "Department": [
+        {
+            "id": 1,
+            "name": "ADMINISTRATION",
+            "code": "ADM",
+            "active": true,
+            "tenantId": "default"
+        }
+    ]
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttributeDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.contract</a> &gt; <span class="el_source">AttributeDefinition.java</span></div><h1>AttributeDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.web.contract;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import org.egov.pgr.domain.model.ValueDefinition;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Getter
+<span class="nc" id="L13">@AllArgsConstructor</span>
+<span class="nc" id="L14">@Builder</span>
+public class AttributeDefinition {
+
+<span class="nc" id="L17">    private boolean variable;</span>
+<span class="nc" id="L18">    private String code;</span>
+<span class="nc" id="L19">    private String dataType;</span>
+<span class="nc" id="L20">    private boolean required;</span>
+<span class="nc" id="L21">    private String dataTypeDescription;</span>
+<span class="nc" id="L22">    private String description;</span>
+<span class="nc" id="L23">    private String url;</span>
+<span class="nc" id="L24">    private String groupCode;</span>
+<span class="nc" id="L25">    private Integer order;</span>
+<span class="nc" id="L26">    private String serviceCode;</span>
+<span class="nc" id="L27">    private boolean active;</span>
+<span class="nc" id="L28">    private List&lt;AttributeValueDefinition&gt; attribValues;</span>
+
+<span class="nc" id="L30">    public AttributeDefinition(org.egov.pgr.domain.model.AttributeDefinition attributeDefinition) {</span>
+<span class="nc" id="L31">        this.variable = attributeDefinition.isReadOnly();</span>
+<span class="nc" id="L32">        this.code = attributeDefinition.getCode();</span>
+<span class="nc" id="L33">        this.dataType = attributeDefinition.getDataType();</span>
+<span class="nc" id="L34">        this.required = attributeDefinition.isRequired();</span>
+<span class="nc" id="L35">        this.dataTypeDescription = attributeDefinition.getDataTypeDescription();</span>
+<span class="nc" id="L36">        this.description = attributeDefinition.getDescription();</span>
+<span class="nc" id="L37">        this.url = attributeDefinition.getUrl();</span>
+<span class="nc" id="L38">        this.groupCode = attributeDefinition.getGroupCode();</span>
+<span class="nc" id="L39">        this.order = attributeDefinition.getOrder();</span>
+<span class="nc" id="L40">        this.active = attributeDefinition.isActive();</span>
+<span class="nc" id="L41">        this.attribValues = mapAttributeValues(attributeDefinition.getValueDefinitions());</span>
+<span class="nc" id="L42">    }</span>
+
+    public org.egov.pgr.domain.model.AttributeDefinition toDomain(String tenantId){
+<span class="nc" id="L45">        return org.egov.pgr.domain.model.AttributeDefinition.builder()</span>
+<span class="nc" id="L46">                    .readOnly(variable)</span>
+<span class="nc" id="L47">                    .description(description)</span>
+<span class="nc" id="L48">                    .dataTypeDescription(dataTypeDescription)</span>
+<span class="nc" id="L49">                    .dataType(dataType)</span>
+<span class="nc" id="L50">                    .code(code)</span>
+<span class="nc" id="L51">                    .groupCode(groupCode)</span>
+<span class="nc" id="L52">                    .required(required)</span>
+<span class="nc" id="L53">                    .order(order)</span>
+<span class="nc" id="L54">                    .url(url)</span>
+<span class="nc" id="L55">                    .serviceCode(serviceCode)</span>
+<span class="nc" id="L56">                    .tenantId(tenantId)</span>
+<span class="nc" id="L57">                    .valueDefinitions(mapAttribValuesToDomainValues())</span>
+<span class="nc" id="L58">                    .build();</span>
+    }
+
+    private List&lt;ValueDefinition&gt; mapAttribValuesToDomainValues(){
+<span class="nc" id="L62">        return attribValues.stream()</span>
+<span class="nc" id="L63">                    .map(AttributeValueDefinition::toDomain)</span>
+<span class="nc" id="L64">                    .collect(Collectors.toList());</span>
+    }
+
+    private List&lt;AttributeValueDefinition&gt; mapAttributeValues(List&lt;ValueDefinition&gt; values) {
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (values == null) {</span>
+<span class="nc" id="L69">            return Collections.emptyList();</span>
+        }
+<span class="nc" id="L71">        return values.stream()</span>
+<span class="nc" id="L72">                .map(AttributeValueDefinition::new)</span>
+<span class="nc" id="L73">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingCenterTypeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">ReceivingCenterTypeController.java</span></div><h1>ReceivingCenterTypeController.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+
+package org.egov.pgr.web.controller;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.exception.PGRMasterException;
+import org.egov.pgr.domain.model.ReceivingCenterType;
+import org.egov.pgr.service.ReceivingCenterTypeService;
+import org.egov.pgr.util.PgrMasterConstants;
+import org.egov.pgr.web.contract.ReceivingCenterTypeGetReq;
+import org.egov.pgr.web.contract.ReceivingCenterTypeReq;
+import org.egov.pgr.web.contract.ReceivingCenterTypeRes;
+import org.egov.pgr.web.contract.RequestInfoWrapper;
+import org.egov.pgr.web.contract.factory.ResponseInfoFactory;
+import org.egov.pgr.web.errorhandlers.Error;
+import org.egov.pgr.web.errorhandlers.ErrorHandler;
+import org.egov.pgr.web.errorhandlers.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/receivingcenter&quot;)
+<span class="nc" id="L75">public class ReceivingCenterTypeController {</span>
+
+<span class="nc" id="L77">    private static final Logger logger = LoggerFactory.getLogger(ReceivingCenterTypeController.class);</span>
+    public static final String CODE = &quot;code&quot;;
+    public static final String MESSAGE = &quot;message&quot;;
+    public static final String FIELD = &quot;field&quot;;
+
+    @Autowired
+    private ReceivingCenterTypeService receivingCenterService;
+
+    @Autowired
+    private ResponseInfoFactory responseInfoFactory;
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+    @Autowired
+    private ErrorHandler errHandler;
+
+<span class="nc" id="L94">    HashMap&lt;String, String&gt; receivingCenterException = new HashMap&lt;&gt;();</span>
+
+
+    @PostMapping(value = &quot;/v1/_create&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; create(@RequestBody @Valid final ReceivingCenterTypeReq centerTypeRequest,
+                                    final BindingResult errors) {
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L102">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L103">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L105">        logger.info(&quot;ReceivingCenterType Create : Request::&quot; + centerTypeRequest);</span>
+
+<span class="nc" id="L107">        validateReceivingCenterRequest(centerTypeRequest, true, &quot;create&quot;);</span>
+
+
+<span class="nc" id="L110">        final ReceivingCenterType ReceivingCenter = receivingCenterService.sendMessage(applicationProperties.getCreateReceivingCenterTopicName(), applicationProperties.getCreateReceivingCenterTopicKey(), centerTypeRequest);</span>
+<span class="nc" id="L111">        final List&lt;ReceivingCenterType&gt; ReceivingCenters = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L112">        ReceivingCenters.add(ReceivingCenter);</span>
+<span class="nc" id="L113">        return getSuccessResponse(ReceivingCenters, centerTypeRequest.getRequestInfo());</span>
+
+    }
+
+    @PostMapping(value = &quot;/v1/_update&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; update(@RequestBody @Valid final ReceivingCenterTypeReq centerTypeRequest, final BindingResult errors) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L121">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L122">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="nc" id="L124">        logger.info(&quot;ReceivingCenterType Update : Request::&quot; + centerTypeRequest);</span>
+
+<span class="nc" id="L126">        validateReceivingCenterRequest(centerTypeRequest, false, &quot;update&quot;);</span>
+
+
+<span class="nc" id="L129">        final ReceivingCenterType documentType = receivingCenterService.sendMessage(applicationProperties.getUpdateReceivingCenterTopicName(),</span>
+<span class="nc" id="L130">                applicationProperties.getUpdateReceivingCenterTopicKey(), centerTypeRequest);</span>
+<span class="nc" id="L131">        final List&lt;ReceivingCenterType&gt; centerTypes = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L132">        centerTypes.add(documentType);</span>
+<span class="nc" id="L133">        return getSuccessResponse(centerTypes, centerTypeRequest.getRequestInfo());</span>
+    }
+
+    @PostMapping(&quot;/v1/_search&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; search(@ModelAttribute @Valid final ReceivingCenterTypeGetReq centerTypeGetRequest,
+                                    final BindingResult modelAttributeBindingResult, @RequestBody @Valid final RequestInfoWrapper requestInfoWrapper,
+                                    final BindingResult requestBodyBindingResult) {
+<span class="nc" id="L141">        final RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();</span>
+
+        // validate input params
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (modelAttributeBindingResult.hasErrors())</span>
+<span class="nc" id="L145">            return errHandler.getErrorResponseEntityForMissingParameters(modelAttributeBindingResult, requestInfo);</span>
+
+        // validate input params
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (requestBodyBindingResult.hasErrors())</span>
+<span class="nc" id="L149">            return errHandler.getErrorResponseEntityForMissingRequestInfo(requestBodyBindingResult, requestInfo);</span>
+
+        // Call service
+<span class="nc" id="L152">        List&lt;ReceivingCenterType&gt; centerTypeList = null;</span>
+        try {
+<span class="nc" id="L154">            centerTypeList = receivingCenterService.getAllReceivingCenterTypes(centerTypeGetRequest);</span>
+<span class="nc" id="L155">        } catch (final Exception exception) {</span>
+<span class="nc" id="L156">            logger.error(&quot;Error while processing request &quot; + centerTypeGetRequest, exception);</span>
+<span class="nc" id="L157">            return errHandler.getResponseEntityForUnexpectedErrors(requestInfo);</span>
+<span class="nc" id="L158">        }</span>
+
+<span class="nc" id="L160">        return getSuccessResponse(centerTypeList, requestInfo);</span>
+
+    }
+
+
+    private void validateReceivingCenterRequest(final ReceivingCenterTypeReq receivingCenterRequest, boolean flag, String mode) {
+<span class="nc" id="L166">        addReceivingCenterNameAndCodeValidationErrors(receivingCenterRequest, flag, mode);</span>
+<span class="nc" id="L167">        checkReceivingCenterNameUniqueness(receivingCenterRequest, mode);</span>
+<span class="nc" id="L168">        addTenantIdValidationErrors(receivingCenterRequest);</span>
+<span class="nc" id="L169">    }</span>
+
+    private ErrorResponse populateErrors(final BindingResult errors) {
+<span class="nc" id="L172">        final ErrorResponse errRes = new ErrorResponse();</span>
+
+<span class="nc" id="L174">        final Error error = new Error();</span>
+<span class="nc" id="L175">        error.setCode(1);</span>
+<span class="nc" id="L176">        error.setDescription(&quot;Error while binding request&quot;);</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (errors.hasFieldErrors())</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            for (final FieldError fieldError : errors.getFieldErrors())</span>
+<span class="nc" id="L179">                error.getFields().put(fieldError.getField(), fieldError.getRejectedValue());</span>
+<span class="nc" id="L180">        errRes.setError(error);</span>
+<span class="nc" id="L181">        return errRes;</span>
+    }
+
+    private void addReceivingCenterNameAndCodeValidationErrors(final ReceivingCenterTypeReq receivingCenterRequest, boolean flag, String mode) {
+<span class="nc" id="L185">        final ReceivingCenterType receivingCenter = receivingCenterRequest.getCenterType();</span>
+<span class="nc bnc" id="L186" title="All 4 branches missed.">        if (receivingCenter.getName() == null || receivingCenter.getName().isEmpty()) {</span>
+<span class="nc" id="L187">            receivingCenterException.put(CODE, PgrMasterConstants.RECEIVINGCENTER_NAME_MANDATORY_CODE);</span>
+<span class="nc" id="L188">            receivingCenterException.put(MESSAGE, PgrMasterConstants.RECEIVINGCENTER_NAME_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L189">            receivingCenterException.put(FIELD, PgrMasterConstants.RECEIVINGCENTER_NAME_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L190">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+<span class="nc bnc" id="L192" title="All 4 branches missed.">        if (receivingCenter.getCode() == null || receivingCenter.getCode().isEmpty()) {</span>
+<span class="nc" id="L193">            receivingCenterException.put(CODE, PgrMasterConstants.RECEIVINGCENTER_CODE_MANDATORY_CODE);</span>
+<span class="nc" id="L194">            receivingCenterException.put(MESSAGE, PgrMasterConstants.RECEIVINGCENTER_CODE_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L195">            receivingCenterException.put(FIELD, PgrMasterConstants.RECEIVINGCENTER_CODE_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L196">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (receivingCenterService.checkReceivingCenterCodeName(receivingCenter.getCode(), receivingCenter.getName(), receivingCenter.getTenantId(), mode)) {</span>
+<span class="nc" id="L200">            receivingCenterException.put(CODE, PgrMasterConstants.CODENAME_UNIQUE_CODE);</span>
+<span class="nc" id="L201">            receivingCenterException.put(MESSAGE, PgrMasterConstants.CODENAME_UNIQUE_ERROR_MESSAGE);</span>
+<span class="nc" id="L202">            receivingCenterException.put(FIELD, PgrMasterConstants.CODENAME_UNIQUE_FIELD_NAME);</span>
+<span class="nc" id="L203">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+
+<span class="nc bnc" id="L206" title="All 4 branches missed.">        if (flag &amp;&amp; !receivingCenterService.checkReceivingCenterTypeByCode(receivingCenter.getCode(), receivingCenter.getTenantId())) {</span>
+<span class="nc" id="L207">            receivingCenterException.put(CODE, PgrMasterConstants.RECEIVINGCENTER_CODE_EXISTS_CODE);</span>
+<span class="nc" id="L208">            receivingCenterException.put(MESSAGE, PgrMasterConstants.RECEIVINGCENTER_CODE_EXISTS_ERROR_MESSAGE);</span>
+<span class="nc" id="L209">            receivingCenterException.put(FIELD, PgrMasterConstants.RECEIVINGCENTER_CODE_EXISTS_FIELD_NAME);</span>
+<span class="nc" id="L210">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+
+<span class="nc" id="L213">    }</span>
+
+    private void checkReceivingCenterNameUniqueness(final ReceivingCenterTypeReq receivingCenterRequest, String mode) {
+<span class="nc" id="L216">        final ReceivingCenterType receivingCenter = receivingCenterRequest.getCenterType();</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (receivingCenterService.checkReceivingCenterNameExists(receivingCenter, mode)) {</span>
+<span class="nc" id="L218">            receivingCenterException.put(CODE, PgrMasterConstants.RECEIVINGCENTER_NAME_UNIQUE_CODE);</span>
+<span class="nc" id="L219">            receivingCenterException.put(MESSAGE, PgrMasterConstants.RECEIVINGCENTER_UNQ_ERROR_MESSAGE);</span>
+<span class="nc" id="L220">            receivingCenterException.put(FIELD, PgrMasterConstants.RECEIVINGCENTER_NAME_UNQ_FIELD_NAME);</span>
+<span class="nc" id="L221">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+<span class="nc" id="L223">    }</span>
+
+    private void addTenantIdValidationErrors(final ReceivingCenterTypeReq receivingCenterRequest) {
+<span class="nc" id="L226">        final ReceivingCenterType receivingCenter = receivingCenterRequest.getCenterType();</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">        if (receivingCenter.getTenantId() == null || receivingCenter.getTenantId().isEmpty()) {</span>
+<span class="nc" id="L228">            receivingCenterException.put(CODE, PgrMasterConstants.TENANTID_MANDATORY_CODE);</span>
+<span class="nc" id="L229">            receivingCenterException.put(MESSAGE, PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE);</span>
+<span class="nc" id="L230">            receivingCenterException.put(FIELD, PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME);</span>
+<span class="nc" id="L231">            throw new PGRMasterException(receivingCenterException);</span>
+        }
+
+<span class="nc" id="L234">    }</span>
+
+    private ResponseEntity&lt;?&gt; getSuccessResponse(final List&lt;ReceivingCenterType&gt; centerList,
+                                                 final RequestInfo requestInfo) {
+<span class="nc" id="L238">        final ReceivingCenterTypeRes receivingCenterResponse = new ReceivingCenterTypeRes();</span>
+<span class="nc" id="L239">        receivingCenterResponse.setCenterTypes(centerList);</span>
+<span class="nc" id="L240">        final ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true);</span>
+<span class="nc" id="L241">        responseInfo.setStatus(HttpStatus.OK.toString());</span>
+<span class="nc" id="L242">        receivingCenterResponse.setResponseInfo(responseInfo);</span>
+<span class="nc" id="L243">        return new ResponseEntity&lt;&gt;(receivingCenterResponse, HttpStatus.OK);</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

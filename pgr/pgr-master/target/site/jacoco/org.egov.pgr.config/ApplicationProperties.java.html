@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.config</a> &gt; <span class="el_source">ApplicationProperties.java</span></div><h1>ApplicationProperties.java</h1><pre class="source lang-java linenums">
+/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+
+@Configuration
+@PropertySource(value = { &quot;classpath:config/application-config.properties&quot; }, ignoreResourceNotFound = true)
+@Order(0)
+<span class="nc" id="L54">public class ApplicationProperties {</span>
+    @Value(&quot;${egov.services.seva.masters.search.pagesize.default}&quot;)
+	public  String SEVA_MASTERS_SEARCH_PAGESIZE_DEFAULT ;
+    
+    @Value(&quot;{egov.services.seva.masters.search.pageno.max=50}&quot;)
+	public String SEVA_MASTERS_SEARCH_PAGENO_MAX ;
+    
+    @Value(&quot;{egov.services.seva.masters.search.pagesize.max}&quot;)
+    public  String SEVA_MASTERS_SEARCH_PAGESIZE_MAX;
+	
+	@Autowired
+	private Environment environment;
+    
+	@Value(&quot;${kafka.topics.servicegroup.create.name}&quot;)
+    private String createServiceGroupTopicName;
+    
+    @Value(&quot;${kafka.topics.servicegroup.create.key}&quot;)
+    private String createServiceGroupTopicKey;
+
+    @Value(&quot;${kafka.topics.router.create.name}&quot;)
+    private String createRouterTopicName;
+    
+    @Value(&quot;${kafka.topics.router.create.key}&quot;)
+    private String createRouterTopicKey;
+
+    @Value(&quot;${kafka.topics.servicegroup.update.name}&quot;)
+    private String updateServiceGroupTopicName;
+    
+    @Value(&quot;${kafka.topics.servicegroup.update.key}&quot;)
+    private String updateServiceGroupTopicKey;
+
+	@Value(&quot;${kafka.topics.receivingcenter.create.name}&quot;)
+    private String createReceivingCenterTopicName;
+    
+    @Value(&quot;${kafka.topics.receivingcenter.create.key}&quot;)
+    private String createReceivingCenterTopicKey;
+    
+    @Value(&quot;${kafka.topics.receivingcenter.update.name}&quot;)
+    private String updateReceivingCenterTopicName;
+    
+    @Value(&quot;${kafka.topics.receivingcenter.update.key}&quot;)
+    private String updateReceivingCenterTopicKey;
+    
+    @Value(&quot;${kafka.topics.receivingmode.create.name}&quot;)
+    private String createReceivingModeTopicName;
+    
+    @Value(&quot;${kafka.topics.receivingmode.create.key}&quot;)
+    private String createReceivingModeTopicKey;
+    
+    @Value(&quot;${kafka.topics.receivingmode.update.name}&quot;)
+    private String updateReceivingModeTopicName;
+    
+    @Value(&quot;${kafka.topics.receivingmode.update.key}&quot;)
+    private String updateReceivingModeTopicKey;
+    
+    @Value(&quot;${kafka.topics.servicetype.create.name}&quot;)
+    private String createGrievanceTypeTopicName;
+    
+    @Value(&quot;${kafka.topics.servicetype.create.key}&quot;)
+    private String createGrievanceTypeTopicKey;
+    
+    @Value(&quot;${kafka.topics.servicetype.update.key}&quot;)
+    private String updateGrievanceTypeTopickey;
+    
+    @Value(&quot;${kafka.topics.servicetype.update.name}&quot;)
+    private String updateGrievanceTypeTopicName;
+
+    @Value(&quot;${kafka.topics.escalationtimetype.create.name}&quot;)
+    private String createEscalationTimeTypeName;
+    
+	@Value(&quot;${kafka.topics.escalationtimetype.create.key}&quot;)
+    private String createEscalationTimeTypeKey;
+	
+    @Value(&quot;${kafka.topics.escalationtimetype.update.name}&quot;)
+    private String updateEscalationTimeTypeName;
+    
+	@Value(&quot;${kafka.topics.escalationtimetype.update.key}&quot;)
+    private String updateEscalationTimeTypeKey;
+	
+	@Value(&quot;${kafka.topics.otpconfig.create.name}&quot;)
+    private String createOtpConfigName;
+    
+	@Value(&quot;${kafka.topics.otpconfig.create.key}&quot;)
+    private String createOtpConfigKey;
+	
+    @Value(&quot;${kafka.topics.otpconfig.update.name}&quot;)
+    private String updateOtpConfigName;
+    
+	@Value(&quot;${kafka.topics.otpconfig.update.key}&quot;)
+    private String updateOtpConfigKey;
+	
+	@Value(&quot;${kafka.topics.escalationhierarchy.create.name}&quot;)
+    private String createEscalationHierarchyName;
+    
+	@Value(&quot;${kafka.topics.escalationhierarchy.create.key}&quot;)
+    private String createEscalationHierarchyKey;
+	
+    @Value(&quot;${kafka.topics.escalationhierarchy.update.name}&quot;)
+    private String updateEscalationHierarchyName;
+    
+	@Value(&quot;${kafka.topics.escalationhierarchy.update.key}&quot;)
+    private String updateEscalationHierarchyKey;
+
+	@Value(&quot;${kafka.topics.servicetypeconfiguration.create.name}&quot;) 
+    String createtopicName;
+    
+    @Value(&quot;${kafka.topics.servicetypeconfiguration.create.key}&quot;) 
+    String createkey;
+    
+    @Value(&quot;${kafka.topics.servicetypeconfiguration.update.name}&quot;) 
+    private String updateTopicname;
+    
+    @Value(&quot;${kafka.topics.servicetypeconfiguration.update.key}&quot;) 
+    private String updatekey;
+    
+	@Value(&quot;${kafka.topics.servicetypes.create.name}&quot;)
+	private String createServiceTypeTopicName;
+
+	@Value(&quot;${kafka.topics.servicetypes.create.key}&quot;)
+	private String createServiceTypeTopicKey;
+
+	@Value(&quot;${kafka.topics.servicetypes.update.name}&quot;)
+	private String updateServiceTypeTopicName;
+
+	@Value(&quot;${kafka.topics.servicetypes.update.key}&quot;)
+	private String updateServiceTypeTopicKey;
+
+	@Value(&quot;${kafka.topics.servicedefinition.create.name}&quot;)
+	private String createServiceDefinitionName;
+
+	@Value(&quot;${kafka.topics.servicedefinition.create.key}&quot;)
+	private String createServiceDefinitionKey;
+
+	@Value(&quot;${kafka.topics.servicedefinition.update.name}&quot;)
+	private String updateServiceDefinitionName;
+
+	@Value(&quot;${kafka.topics.servicedefinition.update.key}&quot;)
+	private String updateServiceDefinitionKey;
+
+	public String getUpdateEscalationTimeTypeName() {
+<span class="nc" id="L194">		return updateEscalationTimeTypeName;</span>
+	}
+
+	public String getUpdateEscalationTimeTypeKey() {
+<span class="nc" id="L198">		return updateEscalationTimeTypeKey;</span>
+	}
+
+	public String getCreateServiceGroupTopicKey() {
+<span class="nc" id="L202">		return createServiceGroupTopicKey;</span>
+	}
+
+	public String getCreateServiceGroupTopicName() {
+<span class="nc" id="L206">		return createServiceGroupTopicName;</span>
+	}
+
+	public String getCreateRouterTopicKey() {
+<span class="nc" id="L210">		return createRouterTopicKey;</span>
+	}
+
+	public String getCreateRouterTopicName() {
+<span class="nc" id="L214">		return createRouterTopicName;</span>
+	}
+	
+	public String getCreateReceivingCenterTopicKey() {
+<span class="nc" id="L218">		return createReceivingCenterTopicKey;</span>
+	}
+
+	public String getCreateReceivingCenterTopicName() {
+<span class="nc" id="L222">		return createReceivingCenterTopicName;</span>
+	}
+	
+	public String getUpdateReceivingCenterTopicKey() {
+<span class="nc" id="L226">		return updateReceivingCenterTopicKey;</span>
+	}
+
+	public String getUpdateReceivingCenterTopicName() {
+<span class="nc" id="L230">		return updateReceivingCenterTopicName;</span>
+	}
+	
+	public String getCreateReceivingModeTopicKey() {
+<span class="nc" id="L234">		return createReceivingModeTopicKey;</span>
+	}
+
+	public String getCreateReceivingModeTopicName() {
+<span class="nc" id="L238">		return createReceivingModeTopicName;</span>
+	}
+	
+	public String getUpdateReceivingModeTopicKey() {
+<span class="nc" id="L242">		return updateReceivingModeTopicKey;</span>
+	}
+
+	public String getUpdateReceivingModeTopicName() {
+<span class="nc" id="L246">		return updateReceivingModeTopicName;</span>
+	}
+	
+	public String getCreateGrievanceTypeTopicName(){
+<span class="nc" id="L250">		return createGrievanceTypeTopicName;</span>
+	}
+	public String getCreateGrievanceTypeTopicKey(){
+<span class="nc" id="L253">		return createGrievanceTypeTopicKey;</span>
+	}
+    public String getUpdateServiceGroupTopicName() {
+<span class="nc" id="L256">		return updateServiceGroupTopicName;</span>
+	}
+
+	public String getUpdateServiceGroupTopicKey() {
+<span class="nc" id="L260">		return updateServiceGroupTopicKey;</span>
+	}
+	
+	public String getUpdateGrievanceTypeTopicName(){
+<span class="nc" id="L264">		return updateGrievanceTypeTopicName;</span>
+	}
+	
+	public String getUpdateGrievanceTypeTopicKey(){
+<span class="nc" id="L268">		return updateGrievanceTypeTopickey;</span>
+
+	}
+    public String getCreateEscalationTimeTypeName() {
+<span class="nc" id="L272">		return createEscalationTimeTypeName;</span>
+	}
+
+	public String getCreateEscalationTimeTypeKey() {
+<span class="nc" id="L276">		return createEscalationTimeTypeKey;</span>
+	}
+	
+	public String getCreateOtpConfigTopicName() {
+<span class="nc" id="L280">		return createOtpConfigName;</span>
+	}
+
+	public String getCreateOtpConfigTopicKey() {
+<span class="nc" id="L284">		return createOtpConfigKey;</span>
+	}
+	
+	public String getUpdateOtpConfigTopicName() {
+<span class="nc" id="L288">		return updateOtpConfigName;</span>
+	}
+
+	public String getUpdateOtpConfigTopicKey() {
+<span class="nc" id="L292">		return updateOtpConfigKey;</span>
+	}
+	
+	public String getCreateEscalationHierarchyTopicName() {
+<span class="nc" id="L296">		return createEscalationHierarchyName;</span>
+	}
+
+	public String getCreateEscalationHierarchyTopicKey() {
+<span class="nc" id="L300">		return createEscalationHierarchyKey;</span>
+	}
+	
+	public String getUpdateEscalationHierarchyTopicName() {
+<span class="nc" id="L304">		return updateEscalationHierarchyName;</span>
+	}
+
+	public String getUpdateEscalationHierarchyTopicKey() {
+<span class="nc" id="L308">		return updateEscalationHierarchyKey;</span>
+	}
+	
+	public String sevaSearchPageSizeDefault() {
+<span class="nc" id="L312">		return SEVA_MASTERS_SEARCH_PAGESIZE_DEFAULT;</span>
+	}
+
+	public String sevaSearchPageNumberMax() {
+<span class="nc" id="L316">		return SEVA_MASTERS_SEARCH_PAGENO_MAX;</span>
+	}
+
+	public String sevaSearchPageSizeMax() {
+<span class="nc" id="L320">		return SEVA_MASTERS_SEARCH_PAGESIZE_MAX;</span>
+	}
+
+	public String servicetypeconfigurationCreateTopic() {
+<span class="nc" id="L324">		return createtopicName;</span>
+	}
+	
+	public String servicetypeconfigurationCreateKeyName() {
+<span class="nc" id="L328">		return createkey;</span>
+	}
+	
+	public String servicetypeconfigurationUpdateTopic() {
+<span class="nc" id="L332">		return updateTopicname;</span>
+	}
+	
+	public String servicetypeconfigurationUpdateKeyName() {
+<span class="nc" id="L336">		return updatekey;</span>
+	}
+
+	public String getCreateServiceTypeTopicName() {
+<span class="nc" id="L340">		return createServiceTypeTopicName;</span>
+	}
+
+	public String getCreateServiceTypeTopicKey() {
+<span class="nc" id="L344">		return createServiceTypeTopicKey;</span>
+	}
+
+	public String getCreateServiceDefinitionName() {
+<span class="nc" id="L348">		return createServiceDefinitionName;</span>
+	}
+
+	public String getCreateServiceDefinitionKey() {
+<span class="nc" id="L352">		return createServiceDefinitionKey;</span>
+	}
+
+	public String getUpdateServiceTypeTopicName() {
+<span class="nc" id="L356">		return updateServiceTypeTopicName;</span>
+	}
+
+	public String getUpdateServiceTypeTopicKey() {
+<span class="nc" id="L360">		return updateServiceTypeTopicKey;</span>
+	}
+
+	public String getUpdateServiceDefinitionName() {
+<span class="nc" id="L364">		return updateServiceDefinitionName;</span>
+	}
+
+	public String getUpdateServiceDefinitionKey() {
+<span class="nc" id="L368">		return updateServiceDefinitionKey;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

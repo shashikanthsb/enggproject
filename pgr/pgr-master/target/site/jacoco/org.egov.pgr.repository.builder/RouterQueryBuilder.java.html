@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouterQueryBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository.builder</a> &gt; <span class="el_source">RouterQueryBuilder.java</span></div><h1>RouterQueryBuilder.java</h1><pre class="source lang-java linenums">package org.egov.pgr.repository.builder;
+
+import java.util.List;
+
+import org.egov.pgr.web.contract.RouterTypeGetReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L11">public class RouterQueryBuilder {</span>
+
+<span class="nc" id="L13">	private static final Logger logger = LoggerFactory.getLogger(RouterQueryBuilder.class);</span>
+	
+	private static final String BASE_QUERY = &quot;SELECT router.id, router.position, router.tenantid, router.bndryid, comp.id complaintid, comp.code servicecode, comp.name servicename, &quot;
+			+ &quot; comp.description servicedescription, comp.category, adef.code attributecode, adef.datatype, adef.datatypedescription, adef.description attributedescription, &quot;
+			+ &quot; adef.variable, adef.required, vdef.key, vdef.name FROM egpgr_router router LEFT JOIN egpgr_complainttype comp ON router.complainttypeid = comp.id &quot; 
+			+ &quot; LEFT JOIN service_definition sdef ON sdef.code = comp.code LEFT JOIN attribute_definition adef ON sdef.code = adef.servicecode LEFT JOIN value_definition vdef ON vdef.attributecode = adef.code &quot; ; 
+
+	private static final String INSERT_ROUTER = &quot;INSERT INTO egpgr_router(complainttypeid, position, bndryid, version, createdby, createddate, lastmodifiedby, lastmodifieddate,tenantid) values&quot;
+			+ &quot;(?,?,?,?,?,?,?,?,?)&quot;;
+	private static final String UPDATE_ROUTER = &quot;update egpgr_router SET position =?, version=?, createdby=?, createddate=?, lastmodifiedby=?, lastmodifieddate=?, tenantid=? where bndryid = ? and complainttypeid= ? and id= ?&quot;;
+	
+	private static final String CHECK_DUPLICATE = &quot;select * from egpgr_router where complainttypeid = ? and bndryid = ?&quot;;
+	
+	public static String insertRouter() {
+<span class="nc" id="L27">		return INSERT_ROUTER;</span>
+	}
+
+	public static String validateRouter() {
+<span class="nc" id="L31">		return CHECK_DUPLICATE;</span>
+	}
+
+	public static String updateRouter() {
+<span class="nc" id="L35">		return UPDATE_ROUTER;</span>
+	}
+	
+	public String getRouterDetail(){
+<span class="nc" id="L39">		return BASE_QUERY;</span>
+	}
+	
+	@SuppressWarnings(&quot;rawtypes&quot;)
+	public String getQuery(final RouterTypeGetReq routerTypeRequest, final List preparedStatementValues) {
+<span class="nc" id="L44">		final StringBuilder selectQuery = new StringBuilder(BASE_QUERY);</span>
+<span class="nc" id="L45">		addWhereClause(selectQuery, preparedStatementValues, routerTypeRequest);</span>
+<span class="nc" id="L46">		logger.debug(&quot;Query : &quot; + selectQuery);</span>
+<span class="nc" id="L47">		return selectQuery.toString();</span>
+	}
+
+	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+	private void addWhereClause(final StringBuilder selectQuery, final List preparedStatementValues,
+			final RouterTypeGetReq routerTypeRequest) {
+
+<span class="nc bnc" id="L54" title="All 4 branches missed.">		if (routerTypeRequest.getId() == null &amp;&amp; routerTypeRequest.getBoundaryid() == null</span>
+<span class="nc bnc" id="L55" title="All 4 branches missed.">				&amp;&amp; routerTypeRequest.getServiceid() == null &amp;&amp; routerTypeRequest.getTenantId() == null &amp;&amp; </span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">				routerTypeRequest.getDesignationid() == null)</span>
+<span class="nc" id="L57">			return;</span>
+
+<span class="nc" id="L59">		selectQuery.append(&quot; WHERE&quot;);</span>
+<span class="nc" id="L60">		boolean isAppendAndClause = false;</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">		if (routerTypeRequest.getTenantId() != null) {</span>
+<span class="nc" id="L63">			isAppendAndClause = true;</span>
+<span class="nc" id="L64">			selectQuery.append(&quot; router.tenantid = ?&quot;);</span>
+<span class="nc" id="L65">			preparedStatementValues.add(routerTypeRequest.getTenantId());</span>
+		}
+
+<span class="nc bnc" id="L68" title="All 2 branches missed.">		if (routerTypeRequest.getId() != null) {</span>
+<span class="nc" id="L69">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L70">			selectQuery.append(&quot; comp.id IN &quot; + getIdQuery(routerTypeRequest.getId()));</span>
+		}
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">		if (routerTypeRequest.getBoundaryid() != null) {</span>
+<span class="nc" id="L74">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L75">			selectQuery.append(&quot; router.bndryid = ?&quot;);</span>
+<span class="nc" id="L76">			preparedStatementValues.add(routerTypeRequest.getBoundaryid());</span>
+		}
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">		if (routerTypeRequest.getServiceid() != null) {</span>
+<span class="nc" id="L80">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L81">			selectQuery.append(&quot; servicecode = ?&quot;);</span>
+<span class="nc" id="L82">			preparedStatementValues.add(routerTypeRequest.getServiceid());</span>
+		}
+		
+<span class="nc bnc" id="L85" title="All 2 branches missed.">		if (routerTypeRequest.getDesignationid() != null) {</span>
+<span class="nc" id="L86">			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);</span>
+<span class="nc" id="L87">			selectQuery.append(&quot; router.position = ?&quot;);</span>
+<span class="nc" id="L88">			preparedStatementValues.add(routerTypeRequest.getDesignationid());</span>
+		}
+		
+		
+
+<span class="nc" id="L93">	}</span>
+
+	/**
+	 * This method is always called at the beginning of the method so that and
+	 * is prepended before the field's predicate is handled.
+	 *
+	 * @param appendAndClauseFlag
+	 * @param queryString
+	 * @return boolean indicates if the next predicate should append an &quot;AND&quot;
+	 */
+	private boolean addAndClauseIfRequired(final boolean appendAndClauseFlag, final StringBuilder queryString) {
+<span class="nc bnc" id="L104" title="All 2 branches missed.">		if (appendAndClauseFlag)</span>
+<span class="nc" id="L105">			queryString.append(&quot; AND&quot;);</span>
+
+<span class="nc" id="L107">		return true;</span>
+	}
+
+	private static String getIdQuery(final List&lt;Long&gt; idList) {
+<span class="nc" id="L111">		final StringBuilder query = new StringBuilder(&quot;(&quot;);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">		if (idList.size() &gt;= 1) {</span>
+<span class="nc" id="L113">			query.append(idList.get(0).toString());</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">			for (int i = 1; i &lt; idList.size(); i++)</span>
+<span class="nc" id="L115">				query.append(&quot;, &quot; + idList.get(i));</span>
+		}
+<span class="nc" id="L117">		return query.append(&quot;)&quot;).toString();</span>
+	}
+	
+	
+	/* Query not to be removed till the SEARCH API is complete
+	 * SELECT * FROM egpgr_router router LEFT JOIN egpgr_complainttype comp ON router.complainttypeid = comp.id
+			LEFT JOIN service_definition sdef ON sdef.code = comp.code 
+			LEFT JOIN attribute_definition adef ON sdef.code = adef.servicecode
+			LEFT JOIN value_definition vdef ON vdef.attributecode = adef.code
+			WHERE 
+			router.tenantid = ?
+			AND
+			router.boundaryid = ?
+			AND 
+			comp.id = ? 
+			AND 
+			router.position = ? */
+
+	
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

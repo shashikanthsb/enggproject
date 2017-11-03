@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceGroupController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.web.controller</a> &gt; <span class="el_source">ServiceGroupController.java</span></div><h1>ServiceGroupController.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.web.controller;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ErrorField;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.config.ApplicationProperties;
+import org.egov.pgr.domain.model.ServiceGroup;
+import org.egov.pgr.service.ServiceGroupService;
+import org.egov.pgr.util.PgrMasterConstants;
+import org.egov.pgr.web.contract.RequestInfoWrapper;
+import org.egov.pgr.web.contract.ServiceGroupGetRequest;
+import org.egov.pgr.web.contract.ServiceGroupRequest;
+import org.egov.pgr.web.contract.ServiceGroupResponse;
+import org.egov.pgr.web.contract.factory.ResponseInfoFactory;
+import org.egov.pgr.web.errorhandlers.Error;
+import org.egov.pgr.web.errorhandlers.ErrorHandler;
+import org.egov.pgr.web.errorhandlers.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/serviceGroup&quot;)
+<span class="fc" id="L73">public class ServiceGroupController {</span>
+
+<span class="fc" id="L75">    private static final Logger logger = LoggerFactory.getLogger(ServiceGroupController.class);</span>
+
+    @Autowired
+    private ServiceGroupService serviceGroupService;
+
+    @Autowired
+    private ResponseInfoFactory responseInfoFactory;
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+<span class="fc" id="L86">    private static final String[] taskAction = {&quot;create&quot;, &quot;update&quot;};</span>
+
+    @Autowired
+    private ErrorHandler errHandler;
+
+    @PostMapping(value = &quot;/v1/_create&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; create(@RequestBody @Valid final ServiceGroupRequest serviceGroupRequest,
+                                    final BindingResult errors) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (errors.hasErrors()) {</span>
+<span class="nc" id="L96">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L97">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="fc" id="L99">        logger.info(&quot;serviceGroup Create : Request::&quot; + serviceGroupRequest);</span>
+
+<span class="fc" id="L101">        final List&lt;ErrorResponse&gt; errorResponses = validateServiceGroupRequest(serviceGroupRequest, taskAction[0]);</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (!errorResponses.isEmpty())</span>
+<span class="fc" id="L103">            return new ResponseEntity&lt;&gt;(errorResponses, HttpStatus.BAD_REQUEST);</span>
+
+<span class="fc" id="L105">        final ServiceGroup serviceGroup = serviceGroupService.createCategory(</span>
+<span class="fc" id="L106">                applicationProperties.getCreateServiceGroupTopicName(),</span>
+<span class="fc" id="L107">                applicationProperties.getCreateServiceGroupTopicKey(), serviceGroupRequest);</span>
+<span class="fc" id="L108">        final List&lt;ServiceGroup&gt; serviceGroups = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L109">        serviceGroups.add(serviceGroup);</span>
+<span class="fc" id="L110">        return getSuccessResponse(serviceGroups, serviceGroupRequest.getRequestInfo());</span>
+
+    }
+
+    @PostMapping(value = &quot;/v1/_update&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; update(@RequestBody @Valid final ServiceGroupRequest serviceGroupRequest
+            , final BindingResult errors) {
+<span class="pc bpc" id="L118" title="3 of 6 branches missed.">        if (errors.hasErrors() || (null == serviceGroupRequest.getServiceGroup().getCode() || serviceGroupRequest.getServiceGroup().getCode().isEmpty())) {</span>
+<span class="nc" id="L119">            final ErrorResponse errRes = populateErrors(errors);</span>
+<span class="nc" id="L120">            return new ResponseEntity&lt;&gt;(errRes, HttpStatus.BAD_REQUEST);</span>
+        }
+<span class="fc" id="L122">        logger.info(&quot;serviceGroup Update : Request::&quot; + serviceGroupRequest);</span>
+<span class="fc" id="L123">        serviceGroupRequest.getServiceGroup().setCode(serviceGroupRequest.getServiceGroup().getCode());</span>
+<span class="fc" id="L124">        final List&lt;ErrorResponse&gt; errorResponses = validateServiceGroupRequest(serviceGroupRequest, taskAction[1]);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (!errorResponses.isEmpty())</span>
+<span class="nc" id="L126">            return new ResponseEntity&lt;&gt;(errorResponses, HttpStatus.BAD_REQUEST);</span>
+
+<span class="fc" id="L128">        final ServiceGroup category = serviceGroupService.updateCategory(</span>
+<span class="fc" id="L129">                applicationProperties.getUpdateServiceGroupTopicName(),</span>
+<span class="fc" id="L130">                applicationProperties.getUpdateServiceGroupTopicKey(), serviceGroupRequest);</span>
+<span class="fc" id="L131">        final List&lt;ServiceGroup&gt; categories = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L132">        categories.add(category);</span>
+<span class="fc" id="L133">        return getSuccessResponse(categories, serviceGroupRequest.getRequestInfo());</span>
+
+    }
+
+    @PostMapping(&quot;/v1/_search&quot;)
+    @ResponseBody
+    public ResponseEntity&lt;?&gt; search(@ModelAttribute @Valid final ServiceGroupGetRequest serviceGroupGetRequest,
+                                    final BindingResult modelAttributeBindingResult, @RequestBody @Valid final RequestInfoWrapper requestInfoWrapper,
+                                    final BindingResult requestBodyBindingResult) {
+<span class="fc" id="L142">        final RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();</span>
+
+        // validate input params
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">        if (modelAttributeBindingResult.hasErrors())</span>
+<span class="nc" id="L146">            return errHandler.getErrorResponseEntityForMissingParameters(modelAttributeBindingResult, requestInfo);</span>
+
+        // validate input params
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        if (requestBodyBindingResult.hasErrors())</span>
+<span class="nc" id="L150">            return errHandler.getErrorResponseEntityForMissingRequestInfo(requestBodyBindingResult, requestInfo);</span>
+
+        // Call service
+<span class="fc" id="L153">        List&lt;ServiceGroup&gt; serviceGroupList = null;</span>
+        try {
+<span class="fc" id="L155">            serviceGroupList = serviceGroupService.getAllServiceGroup(serviceGroupGetRequest);</span>
+<span class="nc" id="L156">        } catch (final Exception exception) {</span>
+<span class="nc" id="L157">            logger.error(&quot;Error while processing request &quot; + serviceGroupGetRequest, exception);</span>
+<span class="nc" id="L158">            return errHandler.getResponseEntityForUnexpectedErrors(requestInfo);</span>
+<span class="fc" id="L159">        }</span>
+<span class="fc" id="L160">        return getSuccessResponse(serviceGroupList, requestInfo);</span>
+    }
+
+    private List&lt;ErrorResponse&gt; validateServiceGroupRequest(final ServiceGroupRequest serviceGroupRequest, String action) {
+<span class="fc" id="L164">        final List&lt;ErrorResponse&gt; errorResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L165">        final ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L166">        final Error error = getError(serviceGroupRequest, action);</span>
+<span class="fc" id="L167">        errorResponse.setError(error);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (!errorResponse.getErrorFields().isEmpty())</span>
+<span class="fc" id="L169">            errorResponses.add(errorResponse);</span>
+<span class="fc" id="L170">        return errorResponses;</span>
+    }
+
+    private Error getError(final ServiceGroupRequest serviceGroupRequest, String action) {
+<span class="fc" id="L174">        serviceGroupRequest.getServiceGroup();</span>
+<span class="fc" id="L175">        final List&lt;ErrorField&gt; errorFields = getErrorFields(serviceGroupRequest, action);</span>
+<span class="fc" id="L176">        return Error.builder().code(HttpStatus.BAD_REQUEST.value())</span>
+<span class="fc" id="L177">                .message(PgrMasterConstants.INVALID_SERVICEGROUP_REQUEST_MESSAGE).errorFields(errorFields).build();</span>
+    }
+
+    private List&lt;ErrorField&gt; getErrorFields(final ServiceGroupRequest serviceGroupRequest, String action) {
+<span class="fc" id="L181">        final List&lt;ErrorField&gt; errorFields = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L182">        addServiceGroupNameValidationErrors(serviceGroupRequest, errorFields);</span>
+<span class="fc" id="L183">        addTeanantIdValidationErrors(serviceGroupRequest, errorFields);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">        if (action.equals(taskAction[0])) {</span>
+<span class="fc" id="L185">            verifyRequestUniqueness(serviceGroupRequest, errorFields);</span>
+        }
+<span class="fc" id="L187">        verifyIfNameAlreadyExists(serviceGroupRequest, errorFields, action);</span>
+<span class="fc" id="L188">        return errorFields;</span>
+    }
+
+    private void addServiceGroupNameValidationErrors(final ServiceGroupRequest serviceGroupRequest,
+                                                     final List&lt;ErrorField&gt; errorFields) {
+<span class="fc" id="L193">        final ServiceGroup serviceGroup = serviceGroupRequest.getServiceGroup();</span>
+<span class="pc bpc" id="L194" title="2 of 4 branches missed.">        if (serviceGroup.getName() == null || serviceGroup.getName().isEmpty()) {</span>
+<span class="nc" id="L195">            final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.SERVICEGROUP_NAME_MANDATORY_CODE)</span>
+<span class="nc" id="L196">                    .message(PgrMasterConstants.SERVICEGROUP_NAME_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L197">                    .field(PgrMasterConstants.SERVICEGROUP_NAME_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L198">            errorFields.add(errorField);</span>
+<span class="pc bpc" id="L199" title="1 of 4 branches missed.">        } else if (serviceGroup.getCode() == null || serviceGroup.getCode().isEmpty()) {</span>
+<span class="fc" id="L200">            final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.SERVICEGROUP_CODE_MANDATORY_CODE)</span>
+<span class="fc" id="L201">                    .message(PgrMasterConstants.SERVICEGROUP_CODE_MANADATORY_ERROR_MESSAGE)</span>
+<span class="fc" id="L202">                    .field(PgrMasterConstants.SERVICEGROUP_CODE_MANADATORY_FIELD_NAME).build();</span>
+<span class="fc" id="L203">            errorFields.add(errorField);</span>
+        }
+<span class="fc" id="L205">    }</span>
+
+    private void addTeanantIdValidationErrors(final ServiceGroupRequest serviceGroupRequest,
+                                              final List&lt;ErrorField&gt; errorFields) {
+<span class="fc" id="L209">        final ServiceGroup serviceGroup = serviceGroupRequest.getServiceGroup();</span>
+<span class="pc bpc" id="L210" title="2 of 4 branches missed.">        if (serviceGroup.getTenantId() == null || serviceGroup.getTenantId().isEmpty()) {</span>
+<span class="nc" id="L211">            final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.TENANTID_MANDATORY_CODE)</span>
+<span class="nc" id="L212">                    .message(PgrMasterConstants.TENANTID_MANADATORY_ERROR_MESSAGE)</span>
+<span class="nc" id="L213">                    .field(PgrMasterConstants.TENANTID_MANADATORY_FIELD_NAME).build();</span>
+<span class="nc" id="L214">            errorFields.add(errorField);</span>
+<span class="nc" id="L215">        } else</span>
+<span class="fc" id="L216">            return;</span>
+<span class="nc" id="L217">    }</span>
+
+    private void verifyRequestUniqueness(final ServiceGroupRequest serviceGroupRequest,
+                                         final List&lt;ErrorField&gt; errorFields) {
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">        if (serviceGroupService.verifyRequestUniqueness(serviceGroupRequest)) {</span>
+<span class="nc" id="L222">            final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.SERVICEGROUP_CODENAME_UNIQUE_CODE)</span>
+<span class="nc" id="L223">                    .message(PgrMasterConstants.SERVICEGROUP_CODENAME_ERROR_MESSAGE)</span>
+<span class="nc" id="L224">                    .field(PgrMasterConstants.SERVICEGROUP_CODENAME_FIELD_NAME).build();</span>
+<span class="nc" id="L225">            errorFields.add(errorField);</span>
+        }
+<span class="fc" id="L227">    }</span>
+
+    private void verifyIfNameAlreadyExists(final ServiceGroupRequest serviceGroupRequest,
+                                           final List&lt;ErrorField&gt; errorFields, String action) {
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (serviceGroupService.verifyIfNameAlreadyExists(serviceGroupRequest, action)) {</span>
+<span class="nc" id="L232">            final ErrorField errorField = ErrorField.builder().code(PgrMasterConstants.SERVICEGROUP_CODENAME_UNIQUE_CODE)</span>
+<span class="nc" id="L233">                    .message(PgrMasterConstants.SERVICEGROUP_CODENAME_ERROR_MESSAGE)</span>
+<span class="nc" id="L234">                    .field(PgrMasterConstants.SERVICEGROUP_CODENAME_FIELD_NAME).build();</span>
+<span class="nc" id="L235">            errorFields.add(errorField);</span>
+        }
+<span class="fc" id="L237">    }</span>
+
+    private ErrorResponse populateErrors(final BindingResult errors) {
+<span class="nc" id="L240">        final ErrorResponse errRes = new ErrorResponse();</span>
+
+<span class="nc" id="L242">        final Error error = new Error();</span>
+<span class="nc" id="L243">        error.setCode(1);</span>
+<span class="nc" id="L244">        error.setDescription(&quot;Error while binding request. Ensure id is passed if you're updating a record.&quot;);</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (errors.hasFieldErrors())</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            for (final FieldError fieldError : errors.getFieldErrors())</span>
+<span class="nc" id="L247">                error.getFields().put(fieldError.getField(), fieldError.getRejectedValue());</span>
+<span class="nc" id="L248">        errRes.setError(error);</span>
+<span class="nc" id="L249">        return errRes;</span>
+    }
+
+    private ResponseEntity&lt;?&gt; getSuccessResponse(final List&lt;ServiceGroup&gt; serviceGroupList, final RequestInfo requestInfo) {
+<span class="fc" id="L253">        final ServiceGroupResponse serviceGroupResponse = new ServiceGroupResponse();</span>
+<span class="fc" id="L254">        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true);</span>
+<span class="fc" id="L255">        responseInfo.setStatus(HttpStatus.OK.toString());</span>
+<span class="fc" id="L256">        serviceGroupResponse.setResponseInfo(responseInfo);</span>
+<span class="fc" id="L257">        serviceGroupResponse.setServiceGroups(serviceGroupList);</span>
+<span class="fc" id="L258">        return new ResponseEntity&lt;&gt;(serviceGroupResponse, HttpStatus.OK);</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

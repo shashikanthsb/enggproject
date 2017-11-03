@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.persistence.dto</a> &gt; <span class="el_source">ServiceDefinition.java</span></div><h1>ServiceDefinition.java</h1><pre class="source lang-java linenums">package org.egov.pgr.persistence.dto;
+
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+<span class="nc" id="L10">@Builder</span>
+<span class="nc" id="L11">@AllArgsConstructor</span>
+@Getter
+<span class="nc" id="L13">@Setter</span>
+<span class="nc" id="L14">@NoArgsConstructor</span>
+public class ServiceDefinition {
+
+<span class="nc" id="L17">    private String code;</span>
+<span class="nc" id="L18">    private String tenantId;</span>
+<span class="nc" id="L19">    private Long createdBy;</span>
+<span class="nc" id="L20">    private Date createdDate;</span>
+<span class="nc" id="L21">    private Long lastModifiedBy;</span>
+<span class="nc" id="L22">    private Date lastModifiedDate;</span>
+
+    
+    public org.egov.pgr.domain.model.ServiceDefinition toDomain(){
+<span class="nc" id="L26">        return org.egov.pgr.domain.model.ServiceDefinition.builder()</span>
+<span class="nc" id="L27">                .code(code)</span>
+<span class="nc" id="L28">                .tenantId(tenantId)</span>
+<span class="nc" id="L29">                .createdBy(createdBy)</span>
+<span class="nc" id="L30">                .createdDate(createdDate)</span>
+<span class="nc" id="L31">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReceivingModeTypeRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pgr-master</a> &gt; <a href="index.source.html" class="el_package">org.egov.pgr.repository</a> &gt; <span class="el_source">ReceivingModeTypeRepository.java</span></div><h1>ReceivingModeTypeRepository.java</h1><pre class="source lang-java linenums">/*
+ * eGov suite of products aim to improve the internal efficiency,transparency,
+ * accountability and the service delivery of the government  organizations.
+ *
+ *  Copyright (C) 2016  eGovernments Foundation
+ *
+ *  The updated version of eGov suite of products as by eGovernments Foundation
+ *  is available at http://www.egovernments.org
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see http://www.gnu.org/licenses/ or
+ *  http://www.gnu.org/licenses/gpl.html .
+ *
+ *  In addition to the terms of the GPL license to be adhered to in using this
+ *  program, the following additional terms are to be complied with:
+ *
+ *      1) All versions of this program, verbatim or modified must carry this
+ *         Legal Notice.
+ *
+ *      2) Any misrepresentation of the origin of the material is prohibited. It
+ *         is required that all modified versions of this material be marked in
+ *         reasonable ways as different from the original version.
+ *
+ *      3) This license does not grant any rights to any user of the program
+ *         with regards to rights under trademark law for use of the trade names
+ *         or trademarks of eGovernments Foundation.
+ *
+ *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+ */
+
+package org.egov.pgr.repository;
+
+import org.egov.pgr.domain.model.ReceivingModeType;
+import org.egov.pgr.repository.builder.ReceivingModeTypeQueryBuilder;
+import org.egov.pgr.repository.rowmapper.ReceivingModeTypeRowMapper;
+import org.egov.pgr.web.contract.ReceivingModeTypeGetReq;
+import org.egov.pgr.web.contract.ReceivingModeTypeReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+@Repository
+<span class="fc" id="L66">public class ReceivingModeTypeRepository {</span>
+
+<span class="fc" id="L68">    public static final Logger LOGGER = LoggerFactory.getLogger(ReceivingModeTypeRepository.class);</span>
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ReceivingModeTypeQueryBuilder receivingModeTypeQueryBuilder;
+
+    public ReceivingModeTypeReq persistReceivingModeType(final ReceivingModeTypeReq modeTypeRequest) {
+<span class="fc" id="L77">        LOGGER.info(&quot;ReceivingModeType Create Request::&quot; + modeTypeRequest);</span>
+<span class="fc" id="L78">        final String receivingModeTypeInsert = ReceivingModeTypeQueryBuilder.insertReceivingModeTypeQuery();</span>
+<span class="fc" id="L79">        final String receivingModeChannelInsert = ReceivingModeTypeQueryBuilder.insertReceivingModeChannelQuery();</span>
+<span class="fc" id="L80">        final ReceivingModeType modeType = modeTypeRequest.getModeType();</span>
+<span class="fc" id="L81">        final Object[] obj = new Object[]{modeType.getCode(), modeType.getName(), modeType.getDescription(),</span>
+<span class="fc" id="L82">                modeType.getActive(),</span>
+<span class="fc" id="L83">                Long.valueOf(modeTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L84">                Long.valueOf(modeTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="fc" id="L85">                new Date(new java.util.Date().getTime()), new Date(new java.util.Date().getTime()),</span>
+<span class="fc" id="L86">                modeType.getTenantId()};</span>
+<span class="fc" id="L87">        jdbcTemplate.update(receivingModeTypeInsert, obj);</span>
+
+<span class="fc" id="L89">        insertReceivingModeChannel(modeType, receivingModeChannelInsert);</span>
+<span class="fc" id="L90">        return modeTypeRequest;</span>
+    }
+
+
+    private void insertReceivingModeChannel(final ReceivingModeType modeType, final String receivingModeChannelInsert) {
+
+<span class="pc bpc" id="L96" title="3 of 4 branches missed.">        if (modeType.getChannels() != null &amp;&amp; modeType.getChannels().size() != 0) {</span>
+
+<span class="nc" id="L98">            List&lt;String&gt; distinctChannelList = modeType.getChannels().stream().distinct().collect(Collectors.toList());</span>
+
+<span class="nc" id="L100">            jdbcTemplate.batchUpdate(receivingModeChannelInsert, new BatchPreparedStatementSetter() {</span>
+
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+<span class="nc" id="L104">                    String channel = distinctChannelList.get(i);</span>
+<span class="nc" id="L105">                    ps.setString(1, modeType.getCode());</span>
+<span class="nc" id="L106">                    ps.setString(2, channel);</span>
+
+<span class="nc" id="L108">                }</span>
+
+                @Override
+                public int getBatchSize() {
+<span class="nc" id="L112">                    return distinctChannelList.size();</span>
+                }
+            });
+        }
+
+<span class="fc" id="L117">    }</span>
+
+    public ReceivingModeTypeReq persistModifyReceivingModeType(final ReceivingModeTypeReq modeTypeRequest) {
+<span class="nc" id="L120">        LOGGER.info(&quot;ReceivingModeType Update Request::&quot; + modeTypeRequest);</span>
+<span class="nc" id="L121">        final String receivingCenterTypeUpdate = ReceivingModeTypeQueryBuilder.updateReceivingModeTypeQuery();</span>
+<span class="nc" id="L122">        final String receivingModeChannelInsert = ReceivingModeTypeQueryBuilder.insertReceivingModeChannelQuery();</span>
+<span class="nc" id="L123">        final ReceivingModeType modeType = modeTypeRequest.getModeType();</span>
+<span class="nc" id="L124">        final Object[] obj = new Object[]{modeType.getName(), modeType.getDescription(),</span>
+<span class="nc" id="L125">                modeType.getActive(), Long.valueOf(modeTypeRequest.getRequestInfo().getUserInfo().getId()),</span>
+<span class="nc" id="L126">                new Date(new java.util.Date().getTime()), modeType.getCode()};</span>
+<span class="nc" id="L127">        jdbcTemplate.update(receivingCenterTypeUpdate, obj);</span>
+
+<span class="nc bnc" id="L129" title="All 4 branches missed.">        if (modeType.getChannels() != null &amp;&amp; modeType.getChannels().size() != 0) {</span>
+
+<span class="nc" id="L131">            final String receivingCenterChanneldelete = ReceivingModeTypeQueryBuilder.deleteReceivingModeChannelQuery();</span>
+<span class="nc" id="L132">            jdbcTemplate.update(receivingCenterChanneldelete, new Object[]{modeType.getCode()});</span>
+
+
+        }
+
+<span class="nc" id="L137">        insertReceivingModeChannel(modeType, receivingModeChannelInsert);</span>
+
+<span class="nc" id="L139">        return modeTypeRequest;</span>
+
+    }
+
+    public List&lt;ReceivingModeType&gt; getAllReceivingModeTypes(final ReceivingModeTypeGetReq modeTypeGetRequest) {
+<span class="fc" id="L144">        LOGGER.info(&quot;ReceivingModeType search Request::&quot; + modeTypeGetRequest);</span>
+<span class="fc" id="L145">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L146">        final String queryStr = receivingModeTypeQueryBuilder.getQuery(modeTypeGetRequest, preparedStatementValues);</span>
+<span class="fc" id="L147">        ReceivingModeTypeRowMapper receivingModeRowMapper = new ReceivingModeTypeRowMapper();</span>
+<span class="fc" id="L148">        jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), receivingModeRowMapper);</span>
+<span class="fc" id="L149">        Map&lt;String, ReceivingModeType&gt; modeMap = receivingModeRowMapper.modeMap;</span>
+<span class="fc" id="L150">        Iterator&lt;Entry&lt;String, ReceivingModeType&gt;&gt; itr = modeMap.entrySet().iterator();</span>
+<span class="fc" id="L151">        List&lt;ReceivingModeType&gt; receivingModeList = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        while (itr.hasNext()) {</span>
+<span class="nc" id="L153">            Entry&lt;String, ReceivingModeType&gt; itrEntry = itr.next();</span>
+<span class="nc" id="L154">            receivingModeList.add(itrEntry.getValue());</span>
+<span class="nc" id="L155">        }</span>
+<span class="fc" id="L156">        return receivingModeList;</span>
+    }
+
+    public boolean checkReceivingModeTypeByNameAndCode(final String code, final String name, final String tenantId, final String mode) {
+<span class="nc" id="L160">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L162">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L163">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L164" title="All 8 branches missed.">        if (code != null &amp;&amp; code != &quot;&quot; &amp;&amp; name != null &amp;&amp; name != &quot;&quot;) {</span>
+
+<span class="nc" id="L166">            preparedStatementValues.add(code);</span>
+<span class="nc" id="L167">            preparedStatementValues.add(name);</span>
+<span class="nc" id="L168">            query = ReceivingModeTypeQueryBuilder.checkReceivinModeTypeByNameAndCode();</span>
+
+        }
+<span class="nc" id="L171">        final List&lt;Map&lt;String, Object&gt;&gt; centerTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L172">                preparedStatementValues.toArray());</span>
+<span class="nc bnc" id="L173" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L174">            String codeFromDB = (String) centerTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(code))</span>
+<span class="nc" id="L176">                return true;</span>
+        }
+<span class="nc bnc" id="L178" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L179">            return true;</span>
+        }
+<span class="nc" id="L181">        return false;</span>
+
+    }
+
+    public boolean checkReceivingModeTypeByName(final String code, final String name, final String tenantId, final String mode) {
+<span class="nc" id="L186">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L188">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L189">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L190" title="All 4 branches missed.">        if (null != name &amp;&amp; name != &quot;&quot;) {</span>
+
+<span class="nc" id="L192">            preparedStatementValues.add(name.toUpperCase().trim());</span>
+<span class="nc" id="L193">            query = ReceivingModeTypeQueryBuilder.checkReceivinModeTypeByName();</span>
+
+        }
+
+<span class="nc" id="L197">        final List&lt;Map&lt;String, Object&gt;&gt; centerTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L198">                preparedStatementValues.toArray());</span>
+
+<span class="nc bnc" id="L200" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L201">            String codeFromDB = (String) centerTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(code))</span>
+<span class="nc" id="L203">                return true;</span>
+        }
+<span class="nc bnc" id="L205" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L206">            return true;</span>
+        }
+
+<span class="nc" id="L209">        return false;</span>
+
+    }
+
+    public boolean checkReceivingModeTypeByCode(final String code, final String tenantId, final String mode) {
+<span class="nc" id="L214">        final List&lt;Object&gt; preparedStatementValues = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L216">        preparedStatementValues.add(tenantId);</span>
+<span class="nc" id="L217">        String query = &quot;&quot;;</span>
+<span class="nc bnc" id="L218" title="All 4 branches missed.">        if (null != code &amp;&amp; code != &quot;&quot;) {</span>
+
+<span class="nc" id="L220">            preparedStatementValues.add(code.toUpperCase().trim());</span>
+<span class="nc" id="L221">            query = ReceivingModeTypeQueryBuilder.checkReceivingModeTypeByCode();</span>
+
+        }
+
+<span class="nc" id="L225">        final List&lt;Map&lt;String, Object&gt;&gt; centerTypes = jdbcTemplate.queryForList(query,</span>
+<span class="nc" id="L226">                preparedStatementValues.toArray());</span>
+
+<span class="nc bnc" id="L228" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;update&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L229">            String codeFromDB = (String) centerTypes.get(0).get(&quot;code&quot;);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            if (!codeFromDB.equalsIgnoreCase(code))</span>
+<span class="nc" id="L231">                return true;</span>
+        }
+<span class="nc bnc" id="L233" title="All 4 branches missed.">        if (!centerTypes.isEmpty() &amp;&amp; &quot;create&quot;.equalsIgnoreCase(mode)) {</span>
+<span class="nc" id="L234">            return true;</span>
+        }
+
+<span class="nc" id="L237">        return false;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
